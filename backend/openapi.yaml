@@ -1,0 +1,233 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: SMS Where We Go API
+  description: The official API for the SMS Where We Go project.
+
+servers:
+  - url: http://localhost:8080/v1
+
+components:
+  responses:
+    Success:
+      description: Success
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Result"
+    NotFound:
+      description: Fail to find the specified resource
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Result"
+    UnAuthorized:
+      description: Unauthorized to access the resource
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Result"
+    Default:
+      description: Default response telling whether the request is successful
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Result"
+
+  schemas:
+    Result:
+      type: object
+      required:
+        - result
+        - message
+      properties:
+        result:
+          type: string
+          enum: [success, error]
+        message:
+          type: string
+    Student:
+      type: object
+      required:
+        - UID
+        - name
+        - class_number
+        - grad_year
+      properties:
+        UID:
+          type: integer
+          description: The unique identifier of the student
+        name:
+          type: string
+          description: The name of the student
+        class_number:
+          type: integer
+          description: The class number of the student at high school
+        grad_year:
+          type: string
+          description: The year when the student graduates from high school
+        curriculum:
+          type: string
+          description: The curriculum of the student at high school
+        phone_number:
+          type: string
+        email:
+          type: string
+        wxid:
+          type: string
+        department:
+          type: string
+        major:
+          type: string
+        school_UID:
+          type: integer
+    School:
+      type: object
+      required:
+        - UID
+        - school_name
+      properties:
+        UID:
+          type: integer
+          description: The unique identifier of the school
+        latitude:
+          type: string
+        longitude:
+          type: string
+        school_name:
+          type: string
+        school_country:
+          type: string
+        school_state_province:
+          type: string
+        city:
+          type: string
+
+security:
+  - BasicAuth: []
+
+paths:
+  /roster:
+    get:
+      operationId: getRoster
+      description: Return a roster containing the students and schools information
+      responses:
+        "200":
+          description: Sucessfully retrieve the roster
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - students
+                  - schools
+                properties:
+                  students:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Student"
+                  schools:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/School"
+        "403":
+          $ref: "#/components/responses/UnAuthorized"
+        default:
+          $ref: "#/components/responses/Default"
+  /login:
+    post:
+      operationId: login
+      description: Handle a login request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - identifier
+                - password
+              properties:
+                identifier:
+                  type: string
+                  description: The identifier of the username, which can be the UID, phone number or email
+                password:
+                  type: string
+      responses:
+        "200":
+          description: Return whether the login is a success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Result"
+        default:
+          $ref: "#/components/responses/Default"
+  /register:
+    post:
+      operationId: register
+      description: Register for a new student
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  description: The name of the student
+                registration_key:
+                  type: string
+                  description: The registration key provided by the maintainer for each class which fills class_number, year, and curriculum for the student
+                phone_number:
+                  type: string
+                email:
+                  type: string
+                wxid:
+                  type: string
+                department:
+                  type: string
+                major:
+                  type: string
+                school_UID:
+                  type: integer
+      responses:
+        "200":
+          $ref: "#/components/responses/Success"
+        default:
+          $ref: "#/components/responses/Default"
+  /validate:
+    post:
+      operationId: validate
+      description: Validate whether the provided registration key is valid and return corresponding information
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - registration_key
+              properties:
+                registration_key:
+                  type: string
+      responses:
+        "200":
+          description: Tell whether the key is valid and return the related information
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Result"
+                  - type: object
+                    properties:
+                      class_number:
+                        type: integer
+                      year:
+                        type: string
+                      curriculum:
+                        type: string
+        default:
+          $ref: "#/components/responses/Default"
