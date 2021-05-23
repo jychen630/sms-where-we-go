@@ -21,7 +21,7 @@ initialize({
     consumesMiddleware: {
         'application/json': express.json()
     },
-    errorMiddleware: function(err: any, req: any, res: any, next) {
+    errorMiddleware: function (err: any, req: any, res: any, next) {
         console.log(err);
         res.status(err.status).send(JSON.stringify({
             result: "error",
