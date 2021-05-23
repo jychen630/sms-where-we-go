@@ -32,7 +32,7 @@ BACKEND_ENV=backend/.env
 export PGPASSFILE=~/.pgpass
 PASSWORD="ThePasswordHere"
 echo "*:*:$DB_NAME:$WWG_USER:$PASSWORD" > $PGPASSFILE
-echo SECRET=MySecretHere$'\n''PG_CONNECTION_STRING="User ID='$WWG_USER';Password='$PASSWORD';Host=localhost;Port=5432;Database='$DB_NAME';Pooling=true;Min Pool Size=0;Max Pool Size=100;Connection Lifetime=0;"' > $BACKEND_ENV
+echo SECRET=MySecretHere$'\n'PGHOST=localhost$'\n'PGUSER=$WWG_USER$'\n'PGPASSWORD=$PASSWORD$'\n'PGDBNAME=$DB_NAME > $BACKEND_ENV
 if ! pg_isready -U "$PG_USER" -q
 then
     echo "[error] PostgreSQL is not running!"
