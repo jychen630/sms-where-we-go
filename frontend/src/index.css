@@ -11,3 +11,18 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.search-input{
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.dropdown {
+  margin-top: -0.85rem;
+}
+
+.dropdown > .list-group-item:first-child{
+  border-top: none;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}

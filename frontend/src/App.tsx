@@ -7,6 +7,7 @@ import {
 } from 'react-router-dom';
 import Map from './Map';
 import Login from './Login';
+import Register from './Register';
 
 function App() {
   return (
@@ -15,7 +16,7 @@ function App() {
         <Route path="/login">
           <Login />
         </Route>
-        <Route path="/register">register</Route>
+        <Route path="/register"><Register /></Route>
         <Route path="/map">
           <Map />
         </Route>
