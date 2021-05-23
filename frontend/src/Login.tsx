@@ -1,0 +1,73 @@
+import React, { useEffect, useRef } from 'react';
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import Card from 'react-bootstrap/Card';
+import MyFormInput from './MyFormInput';
+import { useForm } from 'react-hook-form';
+import { LoginForm } from './api/schemas';
+
+function Login() {
+    const {
+        handleSubmit,
+        control,
+        formState: { errors }
+    } = useForm<LoginForm>();
+
+    const onSubmit = (data: LoginForm) => { 
+        console.log(data);
+    };
+
+    return (
+        <div className="Login">
+            <Card style={{ width: '18rem' }}>
+                <Card.Body>
+                    <Card.Title>登录</Card.Title>
+                    <Form onSubmit={handleSubmit(onSubmit)} >
+                        <MyFormInput
+                            control={control as any}
+                            name="identifier"
+                            displayName="电话号码/邮箱"
+                            error={errors.identifier}
+                            errorMessage="此项为必填"
+                            placeholder="请输入电话号码"
+                            required={true}
+                        />
+
+                        <MyFormInput
+                            control={control as any}
+                            name="password"
+                            displayName="密码"
+                            controlProps={{type:'password'}}
+                            error={errors.password}
+                            errorMessage="此项为必填"
+                            placeholder="请输入密码"
+                            required={true}
+                        />
+                        
+                        <MyFormInput
+                            control={control as any}
+                            name="rememberMe"
+                            displayName="自动登录"
+                            required={false}
+                            altRender={
+                                ({field: {onChange, value}}) => (
+                                    <Form.Check onChange={onChange} value={value} type="checkbox" label="自动登录" />
+                                )
+                            }
+                        />
+                        <Button variant="primary">
+                            去注册
+                        </Button>
+                        <Button variant="primary" type="submit">
+                            登录
+                        </Button>
+                    </Form>
+
+                </Card.Body>
+            </Card>
+        </div>
+    );
+}
+
+export default Login;
