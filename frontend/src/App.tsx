@@ -4,15 +4,16 @@ import {
   Switch,
   Route,
   Redirect
-} from "react-router-dom";
+} from 'react-router-dom';
 import Map from './Map';
+import Login from './Login';
 
 function App() {
   return (
     <Router>
       <Switch>
         <Route path="/login">
-          login
+          <Login />
         </Route>
         <Route path="/register">register</Route>
         <Route path="/map">
