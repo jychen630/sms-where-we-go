@@ -5,6 +5,7 @@ import session from 'express-session';
 import knex from 'knex';
 import path from 'path';
 import cors from 'cors';
+import log4js from 'log4js';
 
 const app = express();
 const port = 8080;
@@ -59,6 +60,24 @@ app.use(session({
 }));
 
 app.use(cors());
+
+log4js.configure({
+    appenders: {
+        console: { type: 'console' },
+        file: { type: 'file', filename: `log/server-${new Date().toJSON().split(':').join('-').slice(0, -1)}.log` }
+    },
+    categories: {
+        default: {
+            appenders: [
+                'console',
+                'file'
+            ],
+            level: 'info'
+        }
+    }
+});
+const logger = log4js.getLogger();
+app.use(log4js.connectLogger(logger, { level: 'auto' }));
 
 initialize({
     app,
