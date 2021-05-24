@@ -2,16 +2,19 @@ import knex from 'knex';
 import hash from 'bcrypt';
 import { Operation } from 'express-openapi';
 import { pgOptions } from '../index';
-import { sendError, sendSuccess } from '../utils';
+import { parseBody, sendError, sendSuccess } from '../utils';
+import { Service } from '../generated';
 
 export const post: Operation = async (req, res, next) => {
+    const data = parseBody<typeof Service.login>(req);
+
     if (!!req.session.identifier) {
         // If the user already has created a session with the server, we simply continue with it
         sendSuccess(res);
         return;
     }
 
-    if (!!!req.body.password) {
+    if (!!!data.password) {
         sendError(res, 400, "The password cannot be empty");
         return
     }
@@ -22,18 +25,18 @@ export const post: Operation = async (req, res, next) => {
         .column('password_hash')
         .select()
         .where({
-            "phone_number": req.body.identifier
+            "phone_number": data.identifier
         })
         .orWhere({
-            "email": req.body.identifier
+            "email": data.identifier
         });
     pg.destroy();
 
     const password_hash = result[0]?.password_hash ?? "";
 
-    hash.compare(req.body.password, password_hash).then((success) => {
+    hash.compare(data.password, password_hash).then((success) => {
         if (success) {
-            req.session.identifier = req.body.identifier;
+            req.session.identifier = data.identifier;
             sendSuccess(res);
         }
         else {
