@@ -11,7 +11,9 @@
     "express": "^4.17.1",
     "express-openapi": "^9.0.0",
     "express-session": "^1.17.2",
+    "knex": "^0.95.6",
     "node": "^16.1.0",
+    "pg": "^8.6.0",
     "typescript": "^4.2.4"
   },
   "devDependencies": {
