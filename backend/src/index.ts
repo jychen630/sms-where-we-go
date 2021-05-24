@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import session from 'express-session';
 import knex from 'knex';
 import path from 'path';
+import cors from 'cors';
 
 const app = express();
 const port = 8080;
@@ -57,6 +58,8 @@ app.use(session({
     resave: false,
     saveUninitialized: false
 }));
+
+app.use(cors());
 
 initialize({
     app,
