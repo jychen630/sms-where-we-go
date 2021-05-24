@@ -71,7 +71,7 @@ initialize({
         console.log(err);
         res.status(err.status).send(JSON.stringify({
             result: "error",
-            message: err.errors ?? err.type
+            message: err.errors[0].message
         }));
     }
 });
