@@ -43,7 +43,7 @@ CREATE TABLE wwg.registration_key (
 
 CREATE TABLE wwg.student (
     student_UID SERIAL PRIMARY KEY,
-    name VARCHAR NOT NULL,
+    name VARCHAR(30) NOT NULL,
     phone_number VARCHAR(21) UNIQUE,
     email VARCHAR(120) UNIQUE,
     password_hash CHAR(60) NOT NULL,
@@ -57,4 +57,16 @@ CREATE TABLE wwg.student (
     school_UID SERIAL,
     FOREIGN KEY (class_number, grad_year, curriculum_UID) REFERENCES wwg.class(class_number, grad_year, curriculum_UID),
     FOREIGN KEY (school_UID) REFERENCES wwg.school(school_UID)
+);
+
+CREATE TABLE wwg.role (
+    role_name VARCHAR(20) NOT NULL PRIMARY KEY
+);
+
+CREATE TABLE wwg.student_role (
+    role_name VARCHAR(20),
+    student_UID INT,
+    PRIMARY KEY (role_name, student_UID),
+    FOREIGN KEY (role_name) REFERENCES wwg.role(role_name),
+    FOREIGN KEY (student_UID) REFERENCES wwg.student(student_UID)
 );
