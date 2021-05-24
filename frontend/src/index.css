@@ -26,3 +26,13 @@ code {
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 }
+
+.Register{
+  position: relative;
+  margin: 10% 15% 15% 15%;
+}
+
+.Login{
+  position: relative;
+  margin: 10% 30% 15% 30%;
+}
