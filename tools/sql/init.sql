@@ -47,7 +47,6 @@ CREATE TABLE wwg.student (
     phone_number VARCHAR(21) UNIQUE,
     email VARCHAR(120) UNIQUE,
     password_hash CHAR(60) NOT NULL,
-    salt CHAR(32) NOT NULL,
     wxid VARCHAR(20),
     department VARCHAR(40),
     major VARCHAR(40),

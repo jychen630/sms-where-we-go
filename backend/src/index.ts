@@ -30,15 +30,14 @@ export const populateTestData = async () => {
     }).catch((err) => { console.log(err.detail); });
     await pg('wwg.school').insert({
         name: "Test School",
-        position: pg.raw('(34,-34)'),
+        position: pg.raw('point(34,-34)'),
         country: "United States",
         city: "test city"
     }).catch((err) => { console.log(err.detail); });
     await pg('wwg.student').insert({
         name: "test_std",
         phone_number: "18923232323",
-        password_hash: "asddfgggjjasddfgggjjasddfgggjjasddfgggjjasddfgggjjasddfgggjj",
-        salt: "asdfgertasdfgertasdfgertasdfgert",
+        password_hash: "$2b$10$5uAd2PJztsBwdXoYsMeo2e5kUJ7kC5XLxV5URwbpagP3ibVUjnNyK",
         class_number: 2,
         grad_year: 2019,
         curriculum_uid: 1,
