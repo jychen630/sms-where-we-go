@@ -43,6 +43,7 @@ fi
 echo "[setup] Setting up PostgreSQL..."
 echo "----BEGIN POSTGRESQL----"
 psql -v ON_ERROR_STOP=1 -h localhost -U $PG_USER -q -e << EOF
+SET CLIENT_ENCODING TO utf8;
 DO \$\$
 BEGIN
     CREATE USER $WWG_USER;

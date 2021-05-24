@@ -3,3 +3,8 @@ export interface LoginForm {
     password: string,
     rememberMe: boolean,
 }
+
+export interface Result {
+    result: string,
+    message: string,
+}

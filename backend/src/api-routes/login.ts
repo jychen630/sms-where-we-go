@@ -6,6 +6,10 @@ export const post: Operation = async (req, res, next) => {
     if (!!req.session.identifier) {
         res.send('Relogin');
         console.log(req.session.identifier);
+        res.send(JSON.stringify({
+            result: "success",
+            message: "",
+        }));
     }
     else {
         const pg = knex(pgOptions);
@@ -21,7 +25,17 @@ export const post: Operation = async (req, res, next) => {
         console.log(result);
         pg.destroy();
         req.session.identifier = req.body.identifier;
-
+        if(req.body.password === "test"){
+            res.send(JSON.stringify({
+                result: "success",
+                message: "",
+            }));
+        }
+        else {
+            res.send(JSON.stringify({
+                result: "error",
+                message: "Password is incorrect!",
+            }));
+        }
     }
-    res.send('OK');
 }

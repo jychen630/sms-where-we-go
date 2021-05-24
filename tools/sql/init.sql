@@ -1,3 +1,4 @@
+\encoding 'UTF8';
 DROP SCHEMA IF EXISTS wwg;
 CREATE SCHEMA wwg;
 

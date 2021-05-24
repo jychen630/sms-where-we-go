@@ -7,6 +7,7 @@ import Card from 'react-bootstrap/Card';
 import MyFormInput from './MyFormInput';
 import { useForm } from 'react-hook-form';
 import { LoginForm } from './api/schemas';
+import { login } from './api/auth';
 
 function Login() {
     const {
@@ -17,6 +18,14 @@ function Login() {
 
     const onSubmit = (data: LoginForm) => {
         console.log(data);
+        login(data).then((data) => {
+            if(data.loginResult) {
+                alert('success');
+            }
+            else{
+                alert('fail to login: ' + data.message);
+            }
+        })
     };
 
     return (
