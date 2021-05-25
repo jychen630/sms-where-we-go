@@ -70,6 +70,10 @@ CREATE TABLE wwg.student (
     FOREIGN KEY (visibility_type) REFERENCES wwg.visibility(type)
 );
 
+CREATE VIEW student_class AS 
+    SELECT * FROM wwg.student
+    NATURAL JOIN wwg.class;
+
 CREATE TABLE wwg.role (
     role_name VARCHAR(20) NOT NULL PRIMARY KEY
 );
