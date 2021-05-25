@@ -97,7 +97,18 @@ initialize({
         'application/json': express.json()
     },
     errorMiddleware: function (err: any, req: any, res: any, next) {
-        logger.log(err);
+        logger.info(err);
+
+        if (err.type === 'entity.parse.failed') {
+            sendError(res, err.status, 'The content format is invalid');
+            return;
+        }
+
+        if (!!!err.errors || !(err.errors.length > 0)) {
+            sendError(res, err.status, 'An unknown error has occurred');
+            return;
+        }
+
         const error = err.errors[0];
         if (error.errorCode === 'pattern.openapi.requestValidation') {
             sendError(res, err.status ?? 400, `The content or the format of ${error.path} is incorrect`);
