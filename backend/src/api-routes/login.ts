@@ -1,12 +1,14 @@
 import knex from 'knex';
 import hash from 'bcrypt';
+import log4js from 'log4js';
 import { Operation } from 'express-openapi';
-import { logger, pgOptions } from '../index';
+import { pgOptions } from '../index';
 import { parseBody, sendError, sendSuccess } from '../utils';
 import { Service } from '../generated';
 
 export const post: Operation = async (req, res, next) => {
     const data = parseBody<typeof Service.login>(req);
+    const logger = log4js.getLogger('login');
 
     if (!!req.session.identifier) {
         // If the user already has created a session with the server, we simply continue with it
