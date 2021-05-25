@@ -45,6 +45,13 @@ export const populateTestData = async () => {
         curriculum_uid: 1,
         school_uid: 1
     });
+    await pg('wwg.registration_key').insert({
+        registration_key: "wwgasdf",
+        expiration_date: new Date('2022').toISOString(),
+        class_number: 2,
+        grad_year: 2019,
+        curriculum_uid: 1,
+    });
 };
 populateTestData().catch(() => { });
 
