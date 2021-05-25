@@ -25,20 +25,21 @@ export const post: Operation = async (req, res, next) => {
 
     // If the user is not logged in previously, we need to fetch their hashed password and salt
     const result = await pg("wwg.student")
-        .column('password_hash')
+        .column('student_uid', 'password_hash')
         .select()
         .where({
             "phone_number": data.identifier
         })
         .orWhere({
             "email": data.identifier
-        });
+        }).first();
 
-    const password_hash = result[0]?.password_hash ?? "";
+    const password_hash = result?.password_hash ?? "";
 
     hash.compare(data.password, password_hash).then((success) => {
         if (success) {
             req.session.identifier = data.identifier;
+            req.session.student_uid = result.student_uid;
             sendSuccess(res);
             logger.info("Login successfully");
         }
