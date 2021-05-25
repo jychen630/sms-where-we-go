@@ -7,7 +7,7 @@ export const pgOptions = {
         host: process.env.PGHOST,
         user: process.env.PGUSER,
         password: process.env.PGPASSWORD,
-        database: process.env.PGDBDNAME
+        database: 'wwg_base'
     },
     searchPath: ['wwg', 'public'],
 };
