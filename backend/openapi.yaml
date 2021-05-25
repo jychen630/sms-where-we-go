@@ -237,5 +237,8 @@ paths:
                         type: string
                       curriculum:
                         type: string
+                      expiration_date:
+                        type: string
+                        format: date
         default:
           $ref: "#/components/responses/Default"

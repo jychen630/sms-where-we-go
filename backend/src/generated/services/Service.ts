@@ -99,6 +99,7 @@ registration_key: string,
 class_number?: number,
 year?: string,
 curriculum?: string,
+expiration_date?: string,
 }) | Result> {
         const result = await __request({
             method: 'POST',
