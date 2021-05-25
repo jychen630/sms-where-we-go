@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import Form from 'react-bootstrap/Form';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
@@ -19,10 +19,10 @@ function Login() {
     const onSubmit = (data: LoginForm) => {
         console.log(data);
         login(data).then((data) => {
-            if(data.loginResult) {
+            if (data.loginResult) {
                 alert('success');
             }
-            else{
+            else {
                 alert('fail to login: ' + data.message);
             }
         })
@@ -33,7 +33,6 @@ function Login() {
             <Card>
                 <Card.Header as="h5">登录</Card.Header>
                 <Card.Body>
-
                     <Form onSubmit={handleSubmit(onSubmit)} >
                         <MyFormInput
                             control={control as any}
@@ -67,6 +66,7 @@ function Login() {
                                 )
                             }
                         />
+
                         <Form.Row>
                             <Col><Button variant="primary" type="submit">
                                 登录
@@ -75,10 +75,7 @@ function Login() {
                                 去注册
                         </Button></Col>
                         </Form.Row>
-
-
                     </Form>
-
                 </Card.Body>
             </Card>
         </div>
