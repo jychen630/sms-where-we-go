@@ -64,8 +64,10 @@ CREATE TABLE wwg.student (
     class_number SMALLINT NOT NULL,
     grad_year INT NOT NULL,
     school_uid INT,
+    visibility_type VARCHAR(20) DEFAULT 'year',
     FOREIGN KEY (class_number, grad_year) REFERENCES wwg.class(class_number, grad_year),
     FOREIGN KEY (school_uid) REFERENCES wwg.school(school_uid),
+    FOREIGN KEY (visibility_type) REFERENCES wwg.visibility(type)
 );
 
 CREATE TABLE wwg.role (
