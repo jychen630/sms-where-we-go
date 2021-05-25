@@ -6,6 +6,7 @@ import knex from 'knex';
 import path from 'path';
 import cors from 'cors';
 import log4js from 'log4js';
+import { sendError } from './utils';
 
 const app = express();
 const port = 8080;
@@ -89,11 +90,14 @@ initialize({
         'application/json': express.json()
     },
     errorMiddleware: function (err: any, req: any, res: any, next) {
-        console.log(err);
-        res.status(err.status).send(JSON.stringify({
-            result: "error",
-            message: err.errors[0].message
-        }));
+        logger.log(err);
+        const error = err.errors[0];
+        if (error.errorCode === 'pattern.openapi.requestValidation') {
+            sendError(res, err.status ?? 400, `The content or the format of ${error.path} is incorrect`);
+        }
+        else {
+            sendError(res, err.status ?? 400, error.message ?? 'The input information is invalid');
+        }
     }
 });
 
