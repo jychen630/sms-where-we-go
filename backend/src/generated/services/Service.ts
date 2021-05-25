@@ -66,7 +66,8 @@ name: string,
 /**
  * The registration key provided by the maintainer for each class which fills class_number, year, and curriculum for the student
  */
-registration_key?: string,
+registration_key: string,
+password: string,
 phone_number?: string,
 email?: string,
 wxid?: string,
