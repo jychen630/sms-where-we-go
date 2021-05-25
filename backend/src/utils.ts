@@ -8,7 +8,6 @@ export const sendSuccess = (res: Response, message?: string) => {
 };
 
 export const sendError = (res: Response, code: number, message?: string) => {
-    console.error(message);
     res.status(code ?? 200).json({
         result: "error",
         message: message ?? "An unspecified error has occurred from the serverside."

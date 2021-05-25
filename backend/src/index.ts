@@ -23,18 +23,18 @@ const pg = knex(pgOptions);
 export const populateTestData = async () => {
     await pg('wwg.curriculum').insert({
         name: "international"
-    }).catch((err) => { console.log(err.detail); });
+    });
     await pg('wwg.class').insert({
         class_number: 2,
         grad_year: 2019,
         curriculum_uid: 1
-    }).catch((err) => { console.log(err.detail); });
+    });
     await pg('wwg.school').insert({
         name: "Test School",
         position: pg.raw('point(34,-34)'),
         country: "United States",
         city: "test city"
-    }).catch((err) => { console.log(err.detail); });
+    });
     await pg('wwg.student').insert({
         name: "test_std",
         phone_number: "18923232323",
@@ -43,14 +43,9 @@ export const populateTestData = async () => {
         grad_year: 2019,
         curriculum_uid: 1,
         school_uid: 1
-    }).catch((err) => { console.log(err.detail); });;
-    await pg('wwg.student').select().then((data) => {
-        console.log(data);
     });
 };
-populateTestData().catch((err) => {
-    console.log(err);
-});
+populateTestData().catch(() => { });
 
 dotenv.config()
 app.use(session({
@@ -73,10 +68,17 @@ log4js.configure({
                 'file'
             ],
             level: 'info'
+        },
+        express: {
+            appenders: [
+                'console',
+                'file'
+            ],
+            level: 'info'
         }
     }
 });
-const logger = log4js.getLogger();
+export const logger = log4js.getLogger('express');
 app.use(log4js.connectLogger(logger, { level: 'auto' }));
 
 initialize({
