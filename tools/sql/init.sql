@@ -41,6 +41,18 @@ CREATE TABLE wwg.registration_key (
     FOREIGN KEY (class_number, grad_year, curriculum_uid) REFERENCES wwg.class(class_number, grad_year, curriculum_uid)
 );
 
+CREATE TABLE wwg.visibility (
+    type VARCHAR(20) PRIMARY KEY,
+    description TEXT
+);
+
+INSERT INTO wwg.visibility VALUES
+    ('private', 'Visible only to the student themself'),
+    ('class', 'Visible only to the students in the same class'),
+    ('curriculum', 'Visible only to the students within the same curriculum'),
+    ('year', 'Visible only to the students who graduate in the same year'),
+    ('students', 'Visible only to any registered users (including past and future students)');
+
 CREATE TABLE wwg.student (
     student_uid SERIAL PRIMARY KEY,
     name VARCHAR(30) NOT NULL,
