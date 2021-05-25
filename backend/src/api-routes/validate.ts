@@ -1,13 +1,11 @@
 import { Operation } from 'express-openapi';
-import knex from 'knex';
-import { pgOptions } from '..';
+import { pg } from '..';
 import { Service } from '../generated';
 import { parseBody, sendError, sendSuccess } from '../utils';
 
 export const post: Operation = (req, res, next) => {
     const data = parseBody<typeof Service.validate>(req);
 
-    const pg = knex(pgOptions);
     pg('wwg.registration_key').join('wwg.curriculum', 'wwg.curriculum.curriculum_uid', 'wwg.registration_key.curriculum_uid').select()
         .where('registration_key', data.registration_key)
         .where(

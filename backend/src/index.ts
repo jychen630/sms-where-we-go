@@ -7,20 +7,12 @@ import path from 'path';
 import cors from 'cors';
 import log4js from 'log4js';
 import { sendError } from './utils';
+import { pgOptions } from './pgconfig';
 
 const app = express();
 const port = 8080;
-export const pgOptions = {
-    client: 'pg',
-    connection: {
-        host: process.env.PGHOST,
-        user: process.env.PGUSER,
-        password: process.env.PGPASSWORD,
-        database: "wwg_base"
-    },
-    searchPath: ['wwg', 'public'],
-}
-const pg = knex(pgOptions);
+
+export const pg = knex(pgOptions);
 export const populateTestData = async () => {
     await pg('wwg.curriculum').insert({
         name: "international"

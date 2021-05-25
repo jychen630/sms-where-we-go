@@ -2,7 +2,7 @@ import knex from 'knex';
 import hash from 'bcrypt';
 import log4js from 'log4js';
 import { Operation } from 'express-openapi';
-import { pgOptions } from '../index';
+import { pg } from '../index';
 import { parseBody, sendError, sendSuccess } from '../utils';
 import { Service } from '../generated';
 
@@ -24,7 +24,6 @@ export const post: Operation = async (req, res, next) => {
     }
 
     // If the user is not logged in previously, we need to fetch their hashed password and salt
-    const pg = knex(pgOptions);
     const result = await pg("wwg.student")
         .column('password_hash')
         .select()
@@ -34,7 +33,6 @@ export const post: Operation = async (req, res, next) => {
         .orWhere({
             "email": data.identifier
         });
-    pg.destroy();
 
     const password_hash = result[0]?.password_hash ?? "";
 

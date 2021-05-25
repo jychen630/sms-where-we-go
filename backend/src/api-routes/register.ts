@@ -2,7 +2,7 @@ import { Operation } from 'express-openapi';
 import knex from 'knex';
 import hash from 'bcrypt';
 import log4js from 'log4js';
-import { pgOptions } from '..';
+import { pg } from '..';
 import { Service } from '../generated';
 import { parseBody, sendError, sendSuccess } from '../utils';
 
@@ -10,7 +10,6 @@ export const post: Operation = async (req, res, next) => {
     const data = parseBody<typeof Service.register>(req);
     const logger = log4js.getLogger('register');
 
-    const pg = knex(pgOptions);
     const registrationInfo = (await pg('registration_key').select()
         .where(
             'registration_key', data.registration_key
