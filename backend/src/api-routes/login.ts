@@ -1,7 +1,7 @@
 import knex from 'knex';
 import hash from 'bcrypt';
 import { Operation } from 'express-openapi';
-import { pgOptions } from '../index';
+import { logger, pgOptions } from '../index';
 import { parseBody, sendError, sendSuccess } from '../utils';
 import { Service } from '../generated';
 
@@ -11,11 +11,13 @@ export const post: Operation = async (req, res, next) => {
     if (!!req.session.identifier) {
         // If the user already has created a session with the server, we simply continue with it
         sendSuccess(res);
+        logger.info("Login using a previous session");
         return;
     }
 
     if (!!!data.password) {
         sendError(res, 400, "The password cannot be empty");
+        logger.error("Attempt to login with an empty password");
         return
     }
 
@@ -38,12 +40,14 @@ export const post: Operation = async (req, res, next) => {
         if (success) {
             req.session.identifier = data.identifier;
             sendSuccess(res);
+            logger.info("Login successfully");
         }
         else {
             sendError(res, 200, "The identifier or the password is incorrect");
+            logger.info("Fail to login due to incorrect identifier/password");
         }
     }).catch((err) => {
-        console.error(err);
         sendError(res, 500, "An internal error has occurred");
+        logger.info(`Internal error:${err}`);
     });
 }
