@@ -3,7 +3,7 @@ DROP SCHEMA IF EXISTS wwg;
 CREATE SCHEMA wwg;
 
 CREATE TABLE wwg.school (
-    school_UID SERIAL PRIMARY KEY,
+    school_uid SERIAL PRIMARY KEY,
     name VARCHAR(60) NOT NULL UNIQUE,
     position point,
     country VARCHAR(40) NOT NULL,
@@ -12,23 +12,23 @@ CREATE TABLE wwg.school (
 );
 
 CREATE TABLE wwg.school_alias (
-    school_UID SERIAL,
+    school_uid SERIAL,
     alias VARCHAR(60),
-    PRIMARY KEY (school_UID, alias),
-    FOREIGN KEY (school_UID) REFERENCES wwg.school(school_UID)
+    PRIMARY KEY (school_uid, alias),
+    FOREIGN KEY (school_uid) REFERENCES wwg.school(school_uid)
 );
 
 CREATE TABLE wwg.curriculum (
-    curriculum_UID SMALLSERIAL PRIMARY KEY,
+    curriculum_uid SMALLSERIAL PRIMARY KEY,
     name VARCHAR(20) UNIQUE
 );
 
 CREATE TABLE wwg.class (
     class_number SMALLINT,
     grad_year INT,
-    curriculum_UID SMALLINT,
-    PRIMARY KEY (class_number, grad_year, curriculum_UID),
-    FOREIGN KEY (curriculum_UID) REFERENCES wwg.curriculum(curriculum_UID)
+    curriculum_uid SMALLINT,
+    PRIMARY KEY (class_number, grad_year, curriculum_uid),
+    FOREIGN KEY (curriculum_uid) REFERENCES wwg.curriculum(curriculum_uid)
 );
 
 CREATE TABLE wwg.registration_key (
@@ -36,13 +36,13 @@ CREATE TABLE wwg.registration_key (
     expiration_date DATE,
     class_number SMALLINT NOT NULL,
     grad_year INT NOT NULL,
-    curriculum_UID SMALLINT NOT NULL,
+    curriculum_uid SMALLINT NOT NULL,
     PRIMARY KEY (registration_key, expiration_date),
-    FOREIGN KEY (class_number, grad_year, curriculum_UID) REFERENCES wwg.class(class_number, grad_year, curriculum_UID)
+    FOREIGN KEY (class_number, grad_year, curriculum_uid) REFERENCES wwg.class(class_number, grad_year, curriculum_uid)
 );
 
 CREATE TABLE wwg.student (
-    student_UID SERIAL PRIMARY KEY,
+    student_uid SERIAL PRIMARY KEY,
     name VARCHAR(30) NOT NULL,
     phone_number VARCHAR(21) UNIQUE,
     email VARCHAR(120) UNIQUE,
@@ -52,10 +52,10 @@ CREATE TABLE wwg.student (
     major VARCHAR(40),
     class_number SMALLINT NOT NULL,
     grad_year INT NOT NULL,
-    curriculum_UID SMALLSERIAL NOT NULL,
-    school_UID SERIAL,
-    FOREIGN KEY (class_number, grad_year, curriculum_UID) REFERENCES wwg.class(class_number, grad_year, curriculum_UID),
-    FOREIGN KEY (school_UID) REFERENCES wwg.school(school_UID)
+    curriculum_uid SMALLINT NOT NULL,
+    school_uid INT,
+    FOREIGN KEY (class_number, grad_year, curriculum_uid) REFERENCES wwg.class(class_number, grad_year, curriculum_uid),
+    FOREIGN KEY (school_uid) REFERENCES wwg.school(school_uid)
 );
 
 CREATE TABLE wwg.role (
@@ -64,8 +64,8 @@ CREATE TABLE wwg.role (
 
 CREATE TABLE wwg.student_role (
     role_name VARCHAR(20),
-    student_UID INT,
-    PRIMARY KEY (role_name, student_UID),
+    student_uid INT,
+    PRIMARY KEY (role_name, student_uid),
     FOREIGN KEY (role_name) REFERENCES wwg.role(role_name),
-    FOREIGN KEY (student_UID) REFERENCES wwg.student(student_UID)
+    FOREIGN KEY (student_uid) REFERENCES wwg.student(student_uid)
 );
