@@ -27,7 +27,7 @@ CREATE TABLE wwg.class (
     class_number SMALLINT,
     grad_year INT,
     curriculum_uid SMALLINT,
-    PRIMARY KEY (class_number, grad_year, curriculum_uid),
+    PRIMARY KEY (class_number, grad_year),
     FOREIGN KEY (curriculum_uid) REFERENCES wwg.curriculum(curriculum_uid)
 );
 
@@ -36,9 +36,8 @@ CREATE TABLE wwg.registration_key (
     expiration_date TIMESTAMP,
     class_number SMALLINT NOT NULL,
     grad_year INT NOT NULL,
-    curriculum_uid SMALLINT NOT NULL,
     PRIMARY KEY (registration_key, expiration_date),
-    FOREIGN KEY (class_number, grad_year, curriculum_uid) REFERENCES wwg.class(class_number, grad_year, curriculum_uid)
+    FOREIGN KEY (class_number, grad_year) REFERENCES wwg.class(class_number, grad_year)
 );
 
 CREATE TABLE wwg.visibility (
@@ -64,10 +63,9 @@ CREATE TABLE wwg.student (
     major VARCHAR(40),
     class_number SMALLINT NOT NULL,
     grad_year INT NOT NULL,
-    curriculum_uid SMALLINT NOT NULL,
     school_uid INT,
-    FOREIGN KEY (class_number, grad_year, curriculum_uid) REFERENCES wwg.class(class_number, grad_year, curriculum_uid),
-    FOREIGN KEY (school_uid) REFERENCES wwg.school(school_uid)
+    FOREIGN KEY (class_number, grad_year) REFERENCES wwg.class(class_number, grad_year),
+    FOREIGN KEY (school_uid) REFERENCES wwg.school(school_uid),
 );
 
 CREATE TABLE wwg.role (
