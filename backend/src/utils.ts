@@ -21,3 +21,11 @@ export const parseBody = <T extends (requestBody: any) => any>(req: Request): Pa
     // Note: This does not validate whether the request body contains the required parameters.
     return req.body as any;
 }
+
+/*
+Remove the keys with null values from an object
+*/
+export const removeNull = (obj: any) => {
+    Object.entries(obj).forEach(([key, value]) => (value === null) && delete obj[key]);
+    return obj;
+}
