@@ -177,8 +177,8 @@ initialize({
     }
 });
 
-const output = "./src/generated/schema.ts";
-updateTypes(pg, { output: output }).catch((err) => logger.error(err));
+// const output = "./src/generated/schema.ts";
+// updateTypes(pg, { output: output }).catch((err) => logger.error(err));
 
 app.get('/', (req, res) => {
     res.send('testwas');
