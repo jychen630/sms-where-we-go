@@ -11,7 +11,7 @@ declare module 'express-session' {
 
 declare namespace schemas {
     interface Student {
-        UID: number
+        uid: number
         name: string
         class_number: number
         grad_year: string
@@ -21,7 +21,7 @@ declare namespace schemas {
         wxid: string
         department: string
         major: string
-        school_UID: number
+        school_uid: number
     }
 }
 

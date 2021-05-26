@@ -48,7 +48,7 @@ export const get: Operation = async (req, res, next) => {
                     students: students.map((student) => {
                         const result = removeNull({
                             ...student,
-                            UID: student.student_uid,
+                            uid: student.student_uid,
                             grad_year: student.grad_year as any,
                         } as Student);
                         delete result.password_hash;
@@ -57,7 +57,7 @@ export const get: Operation = async (req, res, next) => {
                     }),
                     schools: schools.map((school) => {
                         return removeNull({
-                            UID: school.school_uid,
+                            uid: school.school_uid,
                             latitude: (school.position as any).x,
                             longitude: (school.position as any).y,
                             school_name: school.name,

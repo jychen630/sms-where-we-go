@@ -49,12 +49,12 @@ components:
     Student:
       type: object
       required:
-        - UID
+        - uid
         - name
         - class_number
         - grad_year
       properties:
-        UID:
+        uid:
           type: integer
           description: The unique identifier of the student
         name:
@@ -79,15 +79,15 @@ components:
           type: string
         major:
           type: string
-        school_UID:
+        school_uid:
           type: integer
     School:
       type: object
       required:
-        - UID
+        - uid
         - school_name
       properties:
-        UID:
+        uid:
           type: integer
           description: The unique identifier of the school
         latitude:
@@ -150,7 +150,7 @@ paths:
               properties:
                 identifier:
                   type: string
-                  description: The identifier of the username, which can be the UID, phone number or email
+                  description: The identifier of the username, which can be the uid, phone number or email
                 password:
                   type: string
       responses:
@@ -199,7 +199,7 @@ paths:
                   type: string
                 major:
                   type: string
-                school_UID:
+                school_uid:
                   type: integer
       responses:
         "200":

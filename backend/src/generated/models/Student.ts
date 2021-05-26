@@ -6,7 +6,7 @@ export type Student = {
     /**
      * The unique identifier of the student
      */
-    UID: number;
+    uid: number;
     /**
      * The name of the student
      */
@@ -28,5 +28,5 @@ export type Student = {
     wxid?: string;
     department?: string;
     major?: string;
-    school_UID?: number;
+    school_uid?: number;
 }

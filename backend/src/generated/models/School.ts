@@ -6,7 +6,7 @@ export type School = {
     /**
      * The unique identifier of the school
      */
-    UID: number;
+    uid: number;
     latitude?: string;
     longitude?: string;
     school_name: string;

@@ -37,7 +37,7 @@ schools: Array<School>,
     public static async login(
 requestBody: {
 /**
- * The identifier of the username, which can be the UID, phone number or email
+ * The identifier of the username, which can be the uid, phone number or email
  */
 identifier: string,
 password: string,
@@ -73,7 +73,7 @@ email?: string,
 wxid?: string,
 department?: string,
 major?: string,
-school_UID?: number,
+school_uid?: number,
 },
 ): Promise<Result> {
         const result = await __request({

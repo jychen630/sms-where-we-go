@@ -36,7 +36,7 @@ export const post: Operation = async (req, res, next) => {
             class_number: registrationInfo.class_number,
             grad_year: registrationInfo.grad_year,
             curriculum_uid: registrationInfo.curriculum_uid,
-            school_uid: data.school_UID,
+            school_uid: data.school_uid,
         }).then((result) => {
             logger.info(`Successfully registered ${data.name} with the key "${data.registration_key}"`);
             sendSuccess(res);
