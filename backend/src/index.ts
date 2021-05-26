@@ -8,6 +8,7 @@ import cors from 'cors';
 import log4js from 'log4js';
 import { sendError } from './utils';
 import { pgOptions } from './pgconfig';
+import { updateTypes } from 'knex-types';
 
 const app = express();
 const port = 8080;
@@ -175,6 +176,9 @@ initialize({
         }
     }
 });
+
+const output = "./src/generated/schema.ts";
+updateTypes(pg, { output: output }).catch((err) => logger.error(err));
 
 app.get('/', (req, res) => {
     res.send('testwas');
