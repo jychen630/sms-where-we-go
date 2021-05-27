@@ -1,3 +1,4 @@
+import log4js from 'log4js';
 import { pg } from '.';
 import { Class, StudentClassRole, StudentRole, StudentVisibility } from './generated/schema';
 import { Role } from './generated/schema';
@@ -8,6 +9,8 @@ type Privilege = {
     delete: boolean,
     grant: boolean // The privilege to grant administrator privileges
 }
+
+const logger = log4js.getLogger('service');
 
 export const ClassService = {
     get: async (grad_year: number, class_number: number): Promise<Class> => {
@@ -105,5 +108,31 @@ export const StudentService = {
             .select()
             .where('student_uid', student_uid)
             .first<StudentClassRole>();
+    }
+}
+
+export const VerificationService = {
+    sendCode: async (phone_number: number): Promise<number> => {
+        const code = Math.floor((Math.random() * 99999 - 10000) + 10000);
+        const params = {
+            'RegionId': 'cn-hangzhou',
+            'PhoneNumbers': phone_number,
+            'SignName': 'WWG2020',
+            'TemplateCode': 'SMS_200722868',
+            'TemplateParam': `{\'code\':\'${code}\'}`,
+        };
+        const reqParams = {
+            method: 'POST'
+        };
+        /*client.request('SendSms', params, reqParams).then((result) => {
+            logger.info(`Sending sms verification to ${phone_number}`);
+            return code;
+        }, (err) => {
+            logger.error(`Failed to send sms verification to ${phone_number}`);
+            logger.error(err);
+            return false;
+        });
+        verificationCodeTemp[req.query.phoneNum] = code*/
+        throw new Error('Service not available');
     }
 }

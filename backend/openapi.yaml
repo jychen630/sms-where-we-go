@@ -345,6 +345,11 @@ paths:
                       type: string
                       description: The registration key provided by the maintainer for each class which fills class_number, year, and curriculum for the student
                       example: asdfghjk
+                    # To be added
+                    #verification_code:
+                    #  description: If the phone number is specified, the verification code will be required
+                    #  type: integer
+                    #  example: 32874
                 - type: object
                   description: Only accessible to admin users
                   required:
@@ -398,6 +403,11 @@ paths:
                   grad_year:
                     type: integer
                     example: 2021
+                  # To be added  
+                  #verification_code:
+                  #  description: If the phone number is specified, the verification code will be required
+                  #  type: integer
+                  #  example: 32874
       responses:
         200:
           $ref: "#/components/responses/Default"
