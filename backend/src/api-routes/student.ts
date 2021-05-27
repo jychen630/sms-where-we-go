@@ -1,10 +1,11 @@
 import { Operation } from 'express-openapi';
-import knex from 'knex';
 import hash from 'bcrypt';
 import log4js from 'log4js';
 import { pg } from '..';
 import { Service } from '../generated';
 import { parseBody, sendError, sendSuccess } from '../utils';
+import { ClassService, RoleService, StudentService } from '../services';
+import { StudentRole } from '../generated/schema';
 
 export const get: Operation = async (req, res, next) => {
 
@@ -16,7 +17,34 @@ export const put: Operation = async (req, res, next) => {
 
 //type: ignore
 export const DELETE: Operation = async (req, res, next) => {
+    const data = parseBody<typeof Service.deleteStudent>(req);
+    const logger = log4js.getLogger('student.delete');
 
+    if (!!!req.session.student_uid) {
+        sendError(res, 403, 'Login to delete student');
+    }
+
+    const privilege = await RoleService.privilege(req.session.student_uid, data.student_uid);
+
+    if (!privilege.delete) {
+        sendError(res, 403, 'You are not authorized to delete this user');
+    }
+
+    pg('wwg.student')
+        .delete()
+        .where('student_uid', data.student_uid)
+        .then((result) => {
+            logger.info(result);
+            if (result === 0) {
+                sendSuccess(res, { message: 'No students affected' });
+            }
+            else {
+                sendSuccess(res, { message: 'Successfully deleted the student' });
+            }
+        }).catch((err) => {
+            logger.error(err);
+            sendError(res, 400, 'Failed to delete the student');
+        });
 }
 
 export const post: Operation = async (req, res, next) => {
