@@ -117,7 +117,9 @@ components:
     sessionAuth:
       type: apiKey
       in: cookie
-      name: SESSIONID
+      name: connect.sid
+security:
+  - sessionAuth: []
 paths:
   /roster:
     get:
@@ -163,6 +165,7 @@ paths:
     post:
       operationId: login
       description: Handle a login request
+      security: []
       requestBody:
         required: true
         content:
@@ -332,6 +335,7 @@ paths:
     post:
       operationId: validate
       description: Validate whether the provided registration key is valid and return corresponding information
+      security: []
       requestBody:
         required: true
         content:
@@ -368,6 +372,7 @@ paths:
     get:
       operationId: getSchool
       description: Search for schools
+      security: []
       requestBody:
         required: false
         content:
