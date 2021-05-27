@@ -6,11 +6,25 @@ import { pg } from '..';
 import { Service } from '../generated';
 import { parseBody, sendError, sendSuccess } from '../utils';
 
+export const get: Operation = async (req, res, next) => {
+
+}
+
+export const put: Operation = async (req, res, next) => {
+
+}
+
+//type: ignore
+export const DELETE: Operation = async (req, res, next) => {
+
+}
+
 export const post: Operation = async (req, res, next) => {
-    const data = parseBody<typeof Service.register>(req);
+    const data = parseBody<typeof Service.postStudent>(req);
     const logger = log4js.getLogger('register');
 
-    const registrationInfo = (await pg('registration_key').select()
+    const registrationInfo = (await pg('wwg.registration_key')
+        .select()
         .where(
             'registration_key', data.registration_key
         )
@@ -35,20 +49,25 @@ export const post: Operation = async (req, res, next) => {
             major: data.major,
             class_number: registrationInfo.class_number,
             grad_year: registrationInfo.grad_year,
-            curriculum_uid: registrationInfo.curriculum_uid,
             school_uid: data.school_uid,
         }).then((result) => {
             logger.info(`Successfully registered ${data.name} with the key "${data.registration_key}"`);
             sendSuccess(res);
         }).catch((err) => {
-            if (err.code == 23505) {
-                const matchGroup = err.detail.match("\\((.*)\\)=\\((.*)\\)");
-                logger.error(err.detail);
-                sendError(res, 200, `The ${matchGroup[1]} "${matchGroup[2]}" has already been taken`);
-            }
-            else {
-                logger.error(err);
-                sendError(res, 200, "");
+            const pattern = /\((.*)\)=\((.*)\)/;
+            const matchGroup = err.detail.match(pattern);
+            switch (err.code) {
+                case "23505":
+                    logger.error(err.detail);
+                    sendError(res, 200, `The ${matchGroup[1]} "${matchGroup[2]}" has already been taken`);
+                    break;
+                case "23503":
+                    logger.error(err.detail);
+                    sendError(res, 200, `${matchGroup[2]} is not a existing ${matchGroup[1]}`);
+                    break;
+                default:
+                    logger.error(err);
+                    sendError(res, 200, `An unknown error just occured [code ${err.code ?? -1}]`);
             }
         });
     });

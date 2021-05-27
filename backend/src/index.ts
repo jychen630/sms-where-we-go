@@ -104,11 +104,10 @@ export const populateTestData = async () => {
         visibility_type: 'curriculum'
     }]);
     await pg('wwg.registration_key').insert({
-        registration_key: "wwgasdf",
+        registration_key: "wwgasdfg",
         expiration_date: new Date('2022').toISOString(),
         class_number: 2,
-        grad_year: 2019,
-        curriculum_uid: 1,
+        grad_year: 2019
     });
 };
 populateTestData().catch(() => { });
@@ -145,6 +144,7 @@ log4js.configure({
     }
 });
 export const logger = log4js.getLogger('express');
+const validationPattern = /^(.+)\.openapi\.requestValidation$/;
 app.use(log4js.connectLogger(logger, { level: 'auto' }));
 
 initialize({
@@ -168,8 +168,9 @@ initialize({
         }
 
         const error = err.errors[0];
-        if (error.errorCode === 'pattern.openapi.requestValidation') {
-            sendError(res, err.status ?? 400, `The content or the format of ${error.path} is incorrect`);
+        const errCode = (error.errorCode as string).match(validationPattern);
+        if (errCode) {
+            sendError(res, err.status ?? 400, `[${errCode[1]}] "${error.path}" ${error.message}`);
         }
         else {
             sendError(res, err.status ?? 400, error.message ?? 'The input information is invalid');

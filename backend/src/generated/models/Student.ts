@@ -4,21 +4,17 @@
 
 export type Student = {
     /**
-     * The unique identifier of the student
-     */
-    uid: number;
-    /**
      * The name of the student
      */
-    name: string;
+    name?: string;
     /**
      * The class number of the student at high school
      */
-    class_number: number;
+    class_number?: number;
     /**
      * The year when the student graduates from high school
      */
-    grad_year: string;
+    grad_year?: number;
     /**
      * The curriculum of the student at high school
      */
@@ -29,4 +25,8 @@ export type Student = {
     department?: string;
     major?: string;
     school_uid?: number;
+    /**
+     * The registration key provided by the maintainer for each class which fills class_number, year, and curriculum for the student
+     */
+    registration_key?: string;
 }

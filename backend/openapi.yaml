@@ -27,13 +27,18 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/Result"
+    Forbidden:
+      description: The user is not allowed to access the resource
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Result"
     Default:
       description: Default response telling whether the request is successful
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/Result"
-
+            $ref:  "#/components/schemas/Result"
   schemas:
     Result:
       type: object
@@ -48,39 +53,45 @@ components:
           type: string
     Student:
       type: object
-      required:
-        - uid
-        - name
-        - class_number
-        - grad_year
       properties:
-        uid:
-          type: integer
-          description: The unique identifier of the student
         name:
           type: string
           description: The name of the student
+          maxLength: 30
         class_number:
           type: integer
           description: The class number of the student at high school
+          minimum: 1
+          maximum: 100
         grad_year:
-          type: string
+          type: integer
           description: The year when the student graduates from high school
+          format: year
         curriculum:
           type: string
           description: The curriculum of the student at high school
         phone_number:
           type: string
+          pattern: ^1(?:3\d{3}|5[^4\D]\d{2}|8\d{3}|7(?:[0-35-9]\d{2}|4(?:0\d|1[0-2]|9\d))|9[0-35-9]\d{2}|6[2567]\d{2}|4(?:(?:10|4[01])\d{3}|[68]\d{4}|[579]\d{2}))\d{6}$
         email:
           type: string
+          format: email
         wxid:
           type: string
+          maxLength: 20
         department:
           type: string
+          maxLength: 40
         major:
           type: string
+          maxLength: 40
         school_uid:
           type: integer
+        registration_key:
+          type: string
+          minLength: 8
+          maxLength: 8
+          description: The registration key provided by the maintainer for each class which fills class_number, year, and curriculum for the student
     School:
       type: object
       required:
@@ -102,10 +113,11 @@ components:
           type: string
         city:
           type: string
-
-security:
-  - BasicAuth: []
-
+  securitySchemes:
+    sessionAuth:
+      type: apiKey
+      in: cookie
+      name: SESSIONID
 paths:
   /roster:
     get:
@@ -117,19 +129,32 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                required:
-                  - students
-                  - schools
-                properties:
-                  students:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/Student"
-                  schools:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/School"
+                allOf:
+                  - $ref:  "#/components/schemas/Result"
+                  - type: object
+                    required:
+                      - students
+                      - schools
+                    properties:
+                      students:
+                        type: array
+                        items:
+                          allOf:
+                            - $ref: "#/components/schemas/Student"
+                            - type: object
+                              required:
+                                - uid
+                                - name
+                                - class_number
+                                - grad_year
+                              properties:
+                                uid:
+                                  type: integer
+                                  description: The unique identifier of the student
+                      schools:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/School"
         "403":
           $ref: "#/components/responses/UnAuthorized"
         default:
@@ -162,10 +187,128 @@ paths:
                 $ref: "#/components/schemas/Result"
         default:
           $ref: "#/components/responses/Default"
-  /register:
+  /student:
+    get:
+      operationId: getStudent
+      description: Return the information of students. Result is scoped by visibility.
+      parameters:
+        - in: query
+          name: name
+          schema:
+            type: string
+        - in: query
+          name: phone_number
+          schema:
+            type: string
+        - in: query
+          name: curriculum
+          schema:
+            type: string
+        - in: query
+          name: city
+          schema:
+            type: string
+        - in: query
+          name: school_state_province
+          schema:
+            type: string
+        - in: query
+          name: school_country
+          schema:
+            type: string
+      responses:
+        200:
+          description: Return a list of students
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  allOf:
+                    - $ref: "#/components/schemas/Student"
+                    - type: object
+                      required:
+                        - uid
+                        - name
+                        - class_number
+                        - grad_year
+                      properties:
+                        uid:
+                          type: integer
+                          description: The unique identifier of the student
+        401:
+          $ref: "#/components/responses/UnAuthorized" 
+        403:
+          $ref: "#/components/responses/Forbidden" 
     post:
-      operationId: register
-      description: Register for a new student
+      operationId: postStudent
+      description: Add a new student (registration key is required for new users)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: "#/components/schemas/Student"
+              - type: object
+                required:
+                  - password
+                properties:
+                  password:
+                    type: string
+                    format: password
+              - oneOf:
+                - type: object
+                  description: Only required for new users
+                  required:
+                    - registration_key
+                  properties:
+                    registration_key:
+                      type: string
+                      description: The registration key provided by the maintainer for each class which fills class_number, year, and curriculum for the student
+                - type: object
+                  description: Only accessible to admin users
+                  required:
+                    - class_number
+                    - grad_year
+                  properties:
+                    class_number:
+                      type: integer
+                    grad_year:
+                      type: integer
+      responses:
+        200:
+          $ref: "#/components/responses/Default"
+        401:
+          $ref: "#/components/responses/UnAuthorized"
+        403:
+          $ref: "#/components/responses/Forbidden"
+    put:
+      operationId: updateStudent
+      description: Update the information of a student
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: "#/components/schemas/Student"
+              - type: object
+                properties:
+                  class_number:
+                    type: integer
+                  grad_year:
+                    type: integer
+      responses:
+        200:
+          $ref: "#/components/responses/Default"
+        401:
+          $ref: "#/components/responses/UnAuthorized"
+        403:
+          $ref: "#/components/responses/Forbidden"
+    delete:
+      operationId: deleteStudent
+      description: Delete a student
       requestBody:
         required: true
         content:
@@ -173,39 +316,18 @@ paths:
             schema:
               type: object
               required:
-                - name
-                - registration_key
-                - password
+                - student_uid
               properties:
-                name:
-                  type: string
-                  description: The name of the student
-                registration_key:
-                  type: string
-                  description: The registration key provided by the maintainer for each class which fills class_number, year, and curriculum for the student
-                password:
-                  type: string
-                phone_number:
-                  type: string
-                  # Matches all phone numbers in CN.
-                  # Special thanks to https://github.com/VincentSit/ChinaMobilePhoneNumberRegex.
-                  pattern: ^1(?:3\d{3}|5[^4\D]\d{2}|8\d{3}|7(?:[0-35-9]\d{2}|4(?:0\d|1[0-2]|9\d))|9[0-35-9]\d{2}|6[2567]\d{2}|4(?:(?:10|4[01])\d{3}|[68]\d{4}|[579]\d{2}))\d{6}$
-                email:
-                  type: string
-                  format: email
-                wxid:
-                  type: string
-                department:
-                  type: string
-                major:
-                  type: string
-                school_uid:
+                student_uid:
                   type: integer
+                  description: The unique identifier of the student
       responses:
-        "200":
+        200:
           $ref: "#/components/responses/Success"
-        default:
-          $ref: "#/components/responses/Default"
+        401:
+          $ref: "#/components/responses/UnAuthorized"
+        403:
+          $ref: "#/components/responses/Forbidden"
   /validate:
     post:
       operationId: validate
@@ -222,7 +344,7 @@ paths:
                 registration_key:
                   type: string
       responses:
-        "200":
+        200:
           description: Tell whether the key is valid and return the related information
           content:
             application/json:
@@ -241,4 +363,59 @@ paths:
                         type: string
                         format: date
         default:
+          $ref: "#/components/responses/Default"
+  /school:
+    get:
+      operationId: getSchool
+      description: Search for schools
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                school_name:
+                  type: string
+                school_country:
+                  type: string
+                school_state_province:
+                  type: string
+                city:
+                  type: string
+                limit:
+                  type: integer
+                  default: 100
+      responses:
+        200:
+          description: Return the schools that satisfy the constraints
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/School"
+    post:
+      operationId: postSchool
+      description: Add a new school
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/School"
+      responses:
+        200:
+          description: Successfully added the school and return the id
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                  - $ref: "#/components/schemas/Result"
+                  - type: object
+                    properties: 
+                      school_uid:
+                        type: integer
+        400:
           $ref: "#/components/responses/Default"
