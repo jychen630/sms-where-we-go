@@ -477,3 +477,26 @@ paths:
                         example: 21
         400:
           $ref: "#/components/responses/Default"
+  /role:
+    get:
+      operationId: getRole
+      description: Get the role of the logged in student
+      responses:
+        200:
+          description: Successfully fetched the role
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref:  "#/components/schemas/Result"
+                  - type: object
+                    properties:
+                      role:
+                        type: string
+                        example: student
+                      description:
+                        type: string
+                        example: Limited write access to the user itself
+        401:
+          $ref:  "#/components/responses/UnAuthorized"
+

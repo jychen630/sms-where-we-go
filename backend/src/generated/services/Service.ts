@@ -256,4 +256,23 @@ school_uid?: number,
         return result.body;
     }
 
+    /**
+     * Get the role of the logged in student
+     * @returns any Successfully fetched the role
+     * @throws ApiError
+     */
+    public static async getRole(): Promise<(Result & {
+role?: string,
+description?: string,
+})> {
+        const result = await __request({
+            method: 'GET',
+            path: `/role`,
+            errors: {
+                401: `Unauthorized to access the resource`,
+            },
+        });
+        return result.body;
+    }
+
 }
