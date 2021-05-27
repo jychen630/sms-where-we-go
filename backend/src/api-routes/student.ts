@@ -98,13 +98,20 @@ export const post: Operation = async (req, res, next) => {
 
         const class_ = await ClassService.get(data.grad_year, data.class_number);
 
-        if ((student.level as number) < 8 && class_.curriculum_name !== data.curriculum) {
-            sendError(res, 400, `Cannot register with curriculum other than ${student.curriculum_name}`);
+        if (!!!class_) {
+            sendError(res, 400, `Cannot register with a class ${data.class_number} which doesn't exist`);
             return;
         }
 
-        if ((student.level as number) < 4 && class_.class_number !== data.class_number) {
+        if ((student.level as number) < 4 && data.class_number !== student.class_number) {
             sendError(res, 400, `Cannot register with class number other than ${student.class_number}`);
+            logger.error(`${student.name} failed to register for ${data.name} with curriculum ${class_.class_number}`);
+            return;
+        }
+
+        if ((student.level as number) < 8 && class_.curriculum_name !== student.curriculum_name) {
+            sendError(res, 400, `Cannot register with curriculum other than ${student.curriculum_name}`);
+            logger.error(`${student.name} failed to register with curriculum ${class_.curriculum_name}`);
             return;
         }
 
