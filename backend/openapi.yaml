@@ -340,6 +340,11 @@ paths:
                     description: If not specified, update the current logged in student
                     type: integer
                     example: 3
+                  password:
+                    description: The new password
+                    type: string
+                    format: password
+                    example: pasword123
                   class_number:
                     type: integer
                     example: 18
