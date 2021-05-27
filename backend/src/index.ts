@@ -23,23 +23,23 @@ export const populateTestData = async () => {
     await pg('wwg.class').insert([{
         class_number: 2,
         grad_year: 2019,
-        curriculum_uid: 1
+        curriculum_name: 'gaokao'
     }, {
         class_number: 3,
         grad_year: 2019,
-        curriculum_uid: 1
+        curriculum_name: 'gaokao'
     }, {
         class_number: 2,
         grad_year: 2020,
-        curriculum_uid: 1
+        curriculum_name: 'gaokao'
     }, {
         class_number: 4,
         grad_year: 2019,
-        curriculum_uid: 2
+        curriculum_name: 'international'
     }, {
         class_number: 5,
         grad_year: 2019,
-        curriculum_uid: 2
+        curriculum_name: 'international'
     }]);
     await pg('wwg.school').insert({
         name: "Test School",

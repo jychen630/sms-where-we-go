@@ -10,15 +10,14 @@ type Privilege = {
 }
 
 export const ClassService = {
-    get: async (grad_year: number, class_number: number): Promise<Class & Curriculum> => {
+    get: async (grad_year: number, class_number: number): Promise<Class> => {
         return pg('class')
             .select()
-            .joinRaw('NATURAL JOIN curriculum')
             .where({
                 grad_year: grad_year,
                 class_number: class_number
             })
-            .first<Class & Curriculum>();
+            .first<Class>();
     }
 }
 
@@ -46,7 +45,7 @@ export const RoleService = {
 
         const isSameStudent = current_uid === target_uid;
         const isSameYear = current.grad_year === target.grad_year;
-        const isSameCurriculum = isSameYear && current.curriculum_uid === target.curriculum_uid;
+        const isSameCurriculum = isSameYear && current.curriculum_name === target.curriculum_name;
         const isSameClass = isSameYear && current.class_number === target.class_number;
         // Only students in the same year with higher privilege level are adminable over another student
         const isAdminable = isSameYear && ((current.level as number) > (target.level as number));

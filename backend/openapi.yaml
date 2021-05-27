@@ -114,10 +114,10 @@ components:
           description: The unique identifier of the school
           example: 12
         latitude:
-          type: string
+          type: number
           example: 22.5514
         longitude:
-          type: string
+          type: number
           example: 114.1216
         school_name:
           type: string

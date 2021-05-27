@@ -19,16 +19,15 @@ CREATE TABLE wwg.school_alias (
 );
 
 CREATE TABLE wwg.curriculum (
-    curriculum_uid SMALLSERIAL PRIMARY KEY,
-    name VARCHAR(20) UNIQUE
+    curriculum_name VARCHAR(20) PRIMARY KEY
 );
 
 CREATE TABLE wwg.class (
     class_number SMALLINT,
     grad_year INT,
-    curriculum_uid SMALLINT,
+    curriculum_name VARCHAR(20) NOT NULL,
     PRIMARY KEY (class_number, grad_year),
-    FOREIGN KEY (curriculum_uid) REFERENCES wwg.curriculum(curriculum_uid)
+    FOREIGN KEY (curriculum_name) REFERENCES wwg.curriculum(curriculum_name)
 );
 
 CREATE TABLE wwg.registration_key (

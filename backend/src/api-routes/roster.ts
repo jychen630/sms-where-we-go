@@ -2,7 +2,7 @@ import { Operation } from 'express-openapi';
 import log4js from 'log4js';
 import { pg } from '..';
 import { Student, School as SchoolRes } from '../generated';
-import { School } from '../generated/schema';
+import { School, StudentVisibility } from '../generated/schema';
 import { StudentClass } from '../generated/schema';
 import { removeNull, sendError, sendSuccess } from '../utils';
 
@@ -16,7 +16,7 @@ export const get: Operation = async (req, res, next) => {
         const student = await pg.select<StudentClass>().from('wwg.student_class')
             .where('student_uid', req.session.student_uid).first();
 
-        if (!!!student || !student.class_number || !student.curriculum_uid || !student.grad_year) {
+        if (!!!student || !student.class_number || !student.curriculum_name || !student.grad_year) {
             logger.error(`Invalid user: ${student}`)
             sendError(res, 403, 'Invalid user');
             return;
@@ -27,18 +27,18 @@ export const get: Operation = async (req, res, next) => {
             .as("current")
             .union(
                 pg('wwg.student_class').select()
-                    .where('visibility_type', 'class')
+                    .where('visibility_type', StudentVisibility.Class)
                     .andWhere('class_number', student.class_number as number)
                     .andWhere('grad_year', student.grad_year),
                 pg('wwg.student_class').select()
-                    .where('visibility_type', 'curriculum')
-                    .andWhere('curriculum_uid', student.curriculum_uid as number)
+                    .where('visibility_type', StudentVisibility.Curriculum)
+                    .andWhere('curriculum_name', student.curriculum_name)
                     .andWhere('grad_year', student.grad_year),
                 pg('wwg.student_class').select()
-                    .where('visibility_type', 'year')
+                    .where('visibility_type', StudentVisibility.Year)
                     .andWhere('grad_year', student.grad_year),
                 pg('wwg.student_class').select()
-                    .where('visibility_type', 'student')
+                    .where('visibility_type', StudentVisibility.Students)
             )
             .then(async (students) => {
                 logger.info('Successfully GET roster');
@@ -53,6 +53,7 @@ export const get: Operation = async (req, res, next) => {
                         } as Student);
                         delete result.password_hash;
                         delete result.visibility_type;
+                        delete result.role;
                         return result;
                     }),
                     schools: schools.map((school) => {

@@ -7,8 +7,8 @@ export type School = {
      * The unique identifier of the school
      */
     uid: number;
-    latitude?: string;
-    longitude?: string;
+    latitude?: number;
+    longitude?: number;
     school_name: string;
     school_country?: string;
     school_state_province?: string;

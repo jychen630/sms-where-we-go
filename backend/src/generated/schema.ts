@@ -33,12 +33,11 @@ export enum Table {
 export type Class = {
   class_number: unknown;
   grad_year: number;
-  curriculum_uid: unknown | null;
+  curriculum_name: string;
 };
 
 export type Curriculum = {
-  curriculum_uid: unknown;
-  name: string | null;
+  curriculum_name: string;
 };
 
 export type RegistrationKey = {
@@ -98,7 +97,7 @@ export type StudentClass = {
   school_uid: number | null;
   visibility_type: StudentVisibility | null;
   role: StudentRole | null;
-  curriculum_uid: unknown | null;
+  curriculum_name: string | null;
 };
 
 export type StudentClassRole = {
@@ -115,7 +114,7 @@ export type StudentClassRole = {
   major: string | null;
   school_uid: number | null;
   visibility_type: StudentVisibility | null;
-  curriculum_uid: unknown | null;
+  curriculum_name: string | null;
   level: unknown | null;
   description: string | null;
 };
