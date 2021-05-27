@@ -6,7 +6,8 @@ import { parseBody, sendError, sendSuccess } from '../utils';
 export const post: Operation = (req, res, next) => {
     const data = parseBody<typeof Service.validate>(req);
 
-    pg('wwg.registration_key').join('wwg.curriculum', 'wwg.curriculum.curriculum_uid', 'wwg.registration_key.curriculum_uid').select()
+    pg('wwg.registration_key').joinRaw('NATURAL JOIN wwg.class').joinRaw('NATURAL JOIN wwg.curriculum')
+        .select()
         .where('registration_key', data.registration_key)
         .where(
             'expiration_date', '>', new Date().toISOString()
