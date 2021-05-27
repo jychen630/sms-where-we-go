@@ -202,6 +202,10 @@ paths:
                 password:
                   type: string
                   example: password123
+                use_uid:
+                  type: boolean
+                  description: When set to true, the identifier will be used as the uid of the student
+                  example: false
       responses:
         "200":
           description: Return whether the login is a success

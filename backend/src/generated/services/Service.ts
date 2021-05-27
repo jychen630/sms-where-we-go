@@ -46,6 +46,10 @@ requestBody: {
  */
 identifier: string,
 password: string,
+/**
+ * When set to true, the identifier will be used as the uid of the student
+ */
+use_uid?: boolean,
 },
 ): Promise<Result> {
         const result = await __request({
@@ -123,6 +127,7 @@ grad_year: number,
             path: `/student`,
             body: requestBody,
             errors: {
+                400: `Default response telling whether the request is successful`,
                 401: `Unauthorized to access the resource`,
                 403: `The user is not allowed to access the resource`,
             },
@@ -147,6 +152,7 @@ grad_year?: number,
             path: `/student`,
             body: requestBody,
             errors: {
+                400: `Default response telling whether the request is successful`,
                 401: `Unauthorized to access the resource`,
                 403: `The user is not allowed to access the resource`,
             },

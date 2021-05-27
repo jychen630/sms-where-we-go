@@ -10,29 +10,28 @@ export const post: Operation = async (req, res, next) => {
     const data = parseBody<typeof Service.login>(req);
     const logger = log4js.getLogger('login');
 
-    if (!!req.session.identifier) {
-        // If the user already has created a session with the server, we simply continue with it
-        sendSuccess(res);
-        logger.info("Login using a previous session");
-        return;
-    }
-
     if (!!!data.password) {
         sendError(res, 400, "The password cannot be empty");
         logger.error("Attempt to login with an empty password");
-        return
+        return;
     }
 
     // If the user is not logged in previously, we need to fetch their hashed password and salt
     const result = await pg("wwg.student")
         .column('student_uid', 'password_hash')
         .select()
-        .where({
-            "phone_number": data.identifier
+        .where(function (pg) {
+            if (data.use_uid) {
+                return pg
+                    .where("student_uid", data.identifier);
+            }
+            else {
+                return pg
+                    .where("phone_number", data.identifier)
+                    .orWhere("email", data.identifier);
+            }
         })
-        .orWhere({
-            "email": data.identifier
-        }).first();
+        .first();
 
     const password_hash = result?.password_hash ?? "";
 
