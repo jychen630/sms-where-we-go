@@ -61,7 +61,8 @@ export const populateTestData = async () => {
         class_number: 2,
         grad_year: 2019,
         school_uid: 1,
-        visibility_type: 'class'
+        visibility_type: 'class',
+        role: 'class'
     }, {
         name: "Kang",
         phone_number: "13634343434",
@@ -77,7 +78,8 @@ export const populateTestData = async () => {
         class_number: 2,
         grad_year: 2020,
         school_uid: 1,
-        visibility_type: 'curriculum'
+        visibility_type: 'curriculum',
+        role: 'system'
     }, {
         name: "Fang",
         phone_number: "13900002222",
@@ -93,7 +95,8 @@ export const populateTestData = async () => {
         class_number: 4,
         grad_year: 2019,
         school_uid: 1,
-        visibility_type: 'curriculum'
+        visibility_type: 'curriculum',
+        role: 'curriculum'
     }, {
         name: "Gao",
         phone_number: "18912346666",
@@ -101,7 +104,8 @@ export const populateTestData = async () => {
         class_number: 5,
         grad_year: 2019,
         school_uid: 1,
-        visibility_type: 'curriculum'
+        visibility_type: 'curriculum',
+        role: 'year'
     }]);
     await pg('wwg.registration_key').insert({
         registration_key: "wwgasdfg",
