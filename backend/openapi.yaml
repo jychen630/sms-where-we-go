@@ -58,40 +58,51 @@ components:
           type: string
           description: The name of the student
           maxLength: 30
+          example: Noel Li
         class_number:
           type: integer
           description: The class number of the student at high school
           minimum: 1
           maximum: 100
+          example: 2
         grad_year:
           type: integer
           description: The year when the student graduates from high school
           format: year
+          example: 2021
         curriculum:
           type: string
           description: The curriculum of the student at high school
+          example: gaokao
         phone_number:
           type: string
           pattern: ^1(?:3\d{3}|5[^4\D]\d{2}|8\d{3}|7(?:[0-35-9]\d{2}|4(?:0\d|1[0-2]|9\d))|9[0-35-9]\d{2}|6[2567]\d{2}|4(?:(?:10|4[01])\d{3}|[68]\d{4}|[579]\d{2}))\d{6}$
+          example: 13912345678
         email:
           type: string
           format: email
+          example: dcwang@shenzhong.net
         wxid:
           type: string
           maxLength: 20
+          example: asdasdfffggghhhjjj
         department:
           type: string
           maxLength: 40
+          example: School of Engineering
         major:
           type: string
           maxLength: 40
+          example: Accouting
         school_uid:
           type: integer
+          example: 12
         registration_key:
           type: string
           minLength: 8
           maxLength: 8
           description: The registration key provided by the maintainer for each class which fills class_number, year, and curriculum for the student
+          example: asdfghjk
     School:
       type: object
       required:
@@ -101,18 +112,25 @@ components:
         uid:
           type: integer
           description: The unique identifier of the school
+          example: 12
         latitude:
           type: string
+          example: 22.5514
         longitude:
           type: string
+          example: 114.1216
         school_name:
           type: string
+          example: The University
         school_country:
           type: string
+          example: China
         school_state_province:
           type: string
+          example: Guangdong
         city:
           type: string
+          example: Shenzhen
   securitySchemes:
     sessionAuth:
       type: apiKey
@@ -153,6 +171,7 @@ paths:
                                 uid:
                                   type: integer
                                   description: The unique identifier of the student
+                                  example: 12
                       schools:
                         type: array
                         items:
@@ -179,8 +198,10 @@ paths:
                 identifier:
                   type: string
                   description: The identifier of the username, which can be the uid, phone number or email
+                  example: testemail@asd.com
                 password:
                   type: string
+                  example: password123
       responses:
         "200":
           description: Return whether the login is a success
@@ -199,26 +220,32 @@ paths:
           name: name
           schema:
             type: string
+            example: Steven King
         - in: query
           name: phone_number
           schema:
             type: string
+            example: 13612341234
         - in: query
           name: curriculum
           schema:
             type: string
+            example: international
         - in: query
           name: city
           schema:
             type: string
+            example: Shenzhen
         - in: query
           name: school_state_province
           schema:
             type: string
+            example: Guangdong
         - in: query
           name: school_country
           schema:
             type: string
+            example: China
       responses:
         200:
           description: Return a list of students
@@ -239,6 +266,7 @@ paths:
                         uid:
                           type: integer
                           description: The unique identifier of the student
+                          example: 21
         401:
           $ref: "#/components/responses/UnAuthorized" 
         403:
@@ -260,6 +288,7 @@ paths:
                   password:
                     type: string
                     format: password
+                    example: password123
               - oneOf:
                 - type: object
                   description: Only required for new users
@@ -269,6 +298,7 @@ paths:
                     registration_key:
                       type: string
                       description: The registration key provided by the maintainer for each class which fills class_number, year, and curriculum for the student
+                      example: asdfghjk
                 - type: object
                   description: Only accessible to admin users
                   required:
@@ -277,10 +307,14 @@ paths:
                   properties:
                     class_number:
                       type: integer
+                      example: 4
                     grad_year:
                       type: integer
+                      example: 2019
       responses:
         200:
+          $ref: "#/components/responses/Default"
+        400:
           $ref: "#/components/responses/Default"
         401:
           $ref: "#/components/responses/UnAuthorized"
@@ -300,10 +334,14 @@ paths:
                 properties:
                   class_number:
                     type: integer
+                    example: 18
                   grad_year:
                     type: integer
+                    example: 2021
       responses:
         200:
+          $ref: "#/components/responses/Default"
+        400:
           $ref: "#/components/responses/Default"
         401:
           $ref: "#/components/responses/UnAuthorized"
@@ -324,6 +362,7 @@ paths:
                 student_uid:
                   type: integer
                   description: The unique identifier of the student
+                  example: 21
       responses:
         200:
           $ref: "#/components/responses/Success"
@@ -347,6 +386,7 @@ paths:
               properties:
                 registration_key:
                   type: string
+                  example: asdfghjk
       responses:
         200:
           description: Tell whether the key is valid and return the related information
@@ -359,10 +399,13 @@ paths:
                     properties:
                       class_number:
                         type: integer
+                        example: 12
                       year:
                         type: string
+                        example: 2021
                       curriculum:
                         type: string
+                        example: international
                       expiration_date:
                         type: string
                         format: date
@@ -382,15 +425,20 @@ paths:
               properties:
                 school_name:
                   type: string
+                  example: The University
                 school_country:
                   type: string
+                  example: China
                 school_state_province:
                   type: string
+                  example: Guangdong
                 city:
                   type: string
+                  example: Shenzhen
                 limit:
                   type: integer
                   default: 100
+                  example: 100
       responses:
         200:
           description: Return the schools that satisfy the constraints
@@ -422,5 +470,6 @@ paths:
                     properties: 
                       school_uid:
                         type: integer
+                        example: 21
         400:
           $ref: "#/components/responses/Default"
