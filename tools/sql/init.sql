@@ -52,6 +52,18 @@ INSERT INTO wwg.visibility VALUES
     ('year', 'Visible only to the students who graduate in the same year'),
     ('students', 'Visible only to any registered users (including past and future students)');
 
+CREATE TABLE wwg.role (
+    role VARCHAR(20) NOT NULL PRIMARY KEY,
+    description TEXT
+);
+
+INSERT INTO wwg.role VALUES
+    ('student', 'Limited write access to the user itself'),
+    ('class', 'Write access to the students within a class'),
+    ('curriculum', 'Write access to the student within a curriculum'),
+    ('year', 'Write access to the students who graduate in the same year'),
+    ('system', 'Write access to the all students including admin students');
+
 CREATE TABLE wwg.student (
     student_uid SERIAL PRIMARY KEY,
     name VARCHAR(30) NOT NULL,
@@ -65,23 +77,13 @@ CREATE TABLE wwg.student (
     grad_year INT NOT NULL,
     school_uid INT,
     visibility_type VARCHAR(20) DEFAULT 'year',
+    role VARCHAR(20) DEFAULT 'student',
     FOREIGN KEY (class_number, grad_year) REFERENCES wwg.class(class_number, grad_year),
     FOREIGN KEY (school_uid) REFERENCES wwg.school(school_uid),
+    FOREIGN KEY (role) REFERENCES wwg.role(role),
     FOREIGN KEY (visibility_type) REFERENCES wwg.visibility(type)
 );
 
 CREATE VIEW student_class AS 
     SELECT * FROM wwg.student
     NATURAL JOIN wwg.class;
-
-CREATE TABLE wwg.role (
-    role_name VARCHAR(20) NOT NULL PRIMARY KEY
-);
-
-CREATE TABLE wwg.student_role (
-    role_name VARCHAR(20),
-    student_uid INT,
-    PRIMARY KEY (role_name, student_uid),
-    FOREIGN KEY (role_name) REFERENCES wwg.role(role_name),
-    FOREIGN KEY (student_uid) REFERENCES wwg.student(student_uid)
-);

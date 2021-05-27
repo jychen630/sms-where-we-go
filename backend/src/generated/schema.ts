@@ -10,8 +10,6 @@ export enum Table {
   SchoolAlias = "school_alias",
   Student = "student",
   StudentClass = "student_class",
-  StudentRole = "student_role",
-  Test = "test",
   Visibility = "visibility",
 }
 
@@ -34,7 +32,8 @@ export type RegistrationKey = {
 };
 
 export type Role = {
-  role_name: string;
+  role: string;
+  description: string | null;
 };
 
 export type School = {
@@ -64,6 +63,7 @@ export type Student = {
   grad_year: number;
   school_uid: number | null;
   visibility_type: string | null;
+  role: string | null;
 };
 
 export type StudentClass = {
@@ -79,19 +79,8 @@ export type StudentClass = {
   major: string | null;
   school_uid: number | null;
   visibility_type: string | null;
+  role: string | null;
   curriculum_uid: unknown | null;
-};
-
-export type StudentRole = {
-  role_name: string;
-  student_uid: number;
-};
-
-export type Test = {
-  id: number;
-  test: string | null;
-  created_at: Date | null;
-  updated_at: Date | null;
 };
 
 export type Visibility = {
