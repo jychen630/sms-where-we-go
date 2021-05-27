@@ -93,7 +93,9 @@ export const RoleService = {
                 privilege.delete = privilege.grant = compare.isAdminable;
                 return privilege;
             case StudentRole.System:
-                privilege.read = privilege.update = privilege.delete = privilege.grant = true;
+                privilege.read = privilege.update = true;
+                // Prevent system admins from lowering their own privilege level or deleting themselves
+                privilege.grant = privilege.delete = !compare.isSameStudent;
                 return privilege;
             default:
                 return privilege;
