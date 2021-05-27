@@ -1,7 +1,5 @@
 import { Operation } from 'express-openapi';
-import { pg } from '..';
-import { Service } from '../generated';
-import { Role } from '../generated/schema';
+import { RoleService } from '../services';
 import { sendError, sendSuccess } from '../utils';
 
 export const get: Operation = (req, res) => {
@@ -10,11 +8,7 @@ export const get: Operation = (req, res) => {
         return;
     }
 
-    pg('student')
-        .select('role')
-        .joinRaw('NATURAL JOIN role')
-        .where('student_uid', req.session.student_uid)
-        .first<Role>()
+    RoleService.get(req.session.student_uid)
         .then((result) => {
             sendSuccess(res, {
                 role: result.role,
