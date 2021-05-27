@@ -336,6 +336,10 @@ paths:
               - $ref: "#/components/schemas/Student"
               - type: object
                 properties:
+                  student_uid:
+                    description: If not specified, update the current logged in student
+                    type: integer
+                    example: 3
                   class_number:
                     type: integer
                     example: 18

@@ -143,6 +143,10 @@ grad_year: number,
      */
     public static async updateStudent(
 requestBody: (Student & {
+/**
+ * If not specified, update the current logged in student
+ */
+student_uid?: number,
 class_number?: number,
 grad_year?: number,
 }),

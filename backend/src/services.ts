@@ -1,6 +1,6 @@
-import { pg } from ".";
-import { Class, Curriculum, StudentClassRole, StudentRole, StudentVisibility } from "./generated/schema";
-import { Role } from "./generated/schema";
+import { pg } from '.';
+import { Class, StudentClassRole, StudentRole, StudentVisibility } from './generated/schema';
+import { Role } from './generated/schema';
 
 type Privilege = {
     read: boolean,
