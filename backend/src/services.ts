@@ -8,7 +8,8 @@ type Privilege = {
     read: boolean,
     update: boolean,
     delete: boolean,
-    grant: boolean // The privilege to grant administrator privileges
+    grant: boolean, // The privilege to grant administrator privileges
+    level: number
 }
 
 const logger = log4js.getLogger('service');
@@ -40,7 +41,7 @@ export const RoleService = {
             update: false,
             delete: false,
             grant: false,
-            level: current.level
+            level: current.level as number,
         }
 
         if (!!!current || !!!target) {
@@ -77,6 +78,7 @@ export const RoleService = {
                 // Prevent overriding the value of privilege.read by false
                 privilege.read = privilege.read || compare.isSameClass;
                 privilege.update = privilege.delete = compare.isSameClass;
+                privilege.grant = compare.isAdminable;
                 return privilege;
             case StudentRole.Curriculum:
                 // Prevent overriding the value of privilege.read by false
