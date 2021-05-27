@@ -52,7 +52,7 @@ use_uid?: boolean,
 /**
  * The identifier of the username, which can be the uid, phone number or email
  */
-identifier?: string,
+identifier: string,
 } | {
 /**
  * When set to true, the identifier will be used as the uid of the student
@@ -61,7 +61,7 @@ use_uid?: boolean,
 /**
  * The identifier as a student uid
  */
-identifier?: number,
+identifier: number,
 })),
 ): Promise<Result> {
         const result = await __request({

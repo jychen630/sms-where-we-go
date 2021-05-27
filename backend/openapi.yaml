@@ -221,7 +221,6 @@ paths:
               allOf:
                 - type: object
                   required:
-                    - identifier
                     - password
                   properties:
                     password:
@@ -229,6 +228,8 @@ paths:
                       example: password123
                 - oneOf:
                   - type: object
+                    required:
+                      - identifier
                     properties:
                       use_uid:
                         type: boolean
@@ -239,6 +240,8 @@ paths:
                         description: The identifier of the username, which can be the uid, phone number or email
                         example: testemail@asd.com
                   - type: object
+                    required:
+                      - identifier
                     properties:
                       use_uid:
                         type: boolean
