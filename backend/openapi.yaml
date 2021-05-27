@@ -338,6 +338,8 @@ paths:
                     type: string
                     format: password
                     example: password123
+                  curriculum:
+                    enum: [null]
               - oneOf:
                 - type: object
                   description: Only required for new users
@@ -406,6 +408,8 @@ paths:
                   grad_year:
                     type: integer
                     example: 2021
+                  curriculum:
+                    enum: [null]
                   # To be added  
                   #verification_code:
                   #  description: If the phone number is specified, the verification code will be required

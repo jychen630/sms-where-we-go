@@ -124,6 +124,7 @@ uid: number,
     public static async postStudent(
 requestBody: (Student & {
 password: string,
+curriculum?: any,
 } & ({
 /**
  * The registration key provided by the maintainer for each class which fills class_number, year, and curriculum for the student

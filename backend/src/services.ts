@@ -40,6 +40,7 @@ export const RoleService = {
             update: false,
             delete: false,
             grant: false,
+            level: current.level
         }
 
         if (!!!current || !!!target) {
