@@ -2,6 +2,7 @@ import log4js from 'log4js';
 import { pg } from '.';
 import { Class, StudentClassRole, StudentRole, StudentVisibility } from './generated/schema';
 import { Role } from './generated/schema';
+import { compareStudents } from './utils';
 
 type Privilege = {
     read: boolean,
@@ -46,26 +47,21 @@ export const RoleService = {
             return privilege;
         }
 
-        const isSameStudent = current_uid === target_uid;
-        const isSameYear = current.grad_year === target.grad_year;
-        const isSameCurriculum = isSameYear && current.curriculum_name === target.curriculum_name;
-        const isSameClass = isSameYear && current.class_number === target.class_number;
-        // Only students in the same year with higher privilege level are adminable over another student
-        const isAdminable = isSameYear && ((current.level as number) > (target.level as number));
+        const compare = compareStudents(current, target);
 
         // For any user, we check the visibility first
         switch (target.visibility_type) {
             case StudentVisibility.Private:
-                privilege.read = isSameStudent;
+                privilege.read = compare.isSameStudent;
                 break;
             case StudentVisibility.Class:
-                privilege.read = isSameClass;
+                privilege.read = compare.isSameClass;
                 break;
             case StudentVisibility.Curriculum:
-                privilege.read = isSameCurriculum;
+                privilege.read = compare.isSameCurriculum;
                 break;
             case StudentVisibility.Year:
-                privilege.read = isSameYear;
+                privilege.read = compare.isSameYear;
                 break;
             case StudentVisibility.Students:
                 privilege.read = true;
@@ -74,24 +70,24 @@ export const RoleService = {
 
         switch (current.role) {
             case StudentRole.Student:
-                privilege.update = privilege.delete = isSameStudent;
+                privilege.update = privilege.delete = compare.isSameStudent;
                 return privilege;
             case StudentRole.Class:
                 // Prevent overriding the value of privilege.read by false
-                privilege.read = privilege.read || isSameClass;
-                privilege.update = privilege.delete = isSameClass;
+                privilege.read = privilege.read || compare.isSameClass;
+                privilege.update = privilege.delete = compare.isSameClass;
                 return privilege;
             case StudentRole.Curriculum:
                 // Prevent overriding the value of privilege.read by false
-                privilege.read = privilege.read || isSameCurriculum;
-                privilege.update = privilege.delete = isSameCurriculum;
-                privilege.grant = isAdminable;
+                privilege.read = privilege.read || compare.isSameCurriculum;
+                privilege.update = privilege.delete = compare.isSameCurriculum;
+                privilege.grant = compare.isAdminable;
                 return privilege;
             case StudentRole.Year:
                 // Prevent overriding the value of privilege.read by false
-                privilege.read = privilege.read || isSameYear;
-                privilege.update = isSameYear;
-                privilege.delete = privilege.grant = isAdminable;
+                privilege.read = privilege.read || compare.isSameYear;
+                privilege.update = compare.isSameYear;
+                privilege.delete = privilege.grant = compare.isAdminable;
                 return privilege;
             case StudentRole.System:
                 privilege.read = privilege.update = privilege.delete = privilege.grant = true;

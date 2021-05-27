@@ -1,4 +1,5 @@
 import { Response, Request } from "express";
+import { StudentClassRole } from "./generated/schema";
 
 export const sendSuccess = (res: Response, result?: object) => {
     res.status(200).json({
@@ -28,4 +29,16 @@ Remove the keys with null values from an object
 export const removeNull = (obj: any) => {
     Object.entries(obj).forEach(([key, value]) => (value === null) && delete obj[key]);
     return obj;
+}
+
+export const compareStudents = (current: StudentClassRole, target: StudentClassRole) => {
+    const isSameYear = current.grad_year === target.grad_year
+    return {
+        isSameStudent: current.student_uid === target.student_uid,
+        isSameYear: isSameYear,
+        isSameCurriculum: isSameYear && current.curriculum_name === target.curriculum_name,
+        isSameClass: isSameYear && current.class_number === target.class_number,
+        // Only students in the same year with higher privilege level are adminable over another student
+        isAdminable: isSameYear && ((current.level as number) > (target.level as number)),
+    }
 }
