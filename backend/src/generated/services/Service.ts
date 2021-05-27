@@ -42,17 +42,27 @@ schools: Array<School>,
      * @throws ApiError
      */
     public static async login(
-requestBody: {
-/**
- * The identifier of the username, which can be the uid, phone number or email
- */
-identifier: string,
+requestBody: ({
 password: string,
+} & ({
 /**
  * When set to true, the identifier will be used as the uid of the student
  */
 use_uid?: boolean,
-},
+/**
+ * The identifier of the username, which can be the uid, phone number or email
+ */
+identifier?: string,
+} | {
+/**
+ * When set to true, the identifier will be used as the uid of the student
+ */
+use_uid?: boolean,
+/**
+ * The identifier as a student uid
+ */
+identifier?: number,
+})),
 ): Promise<Result> {
         const result = await __request({
             method: 'POST',

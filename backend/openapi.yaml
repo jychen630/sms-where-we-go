@@ -218,22 +218,36 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              required:
-                - identifier
-                - password
-              properties:
-                identifier:
-                  type: string
-                  description: The identifier of the username, which can be the uid, phone number or email
-                  example: testemail@asd.com
-                password:
-                  type: string
-                  example: password123
-                use_uid:
-                  type: boolean
-                  description: When set to true, the identifier will be used as the uid of the student
-                  example: false
+              allOf:
+                - type: object
+                  required:
+                    - identifier
+                    - password
+                  properties:
+                    password:
+                      type: string
+                      example: password123
+                - oneOf:
+                  - type: object
+                    properties:
+                      use_uid:
+                        type: boolean
+                        description: When set to true, the identifier will be used as the uid of the student
+                        enum: [false]
+                      identifier:
+                        type: string
+                        description: The identifier of the username, which can be the uid, phone number or email
+                        example: testemail@asd.com
+                  - type: object
+                    properties:
+                      use_uid:
+                        type: boolean
+                        description: When set to true, the identifier will be used as the uid of the student
+                        enum: [true]
+                      identifier:
+                        type: number
+                        description: The identifier as a student uid
+                        maximum: 2147483647
       responses:
         "200":
           description: Return whether the login is a success
@@ -367,6 +381,7 @@ paths:
                   student_uid:
                     description: If not specified, update the current logged in student
                     type: integer
+                    maximum: 2147483647
                     example: 3
                   visibility:
                     $ref: "#/components/schemas/Visibility"
@@ -407,6 +422,7 @@ paths:
                 student_uid:
                   type: integer
                   description: The unique identifier of the student
+                  maximum: 2147483647
                   example: 21
       responses:
         200:

@@ -171,19 +171,24 @@ initialize({
             return;
         }
 
-        const error = err.errors[0];
-        const errCode = (error.errorCode as string).match(validationPattern);
+        let error = err.errors[0];
+        let errCode = (error.errorCode as string).match(validationPattern);
         if (errCode) {
             if (errCode[1] === 'oneOf' && req.path === '/student' && req.method === 'POST') {
                 sendError(res, err.status ?? 400, 'You should either pass a registration key or class number with graduation year');
                 return;
             }
 
-            if (error.path !== undefined) {
+            if (errCode[1] === 'enum' && req.path === '/login' && req.method === 'POST') {
+                error = err.errors[1];
+                errCode = (error.errorCode as string).match(validationPattern);
+            }
+
+            if (error.path !== undefined && !!errCode) {
                 sendError(res, err.status ?? 400, `[${errCode[1]}] "${error.path}" ${error.message}`);
             }
             else {
-                sendError(res, err.status ?? 400, `[${errCode[1]}] ${error.message}`);
+                sendError(res, err.status ?? 400, `[${(!!errCode) ? errCode[1] : 'unknown'}] ${error.message}`);
             }
         }
         else {

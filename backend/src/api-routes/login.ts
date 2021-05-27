@@ -12,11 +12,16 @@ export const post: Operation = async (req, res, next) => {
 
     if (!!!data.password) {
         sendError(res, 400, "The password cannot be empty");
-        logger.error("Attempt to login with an empty password");
+        logger.error(`${data.identifier} attempts to login with an empty password`);
         return;
     }
 
-    // If the user is not logged in previously, we need to fetch their hashed password and salt
+    if (data.use_uid && typeof data.identifier !== 'number') {
+        sendError(res, 400, 'The identifier must be a number when using uid');
+        logger.error(`${data.identifier} attempts to login with a non-number uid`);
+        return;
+    }
+
     const result = await pg("wwg.student")
         .column('student_uid', 'password_hash')
         .select()
@@ -35,16 +40,16 @@ export const post: Operation = async (req, res, next) => {
 
     const password_hash = result?.password_hash ?? "";
 
-    hash.compare(data.password, password_hash).then((success) => {
-        if (success) {
+    hash.compare(data.password, password_hash).then((succedded) => {
+        if (succedded) {
             req.session.identifier = data.identifier;
             req.session.student_uid = result.student_uid;
             sendSuccess(res);
-            logger.info("Login successfully");
+            logger.info(`${data.identifier} logged in successfully`);
         }
         else {
             sendError(res, 200, "The identifier or the password is incorrect");
-            logger.info("Fail to login due to incorrect identifier/password");
+            logger.info(`${data.identifier} fails to login due to incorrect identifier/password`);
         }
     }).catch((err) => {
         sendError(res, 500, "An internal error has occurred");
