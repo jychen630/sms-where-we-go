@@ -179,6 +179,11 @@ initialize({
                 return;
             }
 
+            if (errCode[1] === 'enum' && error.path === 'curriculum' && req.path === '/student' && (req.method === 'POST' || req.method === 'PUT')) {
+                sendError(res, 400, '"curriculum" is not allowed for registering or updating');
+                return
+            }
+
             if (errCode[1] === 'enum' && req.path === '/login' && req.method === 'POST') {
                 error = err.errors[1];
                 errCode = (error.errorCode as string).match(validationPattern);

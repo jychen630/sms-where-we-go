@@ -1,5 +1,5 @@
 import { Operation } from 'express-openapi';
-import hash from 'bcrypt';
+import hash, { hashSync } from 'bcrypt';
 import log4js from 'log4js';
 import { pg } from '..';
 import { Service } from '../generated';
@@ -12,7 +12,85 @@ export const get: Operation = async (req, res, next) => {
 }
 
 export const put: Operation = async (req, res, next) => {
+    const data = parseBody<typeof Service.updateStudent>(req);
+    const logger = log4js.getLogger('student.update');
 
+    if (!!!req.session.student_uid) {
+        logger.error(`Attempt to update ${data.student_uid ?? "[uid not specified]"} without authentication`);
+        sendError(res, 403, 'Login to update student information');
+        return;
+    }
+
+    // Try to update the requester by default
+    const target_uid = data.student_uid ?? req.session.student_uid;
+    const privileges = await RoleService.privilege(req.session.student_uid, target_uid);
+
+    if (!privileges.update) {
+        logger.error(`User update denied for ${data.student_uid} from ${req.session.student_uid} with privileges ${privileges}`);
+        logger.error(data);
+        sendError(res, 403, 'You are not allowed to update this student\'s information');
+        return;
+    }
+
+    if (privileges.level < 16 && !!data.grad_year) {
+        sendError(res, 400, `You are not allowed to update the graduation year`);
+        logger.error(`${req.session.identifier} attempts to update grad_year`);
+        return;
+    }
+
+    if (privileges.level < 4 && !!data.class_number) {
+        sendError(res, 400, `You are not allowed to update the class number`);
+        logger.error(`${req.session.identifier} attempts to update class_number`);
+        return;
+    }
+
+    if (!!data.role && (!privileges.grant ||
+        (data.role === StudentRole.Class.valueOf() && privileges.level < 4) ||
+        (data.role === StudentRole.Curriculum.valueOf() && privileges.level < 8) ||
+        (data.role === StudentRole.Year.valueOf() && privileges.level < 16) ||
+        (data.role === StudentRole.System.valueOf() && privileges.level < 16))) {
+        logger.error(`${req.session.identifier} (level: ${privileges.level}) is denied for updating ${target_uid} ${!privileges.grant ? 'for lower privilege level' : 'for role not allowed'}`);
+        logger.error(data);
+        sendError(res, 403, `You are not allowed to alter this student\'s role${privileges.grant ? ` to "${data.role}" as your privilege level is ${privileges.level}` : ''}`);
+        return;
+    }
+
+    /*
+    verification code check is disabled until we have the sms support
+    if (!!data.phone_number && data.verification_code) {
+        logger.info(`Tried to update phone number without verification code`);
+        sendError(res, 400, 'You must provide a verification code when changing the phone number');
+        return;
+    }*/
+
+    let hashed = undefined;
+    if (!!data.password) {
+        hashed = hashSync(data.password, 10);
+    }
+
+    pg('student')
+        .select()
+        .where('student_uid', target_uid)
+        .update({
+            name: data.name,
+            phone_number: data.phone_number,
+            email: data.email,
+            password_hash: hashed,
+            wxid: data.wxid,
+            department: data.department,
+            major: data.major,
+            class_number: data.class_number,
+            grad_year: data.grad_year,
+            school_uid: data.school_uid,
+            visibility_type: data.visibility,
+            role: data.role
+        })
+        .then(result => {
+            logger.info(`Updated uid ${target_uid}'s information${!!!data.student_uid ? " (self-update)" : ""}`);
+            logger.info(data);
+            sendSuccess(res);
+        })
+        .catch(err => dbHandleError(err, res, logger));
 }
 
 //type: ignore
