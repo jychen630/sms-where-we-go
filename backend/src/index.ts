@@ -16,9 +16,9 @@ const port = 8080;
 export const pg = knex(pgOptions);
 export const populateTestData = async () => {
     await pg('wwg.curriculum').insert([{
-        name: "international"
+        curriculum_name: "international"
     }, {
-        name: "gaokao"
+        curriculum_name: "gaokao"
     }]);
     await pg('wwg.class').insert([{
         class_number: 2,
