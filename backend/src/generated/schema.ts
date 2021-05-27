@@ -1,6 +1,22 @@
 // The TypeScript definitions below are automatically generated.
 // Do not touch them, or risk, your modifications being lost.
 
+export enum StudentRole {
+  Student = "student",
+  Class = "class",
+  Curriculum = "curriculum",
+  Year = "year",
+  System = "system",
+}
+
+export enum StudentVisibility {
+  Private = "private",
+  Class = "class",
+  Curriculum = "curriculum",
+  Year = "year",
+  Students = "students",
+}
+
 export enum Table {
   Class = "class",
   Curriculum = "curriculum",
@@ -10,6 +26,7 @@ export enum Table {
   SchoolAlias = "school_alias",
   Student = "student",
   StudentClass = "student_class",
+  StudentClassRole = "student_class_role",
   Visibility = "visibility",
 }
 
@@ -32,7 +49,8 @@ export type RegistrationKey = {
 };
 
 export type Role = {
-  role: string;
+  role: StudentRole;
+  level: unknown | null;
   description: string | null;
 };
 
@@ -62,8 +80,8 @@ export type Student = {
   class_number: unknown;
   grad_year: number;
   school_uid: number | null;
-  visibility_type: string | null;
-  role: string | null;
+  visibility_type: StudentVisibility | null;
+  role: StudentRole | null;
 };
 
 export type StudentClass = {
@@ -78,13 +96,32 @@ export type StudentClass = {
   department: string | null;
   major: string | null;
   school_uid: number | null;
-  visibility_type: string | null;
-  role: string | null;
+  visibility_type: StudentVisibility | null;
+  role: StudentRole | null;
   curriculum_uid: unknown | null;
 };
 
+export type StudentClassRole = {
+  role: StudentRole | null;
+  class_number: unknown | null;
+  grad_year: number | null;
+  student_uid: number | null;
+  name: string | null;
+  phone_number: string | null;
+  email: string | null;
+  password_hash: string | null;
+  wxid: string | null;
+  department: string | null;
+  major: string | null;
+  school_uid: number | null;
+  visibility_type: StudentVisibility | null;
+  curriculum_uid: unknown | null;
+  level: unknown | null;
+  description: string | null;
+};
+
 export type Visibility = {
-  type: string;
+  type: StudentVisibility;
   description: string | null;
 };
 

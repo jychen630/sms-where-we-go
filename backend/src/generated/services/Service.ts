@@ -263,6 +263,10 @@ school_uid?: number,
      */
     public static async getRole(): Promise<(Result & {
 role?: string,
+/**
+ * The privilege level of the student, the higher the greater
+ */
+level?: number,
 description?: string,
 })> {
         const result = await __request({

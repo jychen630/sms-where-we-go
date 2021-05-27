@@ -494,6 +494,10 @@ paths:
                       role:
                         type: string
                         example: student
+                      level:
+                        type: integer
+                        description: The privilege level of the student, the higher the greater
+                        example: 0
                       description:
                         type: string
                         example: Limited write access to the user itself
