@@ -2,8 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { Result } from '../models/Result';
+import type { Role } from '../models/Role';
 import type { School } from '../models/School';
 import type { Student } from '../models/Student';
+import type { Visibility } from '../models/Visibility';
 import { request as __request } from '../core/request';
 
 export class Service {
@@ -147,6 +149,8 @@ requestBody: (Student & {
  * If not specified, update the current logged in student
  */
 student_uid?: number,
+visibility?: Visibility,
+role?: Role,
 /**
  * The new password
  */

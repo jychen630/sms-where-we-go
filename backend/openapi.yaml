@@ -131,6 +131,34 @@ components:
         city:
           type: string
           example: Shenzhen
+    Visibility:
+      type: string
+      description: >
+        * `private`: Visible only to the student themself
+        * `class`: Visible only to the students in the same class
+        * `curriculum`: Visible only to the students within the same curriculum
+        * `year`: Visible only to the students who graduate in the same year
+        * `students`: Visible only to any registered users (including past and future students)
+      enum:
+        - private
+        - class
+        - curriculum
+        - year
+        - students
+    Role:
+      type: string
+      description: >
+        * `student` Limited write access to the user itself
+        * `class` Write access to the students within a class
+        * `curriculum` Write access to the student within a curriculum
+        * `year` Write access to the students who graduate in the same year
+        * `system` Write access to the all students including admin students
+      enum:
+        - student
+        - class
+        - curriculum
+        - year
+        - system
   securitySchemes:
     sessionAuth:
       type: apiKey
@@ -340,6 +368,10 @@ paths:
                     description: If not specified, update the current logged in student
                     type: integer
                     example: 3
+                  visibility:
+                    $ref: "#/components/schemas/Visibility"
+                  role:
+                    $ref: "#/components/schemas/Role"
                   password:
                     description: The new password
                     type: string
