@@ -3,7 +3,7 @@ import hash from 'bcrypt';
 import log4js from 'log4js';
 import { pg } from '..';
 import { Service } from '../generated';
-import { parseBody, sendError, sendSuccess } from '../utils';
+import { dbHandleError, parseBody, sendError, sendSuccess } from '../utils';
 import { ClassService, RoleService, StudentService } from '../services';
 import { StudentRole } from '../generated/schema';
 
@@ -22,6 +22,7 @@ export const DELETE: Operation = async (req, res, next) => {
 
     if (!!!req.session.student_uid) {
         sendError(res, 403, 'Login to delete student');
+        return;
     }
 
     const privilege = await RoleService.privilege(req.session.student_uid, data.student_uid);
@@ -136,22 +137,6 @@ export const post: Operation = async (req, res, next) => {
         }).then((result) => {
             logger.info(`Successfully registered ${data.name} with the key '${data.registration_key}'`);
             sendSuccess(res);
-        }).catch((err) => {
-            const pattern = /\((.*)\)=\((.*)\)/;
-            const matchGroup = err.detail.match(pattern);
-            switch (err.code) {
-                case '23505':
-                    logger.error(err.detail);
-                    sendError(res, 200, `The ${matchGroup[1]} '${matchGroup[2]}' has already been taken`);
-                    break;
-                case '23503':
-                    logger.error(err.detail);
-                    sendError(res, 200, `${matchGroup[2]} is not a existing ${matchGroup[1]}`);
-                    break;
-                default:
-                    logger.error(err);
-                    sendError(res, 200, `An unknown error just occured [code ${err.code ?? -1}]`);
-            }
-        });
+        }).catch((err) => dbHandleError(err, res, logger));
     });
 }
