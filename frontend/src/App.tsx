@@ -7,7 +7,7 @@ import {
 } from 'react-router-dom';
 import Map from './Map';
 import Login from './Login';
-import Register from './Register';
+import 'antd/dist/antd.css';
 
 function App() {
   return (
