@@ -218,7 +218,6 @@ student_uid: number,
      * Validate whether the provided registration key is valid and return corresponding information
      * @param requestBody 
      * @returns any Tell whether the key is valid and return the related information
-     * @returns Result Default response telling whether the request is successful
      * @throws ApiError
      */
     public static async validate(
@@ -227,10 +226,10 @@ registration_key: string,
 },
 ): Promise<(Result & {
 class_number?: number,
-year?: string,
+grad_year?: number,
 curriculum?: string,
 expiration_date?: string,
-}) | Result> {
+})> {
         const result = await __request({
             method: 'POST',
             path: `/validate`,

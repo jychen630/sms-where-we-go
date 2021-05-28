@@ -474,6 +474,8 @@ paths:
               properties:
                 registration_key:
                   type: string
+                  minLength: 8
+                  maxLength: 8
                   example: asdfghjk
       responses:
         200:
@@ -488,8 +490,8 @@ paths:
                       class_number:
                         type: integer
                         example: 12
-                      year:
-                        type: string
+                      grad_year:
+                        type: integer
                         example: 2021
                       curriculum:
                         type: string
@@ -497,8 +499,6 @@ paths:
                       expiration_date:
                         type: string
                         format: date
-        default:
-          $ref: "#/components/responses/Default"
   /school:
     get:
       operationId: getSchool
