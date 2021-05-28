@@ -7,6 +7,7 @@ import {
 } from 'react-router-dom';
 import Map from './Map';
 import Login from './Login';
+import Registration from './pages/registeration';
 import 'antd/dist/antd.css';
 
 function App() {
@@ -16,7 +17,7 @@ function App() {
         <Route path="/login">
           <Login />
         </Route>
-        <Route path="/register"><Register /></Route>
+        <Route path="/register"><Registration /></Route>
         <Route path="/map">
           <Map />
         </Route>
