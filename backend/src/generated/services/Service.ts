@@ -68,6 +68,9 @@ identifier: number,
             method: 'POST',
             path: `/login`,
             body: requestBody,
+            errors: {
+                400: `Default response telling whether the request is successful`,
+            },
         });
         return result.body;
     }
@@ -123,6 +126,7 @@ uid: number,
      */
     public static async postStudent(
 requestBody: (Student & {
+name: string,
 password: string,
 curriculum?: any,
 } & ({
@@ -168,6 +172,7 @@ role?: Role,
 password?: string,
 class_number?: number,
 grad_year?: number,
+curriculum?: any,
 }),
 ): Promise<Result> {
         const result = await __request({
