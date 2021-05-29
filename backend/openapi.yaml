@@ -103,6 +103,33 @@ components:
           maxLength: 8
           description: The registration key provided by the maintainer for each class which fills class_number, year, and curriculum for the student
           example: asdfghjk
+    StudentVerbose:
+      type: object
+      required:
+        - name
+        - class_number
+        - grad_year
+      properties:
+        uid:
+          type: integer
+          description: The unique identifier of the student
+          example: 12
+        name:
+          type: string
+          description: The name of the student
+          maxLength: 30
+          example: Noel Li
+        class_number:
+          type: integer
+          description: The class number of the student at high school
+          minimum: 1
+          maximum: 100
+          example: 2
+        grad_year:
+          type: integer
+          description: The year when the student graduates from high school
+          format: year
+          example: 2021
     School:
       type: object
       required:
@@ -173,7 +200,7 @@ paths:
       description: Return a roster containing the students and schools information
       responses:
         "200":
-          description: Sucessfully retrieve the roster
+          description: Sucessfully retrieved the roster
           content:
             application/json:
               schema:
@@ -189,17 +216,7 @@ paths:
                         items:
                           allOf:
                             - $ref: "#/components/schemas/Student"
-                            - type: object
-                              required:
-                                - uid
-                                - name
-                                - class_number
-                                - grad_year
-                              properties:
-                                uid:
-                                  type: integer
-                                  description: The unique identifier of the student
-                                  example: 12
+                            - $ref: "#/components/schemas/StudentVerbose"
                       schools:
                         type: array
                         items:
@@ -308,21 +325,16 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  allOf:
-                    - $ref: "#/components/schemas/Student"
-                    - type: object
-                      required:
-                        - uid
-                        - name
-                        - class_number
-                        - grad_year
-                      properties:
-                        uid:
-                          type: integer
-                          description: The unique identifier of the student
-                          example: 21
+                allOf:
+                  - $ref: "#/components/schemas/Result"
+                  - type: object
+                    properties:
+                      students:
+                        type: array
+                        items:
+                          allOf:
+                            - $ref: "#/components/schemas/Student"
+                            - $ref: "#/components/schemas/StudentVerbose"
         401:
           $ref: "#/components/responses/UnAuthorized" 
         403:
@@ -527,15 +539,27 @@ paths:
                   type: integer
                   default: 100
                   example: 100
+                  minimum: 1
+                  maximum: 100
+                offset:
+                  type: integer
+                  default: 0
+                  example: 0
+                  minimum: 0
       responses:
         200:
           description: Return the schools that satisfy the constraints
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/School"
+                allOf:
+                  - $ref: "#/components/schemas/Result"
+                  - type: object
+                    properties:
+                      schools:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/School"
     post:
       operationId: postSchool
       description: Add a new school

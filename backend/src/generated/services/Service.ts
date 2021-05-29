@@ -5,6 +5,7 @@ import type { Result } from '../models/Result';
 import type { Role } from '../models/Role';
 import type { School } from '../models/School';
 import type { Student } from '../models/Student';
+import type { StudentVerbose } from '../models/StudentVerbose';
 import type { Visibility } from '../models/Visibility';
 import { request as __request } from '../core/request';
 
@@ -12,17 +13,12 @@ export class Service {
 
     /**
      * Return a roster containing the students and schools information
-     * @returns any Sucessfully retrieve the roster
+     * @returns any Sucessfully retrieved the roster
      * @returns Result Default response telling whether the request is successful
      * @throws ApiError
      */
     public static async getRoster(): Promise<(Result & {
-students: Array<(Student & {
-/**
- * The unique identifier of the student
- */
-uid: number,
-})>,
+students: Array<(Student & StudentVerbose)>,
 schools: Array<School>,
 }) | Result> {
         const result = await __request({
@@ -93,12 +89,9 @@ curriculum?: string,
 city?: string,
 schoolStateProvince?: string,
 schoolCountry?: string,
-): Promise<Array<(Student & {
-/**
- * The unique identifier of the student
- */
-uid: number,
-})>> {
+): Promise<(Result & {
+students?: Array<(Student & StudentVerbose)>,
+})> {
         const result = await __request({
             method: 'GET',
             path: `/student`,
@@ -241,7 +234,7 @@ expiration_date?: string,
     /**
      * Search for schools
      * @param requestBody 
-     * @returns School Return the schools that satisfy the constraints
+     * @returns any Return the schools that satisfy the constraints
      * @throws ApiError
      */
     public static async getSchool(
@@ -251,8 +244,11 @@ school_country?: string,
 school_state_province?: string,
 city?: string,
 limit: number,
+offset: number,
 },
-): Promise<Array<School>> {
+): Promise<(Result & {
+schools?: Array<School>,
+})> {
         const result = await __request({
             method: 'GET',
             path: `/school`,
