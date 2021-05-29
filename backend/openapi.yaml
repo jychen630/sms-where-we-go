@@ -173,7 +173,7 @@ paths:
       description: Return a roster containing the students and schools information
       responses:
         "200":
-          description: Sucessfully retrieve the roster
+          description: Sucessfully retrieved the roster
           content:
             application/json:
               schema:
@@ -308,21 +308,23 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  allOf:
-                    - $ref: "#/components/schemas/Student"
-                    - type: object
-                      required:
-                        - uid
-                        - name
-                        - class_number
-                        - grad_year
-                      properties:
-                        uid:
-                          type: integer
-                          description: The unique identifier of the student
-                          example: 21
+                allOf:
+                  - $ref: "#/components/schemas/Result"
+                    type: array
+                    items:
+                      allOf:
+                        - $ref: "#/components/schemas/Student"
+                        - type: object
+                          required:
+                            - uid
+                            - name
+                            - class_number
+                            - grad_year
+                          properties:
+                            uid:
+                              type: integer
+                              description: The unique identifier of the student
+                              example: 21
         401:
           $ref: "#/components/responses/UnAuthorized" 
         403:
@@ -540,9 +542,11 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/School"
+                allOf:
+                  - $ref: "#/components/schemas/Result"
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/School"
     post:
       operationId: postSchool
       description: Add a new school

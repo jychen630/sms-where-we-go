@@ -12,7 +12,7 @@ export class Service {
 
     /**
      * Return a roster containing the students and schools information
-     * @returns any Sucessfully retrieve the roster
+     * @returns any Sucessfully retrieved the roster
      * @returns Result Default response telling whether the request is successful
      * @throws ApiError
      */
@@ -93,12 +93,7 @@ curriculum?: string,
 city?: string,
 schoolStateProvince?: string,
 schoolCountry?: string,
-): Promise<Array<(Student & {
-/**
- * The unique identifier of the student
- */
-uid: number,
-})>> {
+): Promise<Result> {
         const result = await __request({
             method: 'GET',
             path: `/student`,
@@ -241,7 +236,7 @@ expiration_date?: string,
     /**
      * Search for schools
      * @param requestBody 
-     * @returns School Return the schools that satisfy the constraints
+     * @returns any Return the schools that satisfy the constraints
      * @throws ApiError
      */
     public static async getSchool(
@@ -253,7 +248,7 @@ city?: string,
 limit: number,
 offset: number,
 },
-): Promise<Array<School>> {
+): Promise<Result> {
         const result = await __request({
             method: 'GET',
             path: `/school`,
