@@ -12183,10 +12183,10 @@ ws@^7.2.3:
   resolved "https://registry.yarnpkg.com/ws/-/ws-7.4.3.tgz#1f9643de34a543b8edb124bdcbc457ae55a6e5cd"
   integrity sha512-hr6vCR76GsossIRsr8OLR9acVVm1jyfEWvhbNjtgPOrfvAlKzvyeg/P6r8RuDjRyrcQoPQT7K0DGEPc7Ae6jzA==
 
-wwg-api@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/wwg-api/-/wwg-api-1.0.1.tgz#c373f8df76b02e36b327330078e0dd233c0724b4"
-  integrity sha512-MsDta5CUiwDxQfOCPnatV6Xe3ECOxi0RC8/n8i0ZHoyoZVvoZodKBleObAb9nIcYILd6E0xIgcYlzAyKTXnvDQ==
+wwg-api@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/wwg-api/-/wwg-api-1.0.4.tgz#534c1c408b63ce837bb5865e85d406f09016b0b8"
+  integrity sha512-T8wdbsAuWNtcNMyuYF5AZGHQA8yDg30QkNIi/Ef+yQbp48fHS4aZldV72PGutSrBsjPrRWJ5qh02RxnwzXNbnw==
 
 xml-name-validator@^3.0.0:
   version "3.0.0"

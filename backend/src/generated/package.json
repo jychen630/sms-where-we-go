@@ -1,6 +1,6 @@
 {
   "name": "wwg-api",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Provide typed supports to wwg APIs.",
   "main": "build/index.js",
   "types": "build/index.d.ts",
