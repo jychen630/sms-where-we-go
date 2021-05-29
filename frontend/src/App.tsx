@@ -6,8 +6,8 @@ import {
   Redirect
 } from 'react-router-dom';
 import Map from './Map';
-import Login from './Login';
 import Registration from './pages/registeration';
+import Login from './pages/login';
 import 'antd/dist/antd.css';
 
 function App() {
