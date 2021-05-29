@@ -1,4 +1,5 @@
 import { Form, Space, Spin, notification, Input, Button } from 'antd';
+import { useHistory } from 'react-router-dom';
 import { Result, Service } from 'wwg-api';
 import { handleApiError } from '../api/utils';
 
@@ -12,6 +13,7 @@ type Value = Parameters<typeof Service.login>[0];
 
 const LoginForm = () => {
     const [form] = Form.useForm<Value>();
+    const history = useHistory();
     const validateLogin = async (
         { password,
             identifier,
@@ -54,6 +56,7 @@ const LoginForm = () => {
         <>
             <Form
                 form={form}
+                layout='vertical'
                 onFinish={validateLogin}
             >
                 <Form.Item
@@ -67,9 +70,8 @@ const LoginForm = () => {
                             required: true,
                             message: '手机号/邮箱不能为空'
                         },
-                        ({ getFieldValue }) => ({
+                        {
                             validator(_, value) {
-                                const email = getFieldValue('email');
                                 if (!!value && !value.match(phonePattern) && !value.match(emailPattern)) {
                                     return Promise.reject('请正确填写电话号码或者邮箱');
                                 }
@@ -77,7 +79,7 @@ const LoginForm = () => {
                                     return Promise.resolve();
                                 }
                             }
-                        })
+                        }
 
                     ]}
                 >
@@ -98,7 +100,7 @@ const LoginForm = () => {
                 <Form.Item>
                     <Space>
                         <Button type='primary' htmlType='submit'>登录</Button>
-                        <Button type='link'>切换到注册</Button>
+                        <Button type='link' onClick={() => history.push('/register')}>切换到注册</Button>
                     </Space>
                 </Form.Item>
             </Form>
