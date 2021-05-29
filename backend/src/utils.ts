@@ -33,6 +33,12 @@ export const removeNull = (obj: any) => {
 }
 
 export const dbHandleError = (err: any, res: Response, logger: Logger) => {
+    if (!!!err.detail) {
+        logger.error(err);
+        sendError(res, 500, 'An unknown error occurred');
+        return;
+    }
+
     const pattern = /\((.*)\)=\((.*)\)/;
     const matchGroup = err.detail.match(pattern);
     switch (err.code) {

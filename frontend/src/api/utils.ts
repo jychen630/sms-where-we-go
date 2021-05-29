@@ -5,18 +5,26 @@ import { ApiError, Result } from 'wwg-api';
  * @param err 
  * @returns 
  */
-export const handleApiError = async (err: ApiError | string): Promise<Result> => {
+export const handleApiError = async (err: ApiError | string | undefined): Promise<Result> => {
     if (typeof err === 'string') {
         return {
             result: Result.result.ERROR,
             message: err
         };
     }
+
+    if (err === undefined) {
+        return {
+            result: Result.result.ERROR,
+            message: '发生了未知错误'
+        };
+    }
+
     if (!!err.body) {
         return {
             result: err.body.result ?? Result.result.ERROR,
             message: err.body.message ?? '发生了未知错误'
-        }
+        };
     }
     else {
         console.error(err);
