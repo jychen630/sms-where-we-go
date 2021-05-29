@@ -107,8 +107,9 @@ const RegistrationForm = () => {
                         ({ getFieldError }) => ({ validator(_, value) { return validateKey(value) } })
                     ]}
                     hasFeedback
+                    required
                 >
-                    <Input placeholder='8位注册码' onChange={() => { setRegInfo(undefined) }} required />
+                    <Input placeholder='8位注册码' onChange={() => { setRegInfo(undefined) }} />
                 </Form.Item>
                 <Collapse defaultActiveKey={'1'} ghost>
                     <Collapse.Panel header={<>注册码信息 <InfoCircleOutlined /></>} key={'1'}>
