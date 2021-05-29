@@ -5,6 +5,7 @@ import type { Result } from '../models/Result';
 import type { Role } from '../models/Role';
 import type { School } from '../models/School';
 import type { Student } from '../models/Student';
+import type { StudentVerbose } from '../models/StudentVerbose';
 import type { Visibility } from '../models/Visibility';
 import { request as __request } from '../core/request';
 
@@ -17,12 +18,7 @@ export class Service {
      * @throws ApiError
      */
     public static async getRoster(): Promise<(Result & {
-students: Array<(Student & {
-/**
- * The unique identifier of the student
- */
-uid: number,
-})>,
+students: Array<(Student & StudentVerbose)>,
 schools: Array<School>,
 }) | Result> {
         const result = await __request({
@@ -93,7 +89,9 @@ curriculum?: string,
 city?: string,
 schoolStateProvince?: string,
 schoolCountry?: string,
-): Promise<Result> {
+): Promise<(Result & {
+students?: Array<(Student & StudentVerbose)>,
+})> {
         const result = await __request({
             method: 'GET',
             path: `/student`,
@@ -248,7 +246,9 @@ city?: string,
 limit: number,
 offset: number,
 },
-): Promise<Result> {
+): Promise<(Result & {
+schools?: Array<School>,
+})> {
         const result = await __request({
             method: 'GET',
             path: `/school`,
