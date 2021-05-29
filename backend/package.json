@@ -1,6 +1,11 @@
 {
   "name": "backend",
-  "version": "1.0.0",
+  "version": "1.0.3",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AcKindle3/sms-where-we-go.git",
+    "directory": "backend/src/generated"
+  },
   "main": "build/index.js",
   "license": "MIT",
   "dependencies": {
