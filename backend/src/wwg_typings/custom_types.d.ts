@@ -5,6 +5,6 @@ import { Session } from 'express-session';
 declare module 'express-session' {
     interface Session {
         student_uid: number,
-        identifier: string
+        identifier: string | number
     }
 }

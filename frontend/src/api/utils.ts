@@ -1,0 +1,28 @@
+import { ApiError, Result } from 'wwg-api';
+
+/**
+ * A type-safe helper to convert err of `any` type to standard `Result` type
+ * @param err 
+ * @returns 
+ */
+export const handleApiError = async (err: ApiError | string): Promise<Result> => {
+    if (typeof err === 'string') {
+        return {
+            result: Result.result.ERROR,
+            message: err
+        };
+    }
+    if (!!err.body) {
+        return {
+            result: err.body.result ?? Result.result.ERROR,
+            message: err.body.message ?? '发生了未知错误'
+        }
+    }
+    else {
+        console.error(err);
+        return {
+            result: Result.result.ERROR,
+            message: '发生了未知错误'
+        }
+    }
+}

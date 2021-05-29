@@ -2,8 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { Result } from '../models/Result';
+import type { Role } from '../models/Role';
 import type { School } from '../models/School';
 import type { Student } from '../models/Student';
+import type { Visibility } from '../models/Visibility';
 import { request as __request } from '../core/request';
 
 export class Service {
@@ -40,22 +42,35 @@ schools: Array<School>,
      * @throws ApiError
      */
     public static async login(
-requestBody: {
-/**
- * The identifier of the username, which can be the uid, phone number or email
- */
-identifier: string,
+requestBody: ({
 password: string,
+} & ({
 /**
  * When set to true, the identifier will be used as the uid of the student
  */
 use_uid?: boolean,
-},
+/**
+ * The identifier of the username, which can be the uid, phone number or email
+ */
+identifier: string,
+} | {
+/**
+ * When set to true, the identifier will be used as the uid of the student
+ */
+use_uid?: boolean,
+/**
+ * The identifier as a student uid
+ */
+identifier: number,
+})),
 ): Promise<Result> {
         const result = await __request({
             method: 'POST',
             path: `/login`,
             body: requestBody,
+            errors: {
+                400: `Default response telling whether the request is successful`,
+            },
         });
         return result.body;
     }
@@ -111,7 +126,9 @@ uid: number,
      */
     public static async postStudent(
 requestBody: (Student & {
+name: string,
 password: string,
+curriculum?: any,
 } & ({
 /**
  * The registration key provided by the maintainer for each class which fills class_number, year, and curriculum for the student
@@ -143,8 +160,19 @@ grad_year: number,
      */
     public static async updateStudent(
 requestBody: (Student & {
+/**
+ * If not specified, update the current logged in student
+ */
+student_uid?: number,
+visibility?: Visibility,
+role?: Role,
+/**
+ * The new password
+ */
+password?: string,
 class_number?: number,
 grad_year?: number,
+curriculum?: any,
 }),
 ): Promise<Result> {
         const result = await __request({
@@ -190,7 +218,6 @@ student_uid: number,
      * Validate whether the provided registration key is valid and return corresponding information
      * @param requestBody 
      * @returns any Tell whether the key is valid and return the related information
-     * @returns Result Default response telling whether the request is successful
      * @throws ApiError
      */
     public static async validate(
@@ -199,10 +226,10 @@ registration_key: string,
 },
 ): Promise<(Result & {
 class_number?: number,
-year?: string,
+grad_year?: number,
 curriculum?: string,
 expiration_date?: string,
-}) | Result> {
+})> {
         const result = await __request({
             method: 'POST',
             path: `/validate`,

@@ -10,18 +10,27 @@ cd sms-where-we-go
 sh setup.sh
 ```
 
-**Note that to set up the project, you need to be able to run the shell script**
+**Note that to set up the project, you need to be able to run shell scripts**
 
 ## Deployment
 
 ```
-sh path-to/sms-where-we-go/deploy.sh
+cd sms-where-we-go
+sh deploy.sh
 ```
 
-This will run the development build of the website. 
+This will run the development build of the website.
 (By default, the frontend runs at port 3000, the backend runs at port 8080)
 
 ## Overview
 
-- Frontend: React + Typescript + Bootstrap + MapBox GL
+- Frontend: React + Typescript + Ant Design + MapBox GL
 - Backend: Node.js + TypeScript + Express + OpenAPI
+
+## Workflow
+
+Coming soon...
+
+## API
+
+Coming soon...

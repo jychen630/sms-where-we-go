@@ -16,30 +16,30 @@ const port = 8080;
 export const pg = knex(pgOptions);
 export const populateTestData = async () => {
     await pg('wwg.curriculum').insert([{
-        name: "international"
+        curriculum_name: "international"
     }, {
-        name: "gaokao"
+        curriculum_name: "gaokao"
     }]);
     await pg('wwg.class').insert([{
         class_number: 2,
         grad_year: 2019,
-        curriculum_uid: 1
+        curriculum_name: 'gaokao'
     }, {
         class_number: 3,
         grad_year: 2019,
-        curriculum_uid: 1
+        curriculum_name: 'gaokao'
     }, {
         class_number: 2,
         grad_year: 2020,
-        curriculum_uid: 1
+        curriculum_name: 'gaokao'
     }, {
         class_number: 4,
         grad_year: 2019,
-        curriculum_uid: 2
+        curriculum_name: 'international'
     }, {
         class_number: 5,
         grad_year: 2019,
-        curriculum_uid: 2
+        curriculum_name: 'international'
     }]);
     await pg('wwg.school').insert({
         name: "Test School",
@@ -61,7 +61,8 @@ export const populateTestData = async () => {
         class_number: 2,
         grad_year: 2019,
         school_uid: 1,
-        visibility_type: 'class'
+        visibility_type: 'class',
+        role: 'class'
     }, {
         name: "Kang",
         phone_number: "13634343434",
@@ -77,7 +78,8 @@ export const populateTestData = async () => {
         class_number: 2,
         grad_year: 2020,
         school_uid: 1,
-        visibility_type: 'curriculum'
+        visibility_type: 'curriculum',
+        role: 'system'
     }, {
         name: "Fang",
         phone_number: "13900002222",
@@ -93,7 +95,8 @@ export const populateTestData = async () => {
         class_number: 4,
         grad_year: 2019,
         school_uid: 1,
-        visibility_type: 'curriculum'
+        visibility_type: 'curriculum',
+        role: 'curriculum'
     }, {
         name: "Gao",
         phone_number: "18912346666",
@@ -101,7 +104,8 @@ export const populateTestData = async () => {
         class_number: 5,
         grad_year: 2019,
         school_uid: 1,
-        visibility_type: 'curriculum'
+        visibility_type: 'curriculum',
+        role: 'year'
     }]);
     await pg('wwg.registration_key').insert({
         registration_key: "wwgasdfg",
@@ -155,7 +159,7 @@ initialize({
         'application/json': express.json()
     },
     errorMiddleware: function (err: any, req: any, res: any, next) {
-        logger.info(err);
+        logger.error(err);
 
         if (err.type === 'entity.parse.failed') {
             sendError(res, err.status, 'The content format is invalid');
@@ -167,10 +171,35 @@ initialize({
             return;
         }
 
-        const error = err.errors[0];
-        const errCode = (error.errorCode as string).match(validationPattern);
+        let error = err.errors[0];
+        let errCode = (error.errorCode as string).match(validationPattern);
         if (errCode) {
-            sendError(res, err.status ?? 400, `[${errCode[1]}] "${error.path}" ${error.message}`);
+            if (errCode[1] === 'oneOf' && req.path === '/student' && req.method === 'POST') {
+                sendError(res, err.status ?? 400, 'You should either pass a registration key or class number with graduation year');
+                return;
+            }
+
+            if (errCode[1] === 'enum' && error.path === 'curriculum' && req.path === '/student' && (req.method === 'POST' || req.method === 'PUT')) {
+                sendError(res, 400, '"curriculum" is not allowed for registering or updating');
+                return
+            }
+
+            if (errCode[1] === 'required') {
+                sendError(res, 400, error.message.replace('should have', 'Missing'));
+                return;
+            }
+
+            if (errCode[1] === 'enum' && req.path === '/login' && req.method === 'POST') {
+                error = err.errors[1];
+                errCode = (error.errorCode as string).match(validationPattern);
+            }
+
+            if (error.path !== undefined && !!errCode) {
+                sendError(res, err.status ?? 400, `[${errCode[1]}] "${error.path}" ${error.message}`);
+            }
+            else {
+                sendError(res, err.status ?? 400, `[${(!!errCode) ? errCode[1] : 'unknown'}] ${error.message}`);
+            }
         }
         else {
             sendError(res, err.status ?? 400, error.message ?? 'The input information is invalid');

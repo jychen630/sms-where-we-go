@@ -114,10 +114,10 @@ components:
           description: The unique identifier of the school
           example: 12
         latitude:
-          type: string
+          type: number
           example: 22.5514
         longitude:
-          type: string
+          type: number
           example: 114.1216
         school_name:
           type: string
@@ -131,6 +131,34 @@ components:
         city:
           type: string
           example: Shenzhen
+    Visibility:
+      type: string
+      description: >
+        * `private`: Visible only to the student themself
+        * `class`: Visible only to the students in the same class
+        * `curriculum`: Visible only to the students within the same curriculum
+        * `year`: Visible only to the students who graduate in the same year
+        * `students`: Visible only to any registered users (including past and future students)
+      enum:
+        - private
+        - class
+        - curriculum
+        - year
+        - students
+    Role:
+      type: string
+      description: >
+        * `student` Limited write access to the user itself
+        * `class` Write access to the students within a class
+        * `curriculum` Write access to the student within a curriculum
+        * `year` Write access to the students who graduate in the same year
+        * `system` Write access to the all students including admin students
+      enum:
+        - student
+        - class
+        - curriculum
+        - year
+        - system
   securitySchemes:
     sessionAuth:
       type: apiKey
@@ -190,22 +218,44 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              required:
-                - identifier
-                - password
-              properties:
-                identifier:
-                  type: string
-                  description: The identifier of the username, which can be the uid, phone number or email
-                  example: testemail@asd.com
-                password:
-                  type: string
-                  example: password123
-                use_uid:
-                  type: boolean
-                  description: When set to true, the identifier will be used as the uid of the student
-                  example: false
+              allOf:
+                - type: object
+                  required:
+                    - password
+                  properties:
+                    password:
+                      type: string
+                      example: password123
+                - oneOf:
+                  - type: object
+                    required:
+                      - identifier
+                    properties:
+                      use_uid:
+                        type: boolean
+                        description: When set to true, the identifier will be used as the uid of the student
+                        enum: [false]
+                      identifier:
+                        description: The identifier of the username, which can be the uid, phone number or email
+                        oneOf:
+                          - type: string
+                            format: email
+                            example: test@asd.com
+                          - type: string
+                            pattern: ^1(?:3\d{3}|5[^4\D]\d{2}|8\d{3}|7(?:[0-35-9]\d{2}|4(?:0\d|1[0-2]|9\d))|9[0-35-9]\d{2}|6[2567]\d{2}|4(?:(?:10|4[01])\d{3}|[68]\d{4}|[579]\d{2}))\d{6}$
+                            example: 18912341234
+                  - type: object
+                    required:
+                      - identifier
+                    properties:
+                      use_uid:
+                        type: boolean
+                        description: When set to true, the identifier will be used as the uid of the student
+                        enum: [true]
+                      identifier:
+                        type: number
+                        description: The identifier as a student uid
+                        maximum: 2147483647
       responses:
         "200":
           description: Return whether the login is a success
@@ -213,6 +263,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Result"
+        "400":
+          $ref: "#/components/responses/Default"
         default:
           $ref: "#/components/responses/Default"
   /student:
@@ -287,12 +339,17 @@ paths:
               - $ref: "#/components/schemas/Student"
               - type: object
                 required:
+                  - name
                   - password
                 properties:
+                  name:
+                    type: string
                   password:
                     type: string
                     format: password
                     example: password123
+                  curriculum:
+                    enum: [null]
               - oneOf:
                 - type: object
                   description: Only required for new users
@@ -303,6 +360,11 @@ paths:
                       type: string
                       description: The registration key provided by the maintainer for each class which fills class_number, year, and curriculum for the student
                       example: asdfghjk
+                    # To be added
+                    #verification_code:
+                    #  description: If the phone number is specified, the verification code will be required
+                    #  type: integer
+                    #  example: 32874
                 - type: object
                   description: Only accessible to admin users
                   required:
@@ -336,12 +398,33 @@ paths:
               - $ref: "#/components/schemas/Student"
               - type: object
                 properties:
+                  student_uid:
+                    description: If not specified, update the current logged in student
+                    type: integer
+                    maximum: 2147483647
+                    example: 3
+                  visibility:
+                    $ref: "#/components/schemas/Visibility"
+                  role:
+                    $ref: "#/components/schemas/Role"
+                  password:
+                    description: The new password
+                    type: string
+                    format: password
+                    example: pasword123
                   class_number:
                     type: integer
                     example: 18
                   grad_year:
                     type: integer
                     example: 2021
+                  curriculum:
+                    enum: [null]
+                  # To be added  
+                  #verification_code:
+                  #  description: If the phone number is specified, the verification code will be required
+                  #  type: integer
+                  #  example: 32874
       responses:
         200:
           $ref: "#/components/responses/Default"
@@ -366,6 +449,7 @@ paths:
                 student_uid:
                   type: integer
                   description: The unique identifier of the student
+                  maximum: 2147483647
                   example: 21
       responses:
         200:
@@ -390,6 +474,8 @@ paths:
               properties:
                 registration_key:
                   type: string
+                  minLength: 8
+                  maxLength: 8
                   example: asdfghjk
       responses:
         200:
@@ -404,8 +490,8 @@ paths:
                       class_number:
                         type: integer
                         example: 12
-                      year:
-                        type: string
+                      grad_year:
+                        type: integer
                         example: 2021
                       curriculum:
                         type: string
@@ -413,8 +499,6 @@ paths:
                       expiration_date:
                         type: string
                         format: date
-        default:
-          $ref: "#/components/responses/Default"
   /school:
     get:
       operationId: getSchool
