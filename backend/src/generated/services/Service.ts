@@ -251,6 +251,7 @@ school_country?: string,
 school_state_province?: string,
 city?: string,
 limit: number,
+offset: number,
 },
 ): Promise<Array<School>> {
         const result = await __request({
