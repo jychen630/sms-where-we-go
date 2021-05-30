@@ -6,18 +6,25 @@ import {
   Redirect
 } from 'react-router-dom';
 import Map from './Map';
-import Registration from './pages/registeration';
-import Login from './pages/login';
 import 'antd/dist/antd.css';
+import CardPage from './pages/CardPage';
+import LoginForm from './components/LoginForm';
+import RegistrationForm from './components/RegistrationForm';
 
 function App() {
   return (
     <Router>
       <Switch>
         <Route path="/login">
-          <Login />
+          <CardPage title='Where We Go 登录'>
+            <LoginForm />
+          </CardPage>
         </Route>
-        <Route path="/register"><Registration /></Route>
+        <Route path="/register">
+          <CardPage title='Where We Go 注册'>
+            <RegistrationForm />
+          </CardPage>
+        </Route>
         <Route path="/map">
           <Map />
         </Route>
