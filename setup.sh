@@ -58,7 +58,6 @@ DROP DATABASE IF EXISTS $DB_NAME;
 CREATE DATABASE $DB_NAME;
 GRANT ALL PRIVILEGES ON DATABASE $DB_NAME TO $WWG_USER;
 EOF
-echo "----END POSTGRESQL----"
 if [ $? -eq 0 ];
 then
     echo "[setup] Successfully set up the role and the database."
@@ -66,12 +65,12 @@ else
     echo "[error] Some error has occurred during the process of initializing the role and the database..."
     exit 1
 fi
+echo "----END POSTGRESQL----"
 
 echo "[setup] Credentials for $WWG_USER are stored to $PGPASSFILE."
 echo "[setup] Initializing the schema."
 echo "----BEGIN POSTGRESQL----"
 psql -v ON_ERROR_STOP=1 -f ./init.sql -U $WWG_USER -h localhost -q -e $DB_NAME
-echo "----END POSTGRESQL----"
 if [ $? -eq 0 ];
 then
     echo "[setup] Successfully set up PostgreSQL."
@@ -79,6 +78,7 @@ else
     echo "[Error] Some error has occurred during the process of initializing the schema..."
     exit 1
 fi
+echo "----END POSTGRESQL----"
 
 cd backend
 echo "[setup] Running yarn load to prepare the types and test data..."
