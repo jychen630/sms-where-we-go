@@ -21,6 +21,8 @@ yarn -i
 echo "[setup] Setting up packages for backend..."
 cd ../backend
 yarn -i
+echo "[setup] Applying patches..."
+yarn patch-package
 
 cd ../
 echo "[setup] Setting up environment variables..."
@@ -68,7 +70,7 @@ fi
 echo "[setup] Credentials for $WWG_USER are stored to $PGPASSFILE."
 echo "[setup] Initializing the schema."
 echo "----BEGIN POSTGRESQL----"
-psql -v ON_ERROR_STOP=1 -f ./tools/sql/init.sql -U $WWG_USER -h localhost -q -e $DB_NAME
+psql -v ON_ERROR_STOP=1 -f ./init.sql -U $WWG_USER -h localhost -q -e $DB_NAME
 echo "----END POSTGRESQL----"
 if [ $? -eq 0 ];
 then
@@ -77,5 +79,10 @@ else
     echo "[Error] Some error has occurred during the process of initializing the schema..."
     exit 1
 fi
+
+cd backend
+echo "[setup] Running yarn load to prepare the types and test data..."
+yarn load
+
 echo "[setup] All done with envrionment setup."
 echo '[setup] Please use sh "deploy.sh" to deploy the website.'

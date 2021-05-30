@@ -2,6 +2,14 @@
 DROP SCHEMA IF EXISTS wwg;
 CREATE SCHEMA wwg;
 
+CREATE EXTENSION fuzzystrmatch
+    SCHEMA wwg
+    VERSION "1.1";
+
+CREATE EXTENSION pg_trgm
+    SCHEMA wwg
+    VERSION "1.5";
+
 CREATE TABLE wwg.school (
     school_uid SERIAL PRIMARY KEY,
     name VARCHAR(60) NOT NULL UNIQUE,

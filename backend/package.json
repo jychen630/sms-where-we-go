@@ -41,6 +41,7 @@
     "watch": "tsc -w",
     "generate": "openapi --input ./openapi.yaml --output ./src/generated",
     "start": "supervisor --no-restart-on exit build/index.js",
+    "load": "node tools/load.mjs",
     "deploy": "yarn npm-run-all -p -l watch start"
   }
 }
