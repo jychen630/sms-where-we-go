@@ -516,36 +516,42 @@ paths:
       operationId: getSchool
       description: Search for schools
       security: []
-      requestBody:
-        required: false
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                school_name:
-                  type: string
-                  example: The University
-                school_country:
-                  type: string
-                  example: China
-                school_state_province:
-                  type: string
-                  example: Guangdong
-                city:
-                  type: string
-                  example: Shenzhen
-                limit:
-                  type: integer
-                  default: 100
-                  example: 100
-                  minimum: 1
-                  maximum: 100
-                offset:
-                  type: integer
-                  default: 0
-                  example: 0
-                  minimum: 0
+      parameters:
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            default: 0
+            example: 0
+            minimum: 0
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 100
+            example: 100
+            minimum: 1
+            maximum: 100
+        - in: query
+          name: school_name
+          schema:
+            type: string
+            example: The University
+        - in: query
+          name: school_country
+          schema:
+            type: string
+            example: China
+        - in: query
+          name: school_state_province
+          schema:
+            type: string
+            example: Guangdong
+        - in: query
+          name: city
+          schema:
+            type: string
+            example: Shenzhen
       responses:
         200:
           description: Return the schools that satisfy the constraints

@@ -233,26 +233,36 @@ expiration_date?: string,
 
     /**
      * Search for schools
-     * @param requestBody 
+     * @param offset 
+     * @param limit 
+     * @param schoolName 
+     * @param schoolCountry 
+     * @param schoolStateProvince 
+     * @param city 
      * @returns any Return the schools that satisfy the constraints
      * @throws ApiError
      */
     public static async getSchool(
-requestBody?: {
-school_name?: string,
-school_country?: string,
-school_state_province?: string,
-city?: string,
-limit: number,
 offset: number,
-},
+limit: number = 100,
+schoolName?: string,
+schoolCountry?: string,
+schoolStateProvince?: string,
+city?: string,
 ): Promise<(Result & {
 schools?: Array<School>,
 })> {
         const result = await __request({
             method: 'GET',
             path: `/school`,
-            body: requestBody,
+            query: {
+                'offset': offset,
+                'limit': limit,
+                'school_name': schoolName,
+                'school_country': schoolCountry,
+                'school_state_province': schoolStateProvince,
+                'city': city,
+            },
         });
         return result.body;
     }

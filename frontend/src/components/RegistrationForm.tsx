@@ -1,8 +1,9 @@
+import _ from 'lodash';
 import { Button, Col, Collapse, Checkbox, Form, Input, Modal, Select, Space, Spin, Row, Tooltip, Typography, notification } from 'antd';
 import { FieldTimeOutlined, InfoCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { Result, Service } from 'wwg-api';
+import { Result, School, Service } from 'wwg-api';
 import { handleApiError } from '../api/utils';
 
 import PrivacyPolicy from './PrivacyPolicy';
@@ -14,10 +15,26 @@ const phonePattern = /^1(?:3\d{3}|5[^4\D]\d{2}|8\d{3}|7(?:[0-35-9]\d{2}|4(?:0\d|
 const emailPattern = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/ // eslint-disable-line
 const { Text } = Typography;
 const SEARCH_LIMIT = 5;
+const searchSchool = _.throttle(async (offset, value, setSchools) => {
+    console.log('lanuch');
+    await Service.getSchool(
+        offset,
+        SEARCH_LIMIT,
+        value
+    ).then((res) => {
+        setSchools(res.schools ?? []);
+    }).catch((err) => {
+        handleApiError(err).then((res) => {
+            console.error(res.message);
+        })
+    });
+}, 1000);
 
 const RegistrationForm = () => {
     const [form] = Form.useForm<Values>();
     const history = useHistory();
+    const [offset, setOffset] = useState(0);
+    const [schools, setSchools] = useState<School[]>([]);
     const [schoolUid, setSchoolUid] = useState(0);
     const [showSchoolModal, setShowSchoolModal] = useState(false);
     const [showPrivacyModal, setShowPrivacyModal] = useState(false);
@@ -77,10 +94,8 @@ const RegistrationForm = () => {
     }
 
     const handleSearchSchool = (value: string) => {
-        Service.getSchool({
-            school_name: value,
-            limit: SEARCH_LIMIT
-        });
+        setSchools([]);
+        searchSchool(offset, value, setSchools);
     }
 
     return (
@@ -207,7 +222,7 @@ const RegistrationForm = () => {
                     <Input placeholder='微信唯一ID (如 asdasdkl202122skwmrt)' />
                 </Form.Item>
                 <Form.Item
-                    name='school'
+                    name='school_uid'
                     label='去向院校'
                     tooltip='没有找到你的学校？点击右方 + 来添加一个学校。若目前未定去向，此项可不填。海外院校请输入英文名'
                 >
@@ -219,9 +234,24 @@ const RegistrationForm = () => {
                                 allowClear
                                 filterOption={false}
                                 onSearch={handleSearchSchool}
-                                onChange={() => { }}
+                                onChange={(value: number) => { setSchoolUid(value) }}
                                 loading={true}
-                            />
+                            >
+                                {
+                                    schools.map((value, index) => {
+                                        return (
+                                            <Select.Option
+                                                key={index}
+                                                value={value.uid}
+                                            >
+                                                <Tooltip placement='left' title={`[uid: ${value.uid}] ${value.school_country ?? '无'}/${value.school_state_province ?? '无'}/${value.city ?? '无'}`}>
+                                                    {value.school_name}
+                                                </Tooltip>
+                                            </Select.Option>
+                                        )
+                                    })
+                                }
+                            </Select>
                         </Col>
                         <Col span={1} />
                         <Col span={1}>

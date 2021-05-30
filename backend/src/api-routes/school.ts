@@ -4,10 +4,11 @@ import { pg } from "..";
 import { School } from "../generated/schema";
 import { School as apiSchool } from "../generated"
 import { Service } from "../generated/services/Service";
-import { dbHandleError, parseBody, sendError, sendSuccess } from "../utils";
+import { dbHandleError, parseQuery, sendError, sendSuccess } from "../utils";
+import knex from "knex";
 
 export const get: Operation = async (req, res) => {
-    const data = parseBody<typeof Service.getSchool>(req);
+    const data = parseQuery<typeof Service.getSchool>(req) as any;
     const logger = getLogger('school.get');
 
     if ((data !== undefined && data?.limit < 1) || (data !== undefined && data?.offset < 0)) {
@@ -19,18 +20,19 @@ export const get: Operation = async (req, res) => {
     pg<School>('school')
         .select()
         .modify<School, School[]>(
-            (qb) => {
+            async (qb) => {
                 if (!!data?.school_name) {
-                    qb.where('name', data.school_name);
+                    qb.orderByRaw('name \% ? DESC', data.school_name);
+                    qb.whereRaw('SIMILARITY(name, ?) > 0.2', data.school_name);
                 }
                 if (!!data?.school_country) {
-                    qb.where('country', data?.school_country)
+                    qb.where('country', data?.school_country);
                 }
                 if (!!data?.school_state_province) {
-                    qb.where('state_province', data?.school_state_province)
+                    qb.where('state_province', data?.school_state_province);
                 }
                 if (!!data?.city) {
-                    qb.where('city', data?.city)
+                    qb.where('city', data?.city);
                 }
             }
         )

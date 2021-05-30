@@ -17,6 +17,13 @@ export const sendError = (res: Response, code: number, message?: string) => {
     })
 };
 
+export const parseQuery = <T extends (parameters: any) => any>(req: Request): Parameters<T> => {
+    // This function takes the type of an OpenAPI service function that has a request body 
+    // and extract the request body and return it given the type definition of the request body.
+    // Note: This does not validate whether the request body contains the required parameters.
+    return req.query as any;
+}
+
 export const parseBody = <T extends (requestBody: any) => any>(req: Request): Parameters<T>[0] => {
     // This function takes the type of an OpenAPI service function that has a request body 
     // and extract the request body and return it given the type definition of the request body.
