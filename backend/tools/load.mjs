@@ -39,7 +39,7 @@ log4js.configure({
 });
 
 function handleError(err) {
-  if (!!err) {
+  if (!!err.detail) {
     logger.error(err.detail);
   } else {
     logger.error(err);
@@ -92,12 +92,56 @@ async function populateTestData() {
 
   logger.info("Populating test data for school...");
   await pg("wwg.school")
-    .insert({
-      name: "Test School",
-      position: pg.raw("point(34,-34)"),
-      country: "United States",
-      city: "test city",
-    })
+    .insert([
+      {
+        name: "Test School",
+        position: pg.raw("point(34,-34)"),
+        country: "United States",
+        city: "test city",
+      },
+      {
+        name: "南京大学",
+        position: pg.raw("point(34,-34)"),
+        country: "China",
+        state_province: "Jiangsu",
+        city: "Nanjing",
+      },
+      {
+        name: "中国政法大学",
+        position: pg.raw("point(34,-34)"),
+        country: "China",
+        state_province: "Beijing",
+        city: "Beijing",
+      },
+      {
+        name: "电子科技大学",
+        position: pg.raw("point(34,-34)"),
+        country: "China",
+        state_province: "Sichuan",
+        city: "Chengdu",
+      },
+      {
+        name: "清华大学",
+        position: pg.raw("point(34,-34)"),
+        country: "China",
+        state_province: "Beijing",
+        city: "Beijing",
+      },
+      {
+        name: "天津渤海职业技术学院",
+        position: pg.raw("point(34,-34)"),
+        country: "China",
+        state_province: "Tianjing",
+        city: "Tianjing",
+      },
+      {
+        name: "石家庄铁路职业技术学院",
+        position: pg.raw("point(34,-34)"),
+        country: "China",
+        state_province: "Hebei",
+        city: "Shijiazhuang",
+      },
+    ])
     .catch(handleError);
 
   logger.info("Populating test data for student...");
