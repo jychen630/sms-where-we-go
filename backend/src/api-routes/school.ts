@@ -16,16 +16,20 @@ export const get: Operation = async (req, res) => {
         return;
     }
 
+    if (data === undefined || (!!!data.school_name && !!!data.school_country && !!!data.school_state_province && !!!data.city)) {
+        sendSuccess(res, { schools: [] })
+        return;
+    }
+
     const subquery = pg('school')
-        .column('school.school_uid')
+        .column({ uid: 'school.school_uid' }, 'name', 'country', 'state_province', 'city', 'latitude', 'longitude', 'alias', pg.raw('SIMILARITY(school_alias.alias, ?) as s', data.school_name ?? ""))
         .select()
         .leftJoin('school_alias', 'school_alias.school_uid', 'school.school_uid')
         .joinRaw('NATURAL JOIN city')
         .modify<School & City & SchoolAlias, (School & City & SchoolAlias)[]>(
             async (qb) => {
-                console.log(data.school_name);
                 if (!!data?.school_name) {
-                    qb.orderByRaw('school_alias.alias \% ? DESC', data.school_name);
+                    qb.orderByRaw('SIMILARITY(school_alias.alias, ?) DESC', data.school_name);
                     qb.whereRaw('SIMILARITY(school_alias.alias, ?) > 0.2', data.school_name);
                 }
                 if (!!data?.school_country) {
@@ -38,21 +42,24 @@ export const get: Operation = async (req, res) => {
                     qb.where('city', data?.city);
                 }
             }
-        );
-    pg('school')
-        .where('school_uid', 'in', subquery)
+        ).as('t1');
+    pg(subquery)
+        .select()
+        .distinctOn('uid')
         .limit(data?.limit ?? 1)
         .offset(data?.offset ?? 0)
+        .orderBy('uid')
+        .orderBy('s', 'desc')
         .then((result) => {
             const schools = result.map(v => ({
-                uid: v.school_uid,
+                uid: v.uid,
                 school_name: v.name,
                 school_country: v.country,
                 school_state_province: v.state_province,
                 city: v.city,
                 latitude: v.latitude,
                 longitude: v.longitude,
-                alias: v.alias
+                matched_alias: data.school_name ? v.alias : undefined,
             } as apiSchool));
             logger.info('Successfully fetched schools');
             sendSuccess(res, { schools: schools });

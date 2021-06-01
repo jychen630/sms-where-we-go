@@ -566,6 +566,11 @@ paths:
                         type: array
                         items:
                           $ref: "#/components/schemas/School"
+                  - type: object
+                    properties:
+                      matched_alias:
+                        type: string
+                        description: The alias that matches the queried school_name
     post:
       operationId: postSchool
       description: Add a new school

@@ -251,6 +251,11 @@ schoolStateProvince?: string,
 city?: string,
 ): Promise<(Result & {
 schools?: Array<School>,
+} & {
+/**
+ * The alias that matches the queried school_name
+ */
+matched_alias?: string,
 })> {
         const result = await __request({
             method: 'GET',
