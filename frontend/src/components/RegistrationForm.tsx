@@ -34,7 +34,7 @@ const RegistrationForm = () => {
     const [form] = Form.useForm<Values>();
     const history = useHistory();
     const [offset, setOffset] = useState(0);
-    const [schools, setSchools] = useState<School[]>([]);
+    const [schools, setSchools] = useState<(School & { matched_alias: string })[]>([]);
     const [schoolUid, setSchoolUid] = useState(0);
     const [showSchoolModal, setShowSchoolModal] = useState(false);
     const [showPrivacyModal, setShowPrivacyModal] = useState(false);
@@ -245,7 +245,7 @@ const RegistrationForm = () => {
                                                 value={value.uid}
                                             >
                                                 <Tooltip placement='left' title={`[uid: ${value.uid}] ${value.school_country ?? '无'}/${value.school_state_province ?? '无'}/${value.city ?? '无'}`}>
-                                                    {value.school_name}
+                                                    {value.school_name} {value.matched_alias !== value.school_name && `(${value.matched_alias})`}
                                                 </Tooltip>
                                             </Select.Option>
                                         )
