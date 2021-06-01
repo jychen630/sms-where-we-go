@@ -10,17 +10,25 @@ CREATE EXTENSION pg_trgm
     SCHEMA wwg
     VERSION "1.5";
 
+CREATE TABLE wwg.city (
+    city_uid SERIAL PRIMARY KEY,
+    city VARCHAR(40),
+    state_province VARCHAR(40),
+    country VARCHAR(40) NOT NULL,
+    UNIQUE(city, state_province, country)
+);
+
 CREATE TABLE wwg.school (
     school_uid SERIAL PRIMARY KEY,
-    name VARCHAR(60) NOT NULL UNIQUE,
+    name VARCHAR(60) NOT NULL,
     position point,
-    country VARCHAR(40) NOT NULL,
-    state_province VARCHAR(40),
-    city VARCHAR(40)
+    city_uid INT NOT NULL,
+    UNIQUE (name, city_uid),
+    FOREIGN KEY (city_uid) REFERENCES wwg.city(city_uid)
 );
 
 CREATE TABLE wwg.school_alias (
-    school_uid SERIAL,
+    school_uid INT,
     alias VARCHAR(60),
     PRIMARY KEY (school_uid, alias),
     FOREIGN KEY (school_uid) REFERENCES wwg.school(school_uid)
@@ -103,3 +111,18 @@ CREATE VIEW wwg.student_class AS
 CREATE VIEW wwg.student_class_role AS
     SELECT * FROM wwg.student_class
     NATURAL JOIN wwg.role;
+
+CREATE FUNCTION add_alias() RETURNS trigger AS $$
+    BEGIN
+        INSERT INTO wwg.school_alias VALUES (
+            NEW.school_uid,
+            NEW.name
+        );
+        RETURN NEW;
+    END;
+    $$ LANGUAGE plpgsql;
+
+CREATE TRIGGER school_insert
+    AFTER INSERT ON wwg.school
+    FOR EACH ROW
+    EXECUTE FUNCTION add_alias();

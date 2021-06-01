@@ -18,6 +18,7 @@ export enum StudentVisibility {
 }
 
 export enum Table {
+  City = "city",
   Class = "class",
   Curriculum = "curriculum",
   RegistrationKey = "registration_key",
@@ -29,6 +30,13 @@ export enum Table {
   StudentClassRole = "student_class_role",
   Visibility = "visibility",
 }
+
+export type City = {
+  city_uid: number;
+  city: string | null;
+  state_province: string | null;
+  country: string;
+};
 
 export type Class = {
   class_number: unknown;
@@ -57,9 +65,7 @@ export type School = {
   school_uid: number;
   name: string;
   position: unknown | null;
-  country: string;
-  state_province: string | null;
-  city: string | null;
+  city_uid: number;
 };
 
 export type SchoolAlias = {

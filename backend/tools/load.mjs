@@ -2,21 +2,29 @@ import knex from "knex";
 import dotenv from "dotenv";
 import log4js from "log4js";
 import knexTypes from "knex-types";
+import initSchools from "./load-school.mjs";
 
-const logger = log4js.getLogger("load");
-const RETRIES = 5;
+import argparse from "argparse";
 
-dotenv.config();
-const pg = knex.knex({
-  client: "pg",
-  connection: {
-    host: process.env.PGHOST,
-    user: process.env.PGUSER,
-    password: process.env.PGPASSWORD,
-    database: "wwg_base",
-  },
-  searchPath: ["wwg", "public"],
+const parser = new argparse.ArgumentParser({
+  description: "Load or incrementally add initial data to the database",
 });
+// ALL, TRACE, DEBUG, INFO, WARN, ERROR, FATAL, MARK, OFF
+let level = "warn";
+parser.add_argument("-f", "--force", {
+  action: "store_true",
+  help: "Reset the database before loading the data",
+});
+let group = parser.add_mutually_exclusive_group();
+group.add_argument("-v", "--verbose", {
+  action: "store_true",
+  help: "Show verbose console output",
+});
+group.add_argument("-s", "--silent", {
+  action: "store_true",
+  help: "Do not show any output",
+});
+const args = parser.parse_args();
 
 log4js.configure({
   appenders: {
@@ -32,10 +40,26 @@ log4js.configure({
   },
   categories: {
     default: {
-      appenders: ["console", "file"],
-      level: "info",
+      appenders: args.silent ? ["console"] : ["console", "file"],
+      level: args.verbose ? "all" : args.silent ? "off" : "info",
     },
   },
+});
+
+const logger = log4js.getLogger("load");
+
+const RETRIES = 5;
+const DATA_PATHS = ["./tools/ChinaUniversityList.json"];
+dotenv.config();
+export const pg = knex.knex({
+  client: "pg",
+  connection: {
+    host: process.env.PGHOST,
+    user: process.env.PGUSER,
+    password: process.env.PGPASSWORD,
+    database: "wwg_base",
+  },
+  searchPath: ["wwg", "public"],
 });
 
 function handleError(err) {
@@ -86,60 +110,6 @@ async function populateTestData() {
         class_number: 5,
         grad_year: 2019,
         curriculum_name: "international",
-      },
-    ])
-    .catch(handleError);
-
-  logger.info("Populating test data for school...");
-  await pg("wwg.school")
-    .insert([
-      {
-        name: "Test School",
-        position: pg.raw("point(34,-34)"),
-        country: "United States",
-        city: "test city",
-      },
-      {
-        name: "南京大学",
-        position: pg.raw("point(34,-34)"),
-        country: "China",
-        state_province: "Jiangsu",
-        city: "Nanjing",
-      },
-      {
-        name: "中国政法大学",
-        position: pg.raw("point(34,-34)"),
-        country: "China",
-        state_province: "Beijing",
-        city: "Beijing",
-      },
-      {
-        name: "电子科技大学",
-        position: pg.raw("point(34,-34)"),
-        country: "China",
-        state_province: "Sichuan",
-        city: "Chengdu",
-      },
-      {
-        name: "清华大学",
-        position: pg.raw("point(34,-34)"),
-        country: "China",
-        state_province: "Beijing",
-        city: "Beijing",
-      },
-      {
-        name: "天津渤海职业技术学院",
-        position: pg.raw("point(34,-34)"),
-        country: "China",
-        state_province: "Tianjing",
-        city: "Tianjing",
-      },
-      {
-        name: "石家庄铁路职业技术学院",
-        position: pg.raw("point(34,-34)"),
-        country: "China",
-        state_province: "Hebei",
-        city: "Shijiazhuang",
       },
     ])
     .catch(handleError);
@@ -263,6 +233,9 @@ async function setup() {
   }
 
   await pingPg();
+
+  logger.info(`Generating school data from ${DATA_PATHS.join(", ")}}`);
+  await initSchools(DATA_PATHS);
 
   logger.info("Populating test data...");
   await populateTestData();
