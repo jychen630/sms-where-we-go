@@ -279,7 +279,13 @@ matched_alias?: string,
      * @throws ApiError
      */
     public static async postSchool(
-requestBody: School,
+requestBody: (School & {
+uid: -1,
+/**
+ * The uid of the city
+ */
+city_uid?: number,
+}),
 ): Promise<(Result & {
 school_uid?: number,
 })> {
@@ -312,6 +318,43 @@ description?: string,
             path: `/role`,
             errors: {
                 401: `Unauthorized to access the resource`,
+            },
+        });
+        return result.body;
+    }
+
+    /**
+     * Get existing cities that match the query params
+     * @param offset 
+     * @param limit 
+     * @param city 
+     * @param stateProvince 
+     * @param country 
+     * @returns any Return a list of cities that match the query params
+     * @throws ApiError
+     */
+    public static async getCity(
+offset: number,
+limit: number = 100,
+city?: string,
+stateProvince?: string,
+country?: string,
+): Promise<(Result & {
+cities?: Array<{
+city: string,
+state_province?: string,
+country: string,
+}>,
+})> {
+        const result = await __request({
+            method: 'GET',
+            path: `/city`,
+            query: {
+                'offset': offset,
+                'limit': limit,
+                'city': city,
+                'state_province': stateProvince,
+                'country': country,
             },
         });
         return result.body;

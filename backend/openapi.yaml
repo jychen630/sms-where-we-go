@@ -579,7 +579,18 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/School"
+              allOf:
+                - $ref: "#/components/schemas/School"
+                - type: object
+                  properties:
+                    uid:
+                      type: integer
+                      default: -1
+                      enum: [-1]
+                    city_uid:
+                      type: integer
+                      example: 121
+                      description: The uid of the city
       responses:
         200:
           description: Successfully added the school and return the id
@@ -622,4 +633,66 @@ paths:
                         example: Limited write access to the user itself
         401:
           $ref:  "#/components/responses/UnAuthorized"
-
+  /city:
+    get:
+      operationId: getCity
+      description: Get existing cities that match the query params
+      security: []
+      parameters:
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            default: 0
+            example: 0
+            minimum: 0
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 100
+            example: 100
+            minimum: 1
+            maximum: 100
+        - in: query
+          name: city
+          schema:
+            type: string
+            example: New York City
+        - in: query
+          name: state_province
+          schema:
+            type: string
+            example: New York
+        - in: query
+          name: country
+          schema:
+            type: string
+            example: United States
+      responses:
+        200:
+          description: Return a list of cities that match the query params
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Result"
+                  - type: object
+                    properties:
+                      cities:
+                        type: array
+                        items:
+                          type: object
+                          required:
+                            - city
+                            - country
+                          properties:
+                            city:
+                              type: string
+                              example: New York City
+                            state_province:
+                              type: string
+                              example: New York
+                            country:
+                              type: string
+                              example: United States
