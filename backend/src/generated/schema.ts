@@ -64,7 +64,8 @@ export type Role = {
 export type School = {
   school_uid: number;
   name: string;
-  position: unknown | null;
+  latitude: number | null;
+  longitude: number | null;
   city_uid: number;
 };
 

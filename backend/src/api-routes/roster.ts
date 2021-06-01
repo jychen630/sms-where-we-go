@@ -2,7 +2,7 @@ import { Operation } from 'express-openapi';
 import log4js from 'log4js';
 import { pg } from '..';
 import { Student, School as SchoolRes } from '../generated';
-import { School, StudentVisibility } from '../generated/schema';
+import { City, School, StudentVisibility } from '../generated/schema';
 import { StudentClass } from '../generated/schema';
 import { removeNull, sendError, sendSuccess } from '../utils';
 
@@ -42,7 +42,8 @@ export const get: Operation = async (req, res, next) => {
             )
             .then(async (students) => {
                 logger.info('Successfully GET roster');
-                const schools = await pg.select().from<School>('wwg.school')
+                const schools = await pg.select().from<School & City>('wwg.school')
+                    .joinRaw('NATURAL JOIN city')
                     .whereIn('school_uid', Object.values(students.map((student) => student.school_uid)));
                 sendSuccess(res, {
                     students: students.map((student) => {
@@ -59,8 +60,8 @@ export const get: Operation = async (req, res, next) => {
                     schools: schools.map((school) => {
                         return removeNull({
                             uid: school.school_uid,
-                            latitude: (school.position as any).x,
-                            longitude: (school.position as any).y,
+                            latitude: school.latitude,
+                            longitude: school.longitude,
                             school_name: school.name,
                             school_country: school.country,
                             school_state_province: school.state_province,

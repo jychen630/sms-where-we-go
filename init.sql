@@ -21,7 +21,8 @@ CREATE TABLE wwg.city (
 CREATE TABLE wwg.school (
     school_uid SERIAL PRIMARY KEY,
     name VARCHAR(60) NOT NULL,
-    position point,
+    latitude float,
+    longitude float,
     city_uid INT NOT NULL,
     UNIQUE (name, city_uid),
     FOREIGN KEY (city_uid) REFERENCES wwg.city(city_uid)

@@ -1,11 +1,10 @@
 import { Operation } from "express-openapi";
 import { getLogger } from "log4js";
 import { pg } from "..";
-import { School } from "../generated/schema";
+import { City, School, SchoolAlias } from "../generated/schema";
 import { School as apiSchool } from "../generated"
 import { Service } from "../generated/services/Service";
 import { dbHandleError, parseQuery, sendError, sendSuccess } from "../utils";
-import knex from "knex";
 
 export const get: Operation = async (req, res) => {
     const data = parseQuery<typeof Service.getSchool>(req) as any;
@@ -17,13 +16,17 @@ export const get: Operation = async (req, res) => {
         return;
     }
 
-    pg<School>('school')
+    const subquery = pg('school')
+        .column('school.school_uid')
         .select()
-        .modify<School, School[]>(
+        .leftJoin('school_alias', 'school_alias.school_uid', 'school.school_uid')
+        .joinRaw('NATURAL JOIN city')
+        .modify<School & City & SchoolAlias, (School & City & SchoolAlias)[]>(
             async (qb) => {
+                console.log(data.school_name);
                 if (!!data?.school_name) {
-                    qb.orderByRaw('name \% ? DESC', data.school_name);
-                    qb.whereRaw('SIMILARITY(name, ?) > 0.2', data.school_name);
+                    qb.orderByRaw('school_alias.alias \% ? DESC', data.school_name);
+                    qb.whereRaw('SIMILARITY(school_alias.alias, ?) > 0.2', data.school_name);
                 }
                 if (!!data?.school_country) {
                     qb.where('country', data?.school_country);
@@ -35,7 +38,9 @@ export const get: Operation = async (req, res) => {
                     qb.where('city', data?.city);
                 }
             }
-        )
+        );
+    pg('school')
+        .where('school_uid', 'in', subquery)
         .limit(data?.limit ?? 1)
         .offset(data?.offset ?? 0)
         .then((result) => {
@@ -45,8 +50,9 @@ export const get: Operation = async (req, res) => {
                 school_country: v.country,
                 school_state_province: v.state_province,
                 city: v.city,
-                latitude: (v.position as any).x,
-                longitude: (v.position as any).y,
+                latitude: v.latitude,
+                longitude: v.longitude,
+                alias: v.alias
             } as apiSchool));
             logger.info('Successfully fetched schools');
             sendSuccess(res, { schools: schools });

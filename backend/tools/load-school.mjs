@@ -20,16 +20,14 @@ const UNIQUE_CONSTRAINT_CODE = "23505";
  *        {
  *          "name": "the name of the school",
  *          "city": "the name of the city",
- *          "position": {
- *            "lat": 12.00
- *            "long": 34.00
- *          }
+ *          "lat": 12.00,
+ *          "long": 34.00
  *        }
  *      ]
  *    }
  *  ]
  * }
- * where the position is optional.
+ * where “lat", "long" are optional.
  *
  * state_province can be absent in case it doesn't apply,
  * but it should be included when there is an equivalent.
