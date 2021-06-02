@@ -3,10 +3,6 @@
 /* eslint-disable */
 
 export type School = {
-    /**
-     * The unique identifier of the school
-     */
-    uid: number;
     latitude?: number;
     longitude?: number;
     school_name: string;

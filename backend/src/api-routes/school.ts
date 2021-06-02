@@ -50,16 +50,13 @@ export const get: Operation = async (req, res) => {
       "alias",
       pg.raw("SIMILARITY(school_alias.alias, ?) as s", data.school_name ?? "")
     )
+    .distinctOn('uid')
     .select()
     .leftJoin("school_alias", "school_alias.school_uid", "school.school_uid")
     .joinRaw("NATURAL JOIN city")
     .modify<School & City & SchoolAlias, (School & City & SchoolAlias)[]>(
       async (qb) => {
         if (!!data?.school_name) {
-          qb.orderByRaw(
-            "SIMILARITY(school_alias.alias, ?) DESC",
-            data.school_name
-          );
           qb.whereRaw(
             "SIMILARITY(school_alias.alias, ?) > 0.2",
             data.school_name
@@ -79,24 +76,23 @@ export const get: Operation = async (req, res) => {
     .as("t1");
   pg(subquery)
     .select()
-    .distinctOn("uid")
     .limit(data?.limit ?? 1)
     .offset(data?.offset ?? 0)
-    .orderBy("uid")
     .orderBy("s", "desc")
+    .orderBy("uid")
     .then((result) => {
       const schools = result.map(
         (v) =>
-          ({
-            uid: v.uid,
-            school_name: v.name,
-            school_country: v.country,
-            school_state_province: v.state_province,
-            city: v.city,
-            latitude: v.latitude,
-            longitude: v.longitude,
-            matched_alias: data.school_name ? v.alias : undefined,
-          } as apiSchool)
+        ({
+          uid: v.uid,
+          school_name: v.name,
+          school_country: v.country,
+          school_state_province: v.state_province,
+          city: v.city,
+          latitude: v.latitude,
+          longitude: v.longitude,
+          matched_alias: data.school_name ? v.alias : undefined,
+        } as apiSchool)
       );
       logger.info("Successfully fetched schools");
       sendSuccess(res, { schools: schools });

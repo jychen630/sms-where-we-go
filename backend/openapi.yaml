@@ -133,13 +133,8 @@ components:
     School:
       type: object
       required:
-        - uid
         - school_name
       properties:
-        uid:
-          type: integer
-          description: The unique identifier of the school
-          example: 12
         latitude:
           type: number
           example: 22.5514
@@ -220,7 +215,14 @@ paths:
                       schools:
                         type: array
                         items:
-                          $ref: "#/components/schemas/School"
+                          allOf:
+                            - $ref: "#/components/schemas/School"
+                            - type: object
+                              properties:
+                                uid:
+                                  type: integer
+                                  description: The unique identifier of the school
+                                  example: 12
         "403":
           $ref: "#/components/responses/UnAuthorized"
         default:
@@ -565,12 +567,19 @@ paths:
                       schools:
                         type: array
                         items:
-                          $ref: "#/components/schemas/School"
-                  - type: object
-                    properties:
-                      matched_alias:
-                        type: string
-                        description: The alias that matches the queried school_name
+                          allOf:
+                          - $ref: "#/components/schemas/School"
+                          - type: object
+                            required:
+                              - uid
+                            properties:
+                              uid:
+                                type: integer
+                                description: The unique identifier of the school
+                                example: 12
+                              matched_alias:
+                                type: string
+                                description: The alias that matches the queried school_name
     post:
       operationId: postSchool
       description: Add a new school
@@ -583,10 +592,6 @@ paths:
                 - $ref: "#/components/schemas/School"
                 - type: object
                   properties:
-                    uid:
-                      type: integer
-                      default: -1
-                      enum: [-1]
                     city_uid:
                       type: integer
                       example: 121

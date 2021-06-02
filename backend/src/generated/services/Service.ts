@@ -19,7 +19,12 @@ export class Service {
      */
     public static async getRoster(): Promise<(Result & {
 students: Array<(Student & StudentVerbose)>,
-schools: Array<School>,
+schools: Array<(School & {
+/**
+ * The unique identifier of the school
+ */
+uid?: number,
+})>,
 }) | Result> {
         const result = await __request({
             method: 'GET',
@@ -250,12 +255,16 @@ schoolCountry?: string,
 schoolStateProvince?: string,
 city?: string,
 ): Promise<(Result & {
-schools?: Array<School>,
-} & {
+schools?: Array<(School & {
+/**
+ * The unique identifier of the school
+ */
+uid: number,
 /**
  * The alias that matches the queried school_name
  */
 matched_alias?: string,
+})>,
 })> {
         const result = await __request({
             method: 'GET',
@@ -280,7 +289,6 @@ matched_alias?: string,
      */
     public static async postSchool(
 requestBody: (School & {
-uid: -1,
 /**
  * The uid of the city
  */
