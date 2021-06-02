@@ -1,0 +1,26 @@
+.app-header {
+  color: black;
+  background-color: white;
+  font-size: 1.25rem;
+  padding: 0 0 0 0 !important;
+  height: 64px;
+  white-space: nowrap;
+  width: 100%;
+  box-shadow: #d3d3d385 0 2px 4px 2px;
+}
+
+.app-content-container {
+  background-color: white;
+  min-height: 450px;
+}
+
+.app-content {
+  height: 100%;
+  width: 100%;
+  padding: 20px 20px 20px 20px;
+  background: linear-gradient(
+    135deg,
+    rgb(243 243 243 / 50%),
+    rgb(232 232 232 / 50%)
+  );
+}

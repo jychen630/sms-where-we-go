@@ -6,10 +6,11 @@ import {
   Redirect
 } from 'react-router-dom';
 import Map from './Map';
-import 'antd/dist/antd.css';
 import CardPage from './pages/CardPage';
 import LoginForm from './components/LoginForm';
 import RegistrationForm from './components/RegistrationForm';
+import UserPage from './pages/UserPage';
+import 'antd/dist/antd.css';
 
 function App() {
   return (
@@ -24,6 +25,9 @@ function App() {
           <CardPage title='Where We Go 注册'>
             <RegistrationForm />
           </CardPage>
+        </Route>
+        <Route path="/user">
+          <UserPage />
         </Route>
         <Route path="/map">
           <Map />
