@@ -1,6 +1,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { City } from '../models/City';
 import type { Result } from '../models/Result';
 import type { Role } from '../models/Role';
 import type { School } from '../models/School';
@@ -348,11 +349,7 @@ city?: string,
 stateProvince?: string,
 country?: string,
 ): Promise<(Result & {
-cities?: Array<{
-city: string,
-state_province?: string,
-country: string,
-}>,
+cities?: Array<City>,
 })> {
         const result = await __request({
             method: 'GET',

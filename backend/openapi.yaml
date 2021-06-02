@@ -153,6 +153,25 @@ components:
         city:
           type: string
           example: Shenzhen
+    City:
+      type: object
+      required:
+        - city_uid
+        - city
+        - country
+      properties:
+        city_uid:
+          type: integer
+          description: The unique identifier of the city
+        city:
+          type: string
+          example: New York City
+        state_province:
+          type: string
+          example: New York
+        country:
+          type: string
+          example: United States
     Visibility:
       type: string
       description: >
@@ -687,17 +706,4 @@ paths:
                       cities:
                         type: array
                         items:
-                          type: object
-                          required:
-                            - city
-                            - country
-                          properties:
-                            city:
-                              type: string
-                              example: New York City
-                            state_province:
-                              type: string
-                              example: New York
-                            country:
-                              type: string
-                              example: United States
+                          $ref: "#/components/schemas/City"
