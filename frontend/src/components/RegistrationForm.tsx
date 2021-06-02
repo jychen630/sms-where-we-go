@@ -1,40 +1,44 @@
-import _ from 'lodash';
-import { Button, Col, Collapse, Checkbox, Form, Input, Modal, Select, Space, Spin, Row, Tooltip, Typography, notification } from 'antd';
-import { FieldTimeOutlined, InfoCircleOutlined, PlusOutlined } from '@ant-design/icons';
+import { Button, Col, Collapse, Checkbox, Form, Input, Modal, Space, Spin, Row, Tooltip, Typography, notification } from 'antd';
+import { CheckCircleFilled, FieldTimeOutlined, InfoCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { Result, School, Service } from 'wwg-api';
+import { Result, Service } from 'wwg-api';
 import { handleApiError } from '../api/utils';
 
 import PrivacyPolicy from './PrivacyPolicy';
 import AddSchoolForm from './AddSchoolForm';
+import SearchTool, { SearchHandlerProps } from './SearchTool';
 
 type Values = Parameters<typeof Service.postStudent>[0];
 const phonePattern = /^1(?:3\d{3}|5[^4\D]\d{2}|8\d{3}|7(?:[0-35-9]\d{2}|4(?:0\d|1[0-2]|9\d))|9[0-35-9]\d{2}|6[2567]\d{2}|4(?:(?:10|4[01])\d{3}|[68]\d{4}|[579]\d{2}))\d{6}$/;
 // https://stackoverflow.com/a/201378/11612399
 const emailPattern = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/ // eslint-disable-line
 const { Text } = Typography;
-const SEARCH_LIMIT = 5;
-const searchSchool = _.throttle(async (offset, value, setSchools) => {
-    console.log('lanuch');
-    await Service.getSchool(
-        offset,
-        SEARCH_LIMIT,
-        value
-    ).then((res) => {
-        setSchools(res.schools ?? []);
-    }).catch((err) => {
+// This function is created for the search tool
+const fetchSchool = async ({ offset, limit, value }: SearchHandlerProps) => {
+    try {
+        const result = await Service.getSchool(
+            offset,
+            limit,
+            value
+        );
+        if (!!result.schools && result.result === Result.result.SUCCESS) {
+            return result.schools;
+        }
+        else {
+            throw new Error('Failed to search for the schools');
+        }
+    }
+    catch (err) {
         handleApiError(err).then((res) => {
             console.error(res.message);
-        })
-    });
-}, 1000);
+        });
+    }
+}
 
 const RegistrationForm = () => {
     const [form] = Form.useForm<Values>();
     const history = useHistory();
-    const [offset, setOffset] = useState(0);
-    const [schools, setSchools] = useState<(School & { matched_alias: string })[]>([]);
     const [schoolUid, setSchoolUid] = useState(0);
     const [showSchoolModal, setShowSchoolModal] = useState(false);
     const [showPrivacyModal, setShowPrivacyModal] = useState(false);
@@ -91,11 +95,6 @@ const RegistrationForm = () => {
                 });
             }
             ));
-    }
-
-    const handleSearchSchool = (value: string) => {
-        setSchools([]);
-        searchSchool(offset, value, setSchools);
     }
 
     return (
@@ -228,30 +227,20 @@ const RegistrationForm = () => {
                 >
                     <Row>
                         <Col span={21}>
-                            <Select
-                                showSearch
+                            <SearchTool
+                                searchHandler={fetchSchool}
+                                item={(value, index) => (
+                                    <Tooltip title={`[uid: ${value.uid}] ${value.school_country ?? '无'}/${value.school_state_province ?? '无'}/${value.city ?? '无'}`}>
+                                        <Button onClick={() => setSchoolUid(value.uid)} type={value.uid === schoolUid ? 'primary' : 'text'} block>
+                                            {value.school_name} {value.matched_alias !== value.school_name && `(${value.matched_alias})`}
+                                            {value.uid === schoolUid &&
+                                                <CheckCircleFilled />
+                                            }
+                                        </Button>
+                                    </Tooltip>
+                                )}
                                 placeholder='输入学校名称'
-                                allowClear
-                                filterOption={false}
-                                onSearch={handleSearchSchool}
-                                onChange={(value: number) => { setSchoolUid(value) }}
-                                loading={true}
-                            >
-                                {
-                                    schools.map((value, index) => {
-                                        return (
-                                            <Select.Option
-                                                key={index}
-                                                value={value.uid}
-                                            >
-                                                <Tooltip placement='left' title={`[uid: ${value.uid}] ${value.school_country ?? '无'}/${value.school_state_province ?? '无'}/${value.city ?? '无'}`}>
-                                                    {value.school_name} {value.matched_alias !== value.school_name && `(${value.matched_alias})`}
-                                                </Tooltip>
-                                            </Select.Option>
-                                        )
-                                    })
-                                }
-                            </Select>
+                            />
                         </Col>
                         <Col span={1} />
                         <Col span={1}>
