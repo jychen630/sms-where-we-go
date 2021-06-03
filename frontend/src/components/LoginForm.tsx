@@ -35,6 +35,7 @@ const LoginForm = () => {
                         description: <Space>即将进入地图 <Spin /></Space>,
                         duration: 1.5
                     });
+                    setTimeout(() => history.push('/map'), 1500);
                     return Promise.resolve();
                 }
                 // fail

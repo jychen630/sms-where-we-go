@@ -66,6 +66,8 @@ export default async function initSchools(paths) {
         const schoolUid = await addOrRetrieveSchool(
           school.name,
           cities[key],
+          school.latitude,
+          school.longitude,
           !!school.aliases
         );
 
@@ -123,13 +125,15 @@ async function addOrRetrieveCity(
   return cityUid;
 }
 
-async function addOrRetrieveSchool(name, cityUid, retrieve = true) {
+async function addOrRetrieveSchool(name, cityUid, lat, long, retrieve = true) {
   let schoolUid = undefined;
   try {
     const result = await pg("wwg.school").insert(
       {
         name: name,
         city_uid: cityUid,
+        latitude: lat,
+        longitude: long,
       },
       "school_uid"
     );
