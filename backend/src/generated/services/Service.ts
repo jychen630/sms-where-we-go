@@ -15,7 +15,6 @@ export class Service {
     /**
      * Return a roster containing the students and schools information
      * @returns any Sucessfully retrieved the roster
-     * @returns Result Default response telling whether the request is successful
      * @throws ApiError
      */
     public static async getRoster(): Promise<(Result & {
@@ -26,7 +25,7 @@ schools: Array<(School & {
 uid?: number,
 students?: Array<(Student & StudentVerbose)>,
 })>,
-}) | Result> {
+})> {
         const result = await __request({
             method: 'GET',
             path: `/roster`,

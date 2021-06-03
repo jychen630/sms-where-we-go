@@ -239,8 +239,6 @@ paths:
                                       - $ref: "#/components/schemas/StudentVerbose"
         "403":
           $ref: "#/components/responses/UnAuthorized"
-        default:
-          $ref: "#/components/responses/Default"
   /login:
     post:
       operationId: login
