@@ -97,15 +97,10 @@ components:
         school_uid:
           type: integer
           example: 12
-        registration_key:
-          type: string
-          minLength: 8
-          maxLength: 8
-          description: The registration key provided by the maintainer for each class which fills class_number, year, and curriculum for the student
-          example: asdfghjk
     StudentVerbose:
       type: object
       required:
+        - uid
         - name
         - class_number
         - grad_year
@@ -225,12 +220,6 @@ paths:
                       - students
                       - schools
                     properties:
-                      students:
-                        type: array
-                        items:
-                          allOf:
-                            - $ref: "#/components/schemas/Student"
-                            - $ref: "#/components/schemas/StudentVerbose"
                       schools:
                         type: array
                         items:
@@ -242,6 +231,12 @@ paths:
                                   type: integer
                                   description: The unique identifier of the school
                                   example: 12
+                                students:
+                                  type: array
+                                  items:
+                                    allOf:
+                                      - $ref: "#/components/schemas/Student"
+                                      - $ref: "#/components/schemas/StudentVerbose"
         "403":
           $ref: "#/components/responses/UnAuthorized"
         default:
@@ -374,6 +369,7 @@ paths:
                 required:
                   - name
                   - password
+                  - registration_key
                 properties:
                   name:
                     type: string
@@ -383,6 +379,12 @@ paths:
                     example: password123
                   curriculum:
                     enum: [null]
+                  registration_key:
+                    type: string
+                    minLength: 8
+                    maxLength: 8
+                    description: The registration key provided by the maintainer for each class which fills class_number, year, and curriculum for the student
+                    example: asdfghjk
               - oneOf:
                 - type: object
                   description: Only required for new users

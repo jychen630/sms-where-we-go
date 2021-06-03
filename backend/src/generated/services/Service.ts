@@ -19,12 +19,12 @@ export class Service {
      * @throws ApiError
      */
     public static async getRoster(): Promise<(Result & {
-students: Array<(Student & StudentVerbose)>,
 schools: Array<(School & {
 /**
  * The unique identifier of the school
  */
 uid?: number,
+students?: Array<(Student & StudentVerbose)>,
 })>,
 }) | Result> {
         const result = await __request({
@@ -128,6 +128,10 @@ requestBody: (Student & {
 name: string,
 password: string,
 curriculum?: any,
+/**
+ * The registration key provided by the maintainer for each class which fills class_number, year, and curriculum for the student
+ */
+registration_key: string,
 } & ({
 /**
  * The registration key provided by the maintainer for each class which fills class_number, year, and curriculum for the student

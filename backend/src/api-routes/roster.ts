@@ -1,8 +1,8 @@
 import { Operation } from 'express-openapi';
 import log4js from 'log4js';
 import { pg } from '..';
-import { Student, School as SchoolRes } from '../generated';
-import { City, School, StudentVisibility } from '../generated/schema';
+import { Student as StudentRes, School as SchoolRes, StudentVerbose } from '../generated';
+import { City, School, Student, StudentVisibility } from '../generated/schema';
 import { StudentClass } from '../generated/schema';
 import { removeNull, sendError, sendSuccess } from '../utils';
 
@@ -45,18 +45,24 @@ export const get: Operation = async (req, res, next) => {
                 const schools = await pg.select().from<School & City>('wwg.school')
                     .joinRaw('NATURAL JOIN city')
                     .whereIn('school_uid', Object.values(students.map((student) => student.school_uid)));
+
+                const tempStudents = students.map<Partial<StudentRes & StudentVerbose>>((student) => {
+                    return removeNull({
+                        uid: student.student_uid,
+                        name: student.name,
+                        class_number: student.class_number,
+                        grad_year: student.grad_year,
+                        curriculum: student.curriculum_name,
+                        phone_number: student.phone_number,
+                        email: student.email,
+                        wxid: student.wxid,
+                        department: student.department,
+                        major: student.major,
+                        school_uid: student.school_uid
+                    });
+                });
+
                 sendSuccess(res, {
-                    students: students.map((student) => {
-                        const result = removeNull({
-                            ...student,
-                            uid: student.student_uid,
-                            grad_year: student.grad_year as any,
-                        } as Student);
-                        delete result.password_hash;
-                        delete result.visibility_type;
-                        delete result.role;
-                        return result;
-                    }),
                     schools: schools.map((school) => {
                         return removeNull({
                             uid: school.school_uid,
@@ -65,7 +71,8 @@ export const get: Operation = async (req, res, next) => {
                             school_name: school.name,
                             school_country: school.country,
                             school_state_province: school.state_province,
-                            city: school.city
+                            city: school.city,
+                            students: tempStudents.filter((student) => student.school_uid === school.school_uid)
                         } as SchoolRes);
                     })
                 });

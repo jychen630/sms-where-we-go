@@ -6,7 +6,7 @@ export type StudentVerbose = {
     /**
      * The unique identifier of the student
      */
-    uid?: number;
+    uid: number;
     /**
      * The name of the student
      */

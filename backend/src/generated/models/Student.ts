@@ -25,8 +25,4 @@ export type Student = {
     department?: string;
     major?: string;
     school_uid?: number;
-    /**
-     * The registration key provided by the maintainer for each class which fills class_number, year, and curriculum for the student
-     */
-    registration_key?: string;
 }
