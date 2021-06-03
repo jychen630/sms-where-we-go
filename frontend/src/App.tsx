@@ -5,7 +5,8 @@ import {
   Route,
   Redirect
 } from 'react-router-dom';
-import Map from './Map';
+import Map from './components/Map';
+import AppPage from './pages/AppPage';
 import CardPage from './pages/CardPage';
 import LoginForm from './components/LoginForm';
 import RegistrationForm from './components/RegistrationForm';
@@ -30,7 +31,9 @@ function App() {
           <UserPage />
         </Route>
         <Route path="/map">
-          <Map />
+          <AppPage>
+            <Map />
+          </AppPage>
         </Route>
         <Route path="/roster">roster</Route>
         <Route path="/"><Redirect to="/login" /></Route>
