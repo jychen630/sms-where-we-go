@@ -200,8 +200,12 @@ components:
       type: apiKey
       in: cookie
       name: connect.sid
+    bearerAuth:
+      type: http
+      scheme: bearer
 security:
   - sessionAuth: []
+  - bearerAuth: []
 paths:
   /roster:
     get:
