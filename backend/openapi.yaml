@@ -226,6 +226,8 @@ paths:
                           allOf:
                             - $ref: "#/components/schemas/School"
                             - type: object
+                              required:
+                                - uid
                               properties:
                                 uid:
                                   type: integer

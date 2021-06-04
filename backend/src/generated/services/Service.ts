@@ -22,7 +22,7 @@ schools: Array<(School & {
 /**
  * The unique identifier of the school
  */
-uid?: number,
+uid: number,
 students?: Array<(Student & StudentVerbose)>,
 })>,
 })> {
