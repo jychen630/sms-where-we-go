@@ -11,7 +11,7 @@
 
 .app-content-container {
   background-color: white;
-  min-height: 450px;
+  min-height: calc(100vh - 64px);
 }
 
 .app-content {

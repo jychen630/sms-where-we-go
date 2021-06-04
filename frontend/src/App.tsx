@@ -6,9 +6,9 @@ import {
   Redirect
 } from 'react-router-dom';
 import Map from './components/Map';
-import AppPage from './pages/AppPage';
 import CardPage from './pages/CardPage';
 import LoginForm from './components/LoginForm';
+import AppPage, { menuOptions } from './pages/AppPage';
 import RegistrationForm from './components/RegistrationForm';
 import UserPage from './pages/UserPage';
 import 'antd/dist/antd.css';
@@ -31,7 +31,7 @@ function App() {
           <UserPage />
         </Route>
         <Route path="/map">
-          <AppPage>
+          <AppPage activeKey={menuOptions.MAP}>
             <Map />
           </AppPage>
         </Route>

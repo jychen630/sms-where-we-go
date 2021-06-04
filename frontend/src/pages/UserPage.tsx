@@ -1,8 +1,8 @@
-import AppPage from "./AppPage";
+import AppPage, { menuOptions } from "./AppPage";
 
 const UserPage = () => {
     return (
-        <AppPage>
+        <AppPage activeKey={menuOptions.SETTINGS}>
             test
         </AppPage>
     )
