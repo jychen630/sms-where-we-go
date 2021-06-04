@@ -5,7 +5,8 @@ import { useTranslation } from "react-i18next";
 import "./InfoCard.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBook, faBuilding, faMap, faUniversity, faMapSigns } from "@fortawesome/free-solid-svg-icons";
-import { EnvironmentFilled, FlagFilled, HomeFilled, IdcardOutlined, LeftOutlined, MailOutlined, PhoneFilled, RightOutlined, WechatFilled } from "@ant-design/icons";
+import { EnvironmentFilled, FlagFilled, HomeFilled, LeftOutlined, MailOutlined, PhoneFilled, RightOutlined, WechatFilled } from "@ant-design/icons";
+import { Student, StudentVerbose } from "wwg-api";
 
 /**
  * A util component that will render nothing if the content is empty
@@ -24,6 +25,20 @@ const Optional = ({ content, icon }: { content: string | number | undefined | nu
 const InfoCard = (props: MapItem) => {
     const [t] = useTranslation();
     const [index, setIndex] = useState(0);
+
+    const currentStudent = (): Partial<Student & StudentVerbose> => {
+        if (!!!props.students || props.students.length === 0) {
+            return {}
+        }
+
+        if (index < props.students?.length) {
+            return props.students[index];
+        }
+        else {
+            setIndex(0);
+            return props.students[0];
+        }
+    }
 
     return (
         <Card
@@ -44,14 +59,14 @@ const InfoCard = (props: MapItem) => {
         >
             {props.students !== undefined && props.students.length > 0 ?
                 <>
-                    <Optional content={props.students[index].name} icon={<IdcardOutlined />} />
-                    <Optional content={props.students[index].phone_number} icon={<PhoneFilled />} />
-                    <Optional content={props.students[index].email ?? ""} icon={<MailOutlined />} />
-                    <Optional content={props.students[index].wxid} icon={<WechatFilled />} />
-                    <Optional content={props.students[index].grad_year + "届" + props.students[index].class_number + "班"} icon={<HomeFilled />} />
-                    <Optional content={t(props.students[index].curriculum ?? "")} icon={<FontAwesomeIcon icon={faMapSigns} />} />
-                    <Optional content={props.students[index].department ?? ""} icon={<FontAwesomeIcon icon={faBuilding} />} />
-                    <Optional content={props.students[index].major ?? ""} icon={<FontAwesomeIcon icon={faBook} />} />
+                    <h1>{currentStudent().name}</h1>
+                    <Optional content={currentStudent().phone_number} icon={<PhoneFilled />} />
+                    <Optional content={currentStudent().email ?? ""} icon={<MailOutlined />} />
+                    <Optional content={currentStudent().wxid} icon={<WechatFilled />} />
+                    <Optional content={currentStudent().grad_year + "届" + currentStudent().class_number + "班"} icon={<HomeFilled />} />
+                    <Optional content={t(currentStudent().curriculum ?? "")} icon={<FontAwesomeIcon icon={faMapSigns} />} />
+                    <Optional content={currentStudent().department ?? ""} icon={<FontAwesomeIcon icon={faBuilding} />} />
+                    <Optional content={currentStudent().major ?? ""} icon={<FontAwesomeIcon icon={faBook} />} />
                 </>
                 :
                 <Empty description="暂无学生数据" />
