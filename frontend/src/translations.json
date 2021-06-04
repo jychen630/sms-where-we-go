@@ -1,0 +1,14 @@
+{
+  "en": {
+    "translation": {
+      "gaokao": "gaokao",
+      "international": "international"
+    }
+  },
+  "zh-CN": {
+    "translation": {
+      "gaokao": "高考",
+      "international": "国际"
+    }
+  }
+}
