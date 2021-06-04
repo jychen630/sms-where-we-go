@@ -12,6 +12,7 @@
 .app-content-container {
   background-color: white;
   min-height: calc(100vh - 64px);
+  position: relative;
 }
 
 .app-content {
@@ -22,4 +23,8 @@
     rgb(243 243 243 / 50%),
     rgb(232 232 232 / 50%)
   );
+}
+
+.mapboxgl-popup-content {
+  padding: 0 0 0 0;
 }

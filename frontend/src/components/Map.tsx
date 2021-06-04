@@ -1,26 +1,19 @@
 import { useEffect, useRef } from 'react';
+import ReactDOM from 'react-dom';
 import geojson from 'geojson';
 import mapboxgl from 'mapbox-gl';
 import MapboxLanguage from '@mapbox/mapbox-gl-language';
 import './Map.css';
-import { Service } from 'wwg-api';
-import { handleApiError } from '../api/utils';
+import { School, Student, StudentVerbose } from 'wwg-api';
 
 mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_TOKEN as string;
 
-const getRoster = async () => {
-    return Service.getRoster()
-        .then((result) => {
-            console.log('Recieved data');
-            console.log(result.schools);
-            return result.schools.filter((school) => !!school.latitude && !!school.longitude);;
-        })
-        .catch((err) => handleApiError(err).then(res => { console.error(err); return [] }));
-}
+export type MapItem = School & { students?: (Student & StudentVerbose)[] };
 
-export default function Map() {
+export default function Map({ getData, getPopup }: { getData: () => Promise<MapItem[]>, getPopup: (props: MapItem) => JSX.Element }) {
     const mapContainer = useRef(null);
     const mapRef = useRef(null);
+
     useEffect(() => {
         if (!!mapRef.current && !!mapContainer.current) return;
         if (mapRef.current) return; // initialize map only once
@@ -32,7 +25,7 @@ export default function Map() {
 
         let popup = new mapboxgl.Popup({ closeOnMove: true, closeOnClick: true });
 
-        getRoster().then((result) => {
+        getData().then((result) => {
             const data = geojson.parse(result ?? [], { Point: ['latitude', 'longitude'] });
             console.log(data)
 
@@ -53,8 +46,15 @@ export default function Map() {
 
             map.on('mouseenter', 'schools', (e: any) => {
                 const coordinates = e.features[0].geometry.coordinates.slice();
+                map.getCanvas().style.cursor = "pointer";
+                const container = document.createElement('div');
+                ReactDOM.render(getPopup(e.features[0].properties), container);
+                console.log(container);
+                popup.setLngLat(coordinates).setDOMContent(container).addTo(map);
+            });
 
-                popup.setLngLat(coordinates).setHTML("<h1>asd</h1>").addTo(map);
+            map.on('mouseleave', 'schools', (e: any) => {
+                map.getCanvas().style.cursor = "";
             });
 
             mapRef.current = map as any;

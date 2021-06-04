@@ -5,14 +5,16 @@ import {
   Route,
   Redirect
 } from 'react-router-dom';
-import Map from './components/Map';
 import CardPage from './pages/CardPage';
 import LoginForm from './components/LoginForm';
-import AppPage, { menuOptions } from './pages/AppPage';
 import RegistrationForm from './components/RegistrationForm';
 import UserPage from './pages/UserPage';
+import MapPage from './pages/MapPage';
 import 'antd/dist/antd.css';
+import { OpenAPI } from 'wwg-api';
 
+OpenAPI.WITH_CREDENTIALS = true;
+OpenAPI.TOKEN = 'asdasd';
 function App() {
   return (
     <Router>
@@ -31,9 +33,7 @@ function App() {
           <UserPage />
         </Route>
         <Route path="/map">
-          <AppPage activeKey={menuOptions.MAP}>
-            <Map />
-          </AppPage>
+          <MapPage />
         </Route>
         <Route path="/roster">roster</Route>
         <Route path="/"><Redirect to="/login" /></Route>
