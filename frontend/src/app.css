@@ -27,4 +27,10 @@
 
 .mapboxgl-popup-content {
   padding: 0 0 0 0;
+  min-width: 240px;
+  max-height: calc(50vh - 64px);
+}
+
+.mapboxgl-popup-close-button {
+  display: none;
 }

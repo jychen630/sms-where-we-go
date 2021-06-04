@@ -1,0 +1,11 @@
+.info-card {
+  position: absolute;
+  min-width: 240px;
+  overflow-x: hidden;
+}
+
+.info-card > div {
+  max-height: 50vh;
+  overflow-y: scroll;
+  margin-right: -16px;
+}

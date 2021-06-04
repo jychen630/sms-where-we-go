@@ -1,18 +1,28 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 import geojson from 'geojson';
 import mapboxgl from 'mapbox-gl';
 import MapboxLanguage from '@mapbox/mapbox-gl-language';
 import './Map.css';
 import { School, Student, StudentVerbose } from 'wwg-api';
+import { Modal } from 'antd';
 
 mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_TOKEN as string;
 
 export type MapItem = School & { students?: (Student & StudentVerbose)[] };
 
 export default function Map({ getData, getPopup }: { getData: () => Promise<MapItem[]>, getPopup: (props: MapItem) => JSX.Element }) {
-    const mapContainer = useRef(null);
     const mapRef = useRef(null);
+    const mapContainer = useRef(null);
+    const [currentItem, setCurrentItem] = useState<MapItem>();
+    const [showModal, setShowModal] = useState(false);
+
+    const displayModalData = (e: any) => {
+        let data = e.features[0].properties;
+        data.students = JSON.parse(data.students);
+        setCurrentItem(data)
+        setShowModal(true);
+    }
 
     useEffect(() => {
         if (!!mapRef.current && !!mapContainer.current) return;
@@ -48,10 +58,16 @@ export default function Map({ getData, getPopup }: { getData: () => Promise<MapI
                 const coordinates = e.features[0].geometry.coordinates.slice();
                 map.getCanvas().style.cursor = "pointer";
                 const container = document.createElement('div');
-                ReactDOM.render(getPopup(e.features[0].properties), container);
+                let data = e.features[0].properties;
+                data.students = JSON.parse(data.students);
+                ReactDOM.render(getPopup(data), container);
                 console.log(container);
                 popup.setLngLat(coordinates).setDOMContent(container).addTo(map);
             });
+
+            map.on('mouseup', 'schools', displayModalData)
+
+            map.on('touchstart', 'schools', displayModalData)
 
             map.on('mouseleave', 'schools', (e: any) => {
                 map.getCanvas().style.cursor = "";
@@ -61,5 +77,12 @@ export default function Map({ getData, getPopup }: { getData: () => Promise<MapI
         })
     });
 
-    return <div className='map-container' ref={mapContainer}></div>
+    return (
+        <>
+            <div className='map-container' ref={mapContainer}></div>
+            <Modal title={currentItem?.school_name} visible={showModal} onCancel={() => setShowModal(false)} footer={null} bodyStyle={{ padding: '0 0 0 0' }}>
+                {currentItem !== undefined && getPopup(currentItem)}
+            </Modal>
+        </>
+    )
 }

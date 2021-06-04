@@ -2,7 +2,7 @@ import { notification } from "antd";
 import { OpenAPI, Service } from "wwg-api";
 import Map from "../components/Map";
 import { handleApiError } from "../api/utils";
-import InfoPopup from "../components/InfoPopup";
+import InfoCard from "../components/InfoCard";
 import AppPage, { menuOptions } from "./AppPage";
 
 const getRoster = async () => {
@@ -26,7 +26,7 @@ const getRoster = async () => {
 const MapPage = () => {
     return (
         <AppPage activeKey={menuOptions.MAP}>
-            <Map getData={getRoster} getPopup={(props) => (<InfoPopup {...props} />)} />
+            <Map getData={getRoster} getPopup={(props) => (<InfoCard {...props} />)} />
         </AppPage>
     )
 }
