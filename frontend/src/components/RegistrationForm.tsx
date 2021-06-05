@@ -6,41 +6,18 @@ import { Result, Service } from 'wwg-api';
 import { handleApiError } from '../api/utils';
 
 import PrivacyPolicy from './PrivacyPolicy';
-import AddSchoolForm from './AddSchoolForm';
-import SearchTool, { SearchHandlerProps } from './SearchTool';
+import SchoolSearchTool from './SchoolSearchTool';
 
 type Values = Parameters<typeof Service.postStudent>[0];
-const phonePattern = /^1(?:3\d{3}|5[^4\D]\d{2}|8\d{3}|7(?:[0-35-9]\d{2}|4(?:0\d|1[0-2]|9\d))|9[0-35-9]\d{2}|6[2567]\d{2}|4(?:(?:10|4[01])\d{3}|[68]\d{4}|[579]\d{2}))\d{6}$/;
+export const phonePattern = /^1(?:3\d{3}|5[^4\D]\d{2}|8\d{3}|7(?:[0-35-9]\d{2}|4(?:0\d|1[0-2]|9\d))|9[0-35-9]\d{2}|6[2567]\d{2}|4(?:(?:10|4[01])\d{3}|[68]\d{4}|[579]\d{2}))\d{6}$/;
 // https://stackoverflow.com/a/201378/11612399
-const emailPattern = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/ // eslint-disable-line
+export const emailPattern = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/ // eslint-disable-line
 const { Text } = Typography;
-// This function is created for the search tool
-const fetchSchool = async ({ offset, limit, value }: SearchHandlerProps) => {
-    try {
-        const result = await Service.getSchool(
-            offset,
-            limit,
-            value
-        );
-        if (!!result.schools && result.result === Result.result.SUCCESS) {
-            return result.schools;
-        }
-        else {
-            throw new Error('Failed to search for the schools');
-        }
-    }
-    catch (err) {
-        handleApiError(err).then((res) => {
-            console.error(res.message);
-        });
-    }
-}
 
 const RegistrationForm = () => {
     const [form] = Form.useForm<Values>();
     const history = useHistory();
     const [schoolUid, setSchoolUid] = useState(0);
-    const [showSchoolModal, setShowSchoolModal] = useState(false);
     const [showPrivacyModal, setShowPrivacyModal] = useState(false);
     const [regInfo, setRegInfo] = useState<{ curriculum: string, classNumber: number, gradYear: number, expDate: Date }>();
 
@@ -225,28 +202,7 @@ const RegistrationForm = () => {
                     label='去向院校'
                     tooltip='没有找到你的学校？点击右方 + 来添加一个学校。若目前未定去向，此项可不填。海外院校请输入英文名'
                 >
-                    <Row>
-                        <Col span={21}>
-                            <SearchTool
-                                searchHandler={fetchSchool}
-                                item={(value, index) => (
-                                    <Tooltip title={`[uid: ${value.uid}] ${value.school_country ?? '无'}/${value.school_state_province ?? '无'}/${value.city ?? '无'}`}>
-                                        <Button onClick={() => setSchoolUid(value.uid)} type={value.uid === schoolUid ? 'primary' : 'text'} block>
-                                            {value.school_name} {value.matched_alias !== value.school_name && `(${value.matched_alias})`}
-                                            {value.uid === schoolUid &&
-                                                <CheckCircleFilled />
-                                            }
-                                        </Button>
-                                    </Tooltip>
-                                )}
-                                placeholder='输入学校名称'
-                            />
-                        </Col>
-                        <Col span={1} />
-                        <Col span={1}>
-                            <Button shape='circle' color='blue' icon={<PlusOutlined />} onClick={() => setShowSchoolModal(true)} />
-                        </Col>
-                    </Row>
+                    <SchoolSearchTool schoolUid={schoolUid} setSchoolUid={setSchoolUid} />
                 </Form.Item>
                 <Form.Item
                     name='department'
@@ -290,11 +246,6 @@ const RegistrationForm = () => {
             </Form>
             <Modal title='用户隐私协议' visible={showPrivacyModal} onOk={() => setShowPrivacyModal(false)} onCancel={() => setShowPrivacyModal(false)} footer={null}>
                 <PrivacyPolicy />
-            </Modal>
-            <Modal title='添加学校' visible={showSchoolModal} onCancel={() => setShowSchoolModal(false)} footer={null}>
-                <Space>
-                    <AddSchoolForm cb={(uid) => setSchoolUid(uid)} />
-                </Space>
             </Modal>
         </>
     )

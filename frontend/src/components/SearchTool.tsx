@@ -22,7 +22,7 @@ const SearchTool = <T extends unknown>({ searchHandler, placeholder, item, searc
     const [loading, setLoading] = useState(false);
     const [resultList, setResultList] = useState<T[]>([]);
 
-    const search = useCallback(_.throttle(async ({ offset, limit, value, append, resultList }: SearchHandlerProps & { append: boolean, resultList: T[] }) => {
+    const search = useCallback(_.throttle(async ({ offset, limit, value, append, resultList }: SearchHandlerProps & { append: boolean, resultList: T[] }) => { // eslint-disable-line react-hooks/exhaustive-deps
         if (!!!value) {
             setResultList([]);
             setLoading(false);
