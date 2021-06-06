@@ -3,12 +3,136 @@ import hash, { hashSync } from 'bcrypt';
 import log4js from 'log4js';
 import { pg } from '..';
 import { Service } from '../generated';
-import { dbHandleError, parseBody, sendError, sendSuccess } from '../utils';
+import { dbHandleError, parseBody, parseQuery, removeNull, sendError, sendSuccess } from '../utils';
 import { ClassService, RoleService, StudentService } from '../services';
-import { StudentRole } from '../generated/schema';
+import { City, School, StudentClassRole, StudentRole, StudentVisibility } from '../generated/schema';
 
 export const get: Operation = async (req, res, next) => {
+    const data = parseQuery<typeof Service.getStudent>(req) as any;
+    const logger = log4js.getLogger('student.get');
 
+    if (!!!req.session.student_uid) {
+        logger.error(`Attempt to get ${req.session.student_uid} without authentication`);
+        sendError(res, 401, 'Login to get student')
+        return;
+    }
+
+    const self = await StudentService.get(req.session.student_uid);
+
+    const subquery = pg('wwg.student_class_role')
+        .modify<any, StudentClassRole[]>(
+            async (qb) => {
+                if (!(typeof self.level === 'number')) {
+                    return;
+                }
+                if (self.level >= 16) {
+                    // System admin can access all students
+                    qb.select();
+                    return;
+                }
+                let union = [];
+                if (self.level < 16) {
+                    qb.select().where('student_uid', self.student_uid);
+                    union.push(
+                        pg('wwg.student_class_role').select()
+                            .where('visibility_type', StudentVisibility.Year)
+                            .andWhere('grad_year', self.grad_year),
+                        pg('wwg.student_class_role').select()
+                            .where('visibility_type', StudentVisibility.Students)
+                    )
+                }
+                if (self.level < 8) {
+                    union.push(
+                        pg('wwg.student_class_role').select()
+                            .where('visibility_type', StudentVisibility.Curriculum)
+                            .andWhere('curriculum_name', self.curriculum_name)
+                            .andWhere('grad_year', self.grad_year)
+                    )
+                }
+                if (self.level < 4) {
+                    union.push(
+                        pg('wwg.student_class_role').select()
+                            .where('visibility_type', StudentVisibility.Class)
+                            .andWhere('class_number', self.class_number as number)
+                            .andWhere('grad_year', self.grad_year)
+                    )
+                }
+                if (self.level < 2) {
+                    union.push(
+                        pg('wwg.student_class_role').select()
+                            .where('visibility_type', StudentVisibility.Private)
+                            .andWhere('student_uid', self.student_uid)
+                    )
+                }
+                else {
+                    union.push(
+                        pg('wwg.student_class_role').select()
+                            .where('visibility_type', StudentVisibility.Private)
+                    )
+                }
+                qb.union(union);
+            }
+        )
+        .as('t1');
+    const school = pg('wwg.school')
+        .column({ 'school_name': 'name' }, 'school_uid', 'city_uid')
+        .select()
+        .as('t2')
+    pg(subquery)
+        .select()
+        .join(school, 't1.school_uid', 't2.school_uid')
+        .joinRaw('NATURAL JOIN city')
+        .modify<any, (StudentClassRole & School & City & { school_name: string })[]>((qb) => {
+            if (!!data['name']) {
+                qb.where('t1.name', 'LIKE', `%${data['name']}%`);
+            }
+            if (!!data['phone_number']) {
+                qb.where('phone_number', 'LIKE', `%${data['phone_number']}%`);
+            }
+            if (!!data['curriculum']) {
+                qb.where('curriculum_name', 'LIKE', `%${data['curriculum']}%`);
+            }
+            if (!!data['city']) {
+                qb.where('t2.city', 'LIKE', `%${data['city']}%`);
+            }
+            if (!!data['school_state_province']) {
+                qb.where('t2.state_province', 'LIKE', `%${data['school_state_province']}%`);
+            }
+            if (!!data['school_country']) {
+                qb.where('t2.country', 'LIKE', `%${data['school_country']}%`);
+            }
+        })
+        .then(async (students) => {
+            students = students.filter(async (student) => (await RoleService.privilege(self, student)).read);
+            logger.info(`Retrieved students for ${self.student_uid}`);
+            sendSuccess(res, {
+                students: await Promise.all(students.map(async (student) => {
+                    const privilege = await RoleService.privilege(self, student);
+                    return removeNull({
+                        uid: student.student_uid,
+                        name: student.name,
+                        class_number: student.class_number,
+                        grad_year: student.grad_year,
+                        curriculum: student.curriculum_name,
+                        phone_number: student.phone_number,
+                        email: student.email,
+                        wxid: student.wxid,
+                        department: student.department,
+                        major: student.major,
+                        school_uid: student.school_uid,
+                        school_name: student.school_name,
+                        school_country: student.country,
+                        school_state_province: student.state_province,
+                        city: student.city,
+                        self: self.student_uid === student.student_uid ? true : undefined,
+                        // Role and visibility are only visible to admins or the users themselves
+                        role: privilege.level > 0 || self.student_uid === student.student_uid ? student.role : undefined,
+                        visibiliy: privilege.level > 0 || self.student_uid === student.student_uid ? student.visibility_type : undefined
+                    });
+                }))
+            });
+        })
+        .catch((err) => dbHandleError(err, res, logger));
 }
 
 export const put: Operation = async (req, res, next) => {
@@ -16,7 +140,7 @@ export const put: Operation = async (req, res, next) => {
     const logger = log4js.getLogger('student.update');
 
     if (!!!req.session.student_uid) {
-        logger.error(`Attempt to update ${data.student_uid ?? "[uid not specified]"} without authentication`);
+        logger.error(`Attempt to update ${data.student_uid ?? '[uid not specified]'} without authentication`);
         sendError(res, 403, 'Login to update student information');
         return;
     }
@@ -51,7 +175,7 @@ export const put: Operation = async (req, res, next) => {
         (data.role === StudentRole.System.valueOf() && privileges.level < 16))) {
         logger.error(`${req.session.identifier} (level: ${privileges.level}) is denied for updating ${target_uid} ${!privileges.grant ? 'for lower privilege level' : 'for role not allowed'}`);
         logger.error(data);
-        sendError(res, 403, `You are not allowed to alter this student\'s role${privileges.grant ? ` to "${data.role}" as your privilege level is ${privileges.level}` : ''}`);
+        sendError(res, 403, `You are not allowed to alter this student\'s role${privileges.grant ? ` to '${data.role}' as your privilege level is ${privileges.level}` : ''}`);
         return;
     }
 
@@ -86,7 +210,7 @@ export const put: Operation = async (req, res, next) => {
             role: data.role
         })
         .then(result => {
-            logger.info(`Updated uid ${target_uid}'s information${!!!data.student_uid ? " (self-update)" : ""}`);
+            logger.info(`Updated uid ${target_uid}'s information${!!!data.student_uid ? ' (self-update)' : ''}`);
             logger.info(data);
             sendSuccess(res);
         })

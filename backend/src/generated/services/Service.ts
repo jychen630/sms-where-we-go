@@ -77,7 +77,8 @@ identifier: number,
     }
 
     /**
-     * Return the information of students. Result is scoped by visibility.
+     * Return the information of students. Result is scoped by the user role. For example: a "student" user cannot see others role and visibility settings, but an admin user, like those with the role "class" can. Apart from that, admin users can ignore the visibility settings of the students who are under their administration.
+ * 
      * @param name 
      * @param phoneNumber 
      * @param curriculum 
@@ -95,7 +96,14 @@ city?: string,
 schoolStateProvince?: string,
 schoolCountry?: string,
 ): Promise<(Result & {
-students?: Array<(Student & StudentVerbose)>,
+students?: Array<(Student & StudentVerbose & School & {
+role?: Role,
+visibility?: Visibility,
+/**
+ * Indicating whether the current student is the caller
+ */
+self?: boolean,
+})>,
 })> {
         const result = await __request({
             method: 'GET',
@@ -318,7 +326,7 @@ school_uid?: number,
      * @throws ApiError
      */
     public static async getRole(): Promise<(Result & {
-role?: string,
+role?: Role,
 /**
  * The privilege level of the student, the higher the greater
  */

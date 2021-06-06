@@ -1,6 +1,6 @@
 import log4js from 'log4js';
 import { pg } from '.';
-import { Class, StudentClassRole, StudentRole, StudentVisibility } from './generated/schema';
+import { Class, Student, StudentClassRole, StudentRole, StudentVisibility } from './generated/schema';
 import { Role } from './generated/schema';
 import { compareStudents } from './utils';
 
@@ -26,16 +26,25 @@ export const ClassService = {
     }
 }
 
-export const RoleService = {
-    get: async (student_uid: number): Promise<Role> => {
+export class RoleService {
+    static async get(student_uid: number): Promise<Role> {
         return pg('student')
             .select('role')
             .joinRaw('NATURAL JOIN role')
             .where('student_uid', student_uid)
             .first<Role>();
-    },
-    privilege: async (current_uid: number, target_uid: number): Promise<Privilege> => {
-        const [current, target] = [await StudentService.get(current_uid), await StudentService.get(target_uid)];
+    }
+    static async privilege(current_uid: number, target_uid: number): Promise<Privilege>;
+    static async privilege(current: StudentClassRole, target: StudentClassRole): Promise<Privilege>;
+    static async privilege(...args: any[]): Promise<Privilege> {
+        let current: StudentClassRole, target: StudentClassRole;
+        if (typeof args[0] === 'number' && typeof args[1] === 'number') {
+            [current, target] = [await StudentService.get(args[0]), await StudentService.get(args[1])];
+        }
+        else {
+            [current, target] = args;
+        }
+
         let privilege = {
             read: false,
             update: false,

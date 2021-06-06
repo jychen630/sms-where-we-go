@@ -307,7 +307,12 @@ paths:
   /student:
     get:
       operationId: getStudent
-      description: Return the information of students. Result is scoped by visibility.
+      description: >
+        Return the information of students. Result is scoped by the user role.
+        For example: a "student" user cannot see others role and visibility settings,
+        but an admin user, like those with the role "class" can. Apart from that, admin
+        users can ignore the visibility settings of the students who are under their
+        administration.
       parameters:
         - in: query
           name: name
@@ -355,6 +360,16 @@ paths:
                           allOf:
                             - $ref: "#/components/schemas/Student"
                             - $ref: "#/components/schemas/StudentVerbose"
+                            - $ref: "#/components/schemas/School"
+                            - type: object
+                              properties:
+                                role:
+                                  $ref: "#/components/schemas/Role"
+                                visibility:
+                                  $ref: "#/components/schemas/Visibility"
+                                self:
+                                  type: boolean
+                                  description: Indicating whether the current student is the caller
         401:
           $ref: "#/components/responses/UnAuthorized" 
         403:
@@ -458,12 +473,7 @@ paths:
                     type: integer
                     example: 2021
                   curriculum:
-                    enum: [null]
-                  # To be added  
-                  #verification_code:
-                  #  description: If the phone number is specified, the verification code will be required
-                  #  type: integer
-                  #  example: 32874
+                    enum: [""]
       responses:
         200:
           $ref: "#/components/responses/Default"
@@ -652,8 +662,7 @@ paths:
                   - type: object
                     properties:
                       role:
-                        type: string
-                        example: student
+                        $ref: "#/components/schemas/Role"
                       level:
                         type: integer
                         description: The privilege level of the student, the higher the greater
