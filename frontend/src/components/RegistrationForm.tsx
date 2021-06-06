@@ -1,5 +1,5 @@
-import { Button, Col, Collapse, Checkbox, Form, Input, Modal, Space, Spin, Row, Tooltip, Typography, notification } from 'antd';
-import { CheckCircleFilled, FieldTimeOutlined, InfoCircleOutlined, PlusOutlined } from '@ant-design/icons';
+import { Button, Collapse, Checkbox, Form, Input, Modal, Space, Spin, Tooltip, Typography, notification } from 'antd';
+import { FieldTimeOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Result, Service } from 'wwg-api';
@@ -107,7 +107,7 @@ const RegistrationForm = () => {
                         <p>毕业年份: <Text type='success' strong>{regInfo?.gradYear ?? '暂无'}</Text></p>
                         <p>班级: <Text type='success' strong>{regInfo?.classNumber ?? '暂无'}</Text></p>
                         <p>方向: <Text type='success' strong>{regInfo?.curriculum ?? '暂无'}</Text></p>
-                        <p><Tooltip placement='bottom' title='为了安全性，注册码将会在创建后一段时间过期'><span style={{ borderBottom: '1px black dotted' }}>过期时间</span></Tooltip>: <Text type='success' strong>{(regInfo?.expDate) ? <Space>{regInfo?.expDate.toLocaleString()}<FieldTimeOutlined /></Space> : '暂无'}</Text></p>
+                        <p><Tooltip placement='bottom' title='为了安全性，注册码将会在创建后一段时间过期'><span className='underdotted'>过期时间</span></Tooltip>: <Text type='success' strong>{(regInfo?.expDate) ? <Space>{regInfo?.expDate.toLocaleString()}<FieldTimeOutlined /></Space> : '暂无'}</Text></p>
                     </Collapse.Panel>
                 </Collapse>
                 <Form.Item name='name' label='姓名' required rules={[

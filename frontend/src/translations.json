@@ -2,13 +2,33 @@
   "en": {
     "translation": {
       "gaokao": "gaokao",
-      "international": "international"
+      "international": "international",
+      "PRIVATE": "Private",
+      "CLASS": "Class",
+      "CURRICULUM": "Curriculum",
+      "YEAR": "Year",
+      "STUDENTS": "Everyone"
     }
   },
   "zh-CN": {
     "translation": {
       "gaokao": "高考",
-      "international": "国际"
+      "international": "国际",
+      "The identifier or the password is incorrect": "电话号码/邮箱或密码不正确",
+      "Privacy": "隐私",
+      "name": "姓名",
+      "Update Information": "更新信息",
+      "PRIVATE": "私密",
+      "CLASS": "班级",
+      "CURRICULUM": "体系",
+      "YEAR": "年级",
+      "STUDENTS": "所有人",
+      "Only visible to the user": "仅对用户本人可见",
+      "Only visible to the students in the same class": "仅对同班学生可见",
+      "Only visible to the students in the same curriculum": "仅对同体系学生可见",
+      "Only visible to the students graduating in the same year": "仅对同年毕业学生可见",
+      "Visible to every registered user": "对所有注册用户可见",
+      "This setting determines the scope of users who can access your personal information (admin users excluded)": "此项决定了个人信息将对哪些用户可见，但是不影响特定管理员的访问权限"
     }
   }
 }

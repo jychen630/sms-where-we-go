@@ -28,7 +28,7 @@ export const fetchSchool = async ({ offset, limit, value }: SearchHandlerProps) 
     }
 }
 
-const SchoolSearchTool = ({ schoolUid, setSchoolUid }: { schoolUid: number, setSchoolUid: React.Dispatch<React.SetStateAction<number>> }) => {
+const SchoolSearchTool = ({ schoolUid, setSchoolUid, initialValue }: { schoolUid: number, setSchoolUid: React.Dispatch<React.SetStateAction<number>>, initialValue?: string }) => {
     const [showSchoolModal, setShowSchoolModal] = useState(false);
 
     return (
@@ -47,6 +47,7 @@ const SchoolSearchTool = ({ schoolUid, setSchoolUid }: { schoolUid: number, setS
                                 </Button>
                             </Tooltip>
                         )}
+                        initialValue={initialValue}
                         placeholder='输入学校名称'
                     />
                 </Col>

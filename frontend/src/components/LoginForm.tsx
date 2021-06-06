@@ -1,4 +1,5 @@
 import { Form, Space, Spin, notification, Input, Button } from 'antd';
+import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 import { Result, Service } from 'wwg-api';
 import { handleApiError } from '../api/utils';
@@ -14,6 +15,7 @@ type Value = Parameters<typeof Service.login>[0];
 const LoginForm = () => {
     const [form] = Form.useForm<Value>();
     const history = useHistory();
+    const [t] = useTranslation();
     const validateLogin = async (
         { password,
             identifier,
@@ -47,7 +49,7 @@ const LoginForm = () => {
             .catch((err) => handleApiError(err).then((res) => {
                 notification.error({
                     message: '登录失败',
-                    description: res.message ?? '登录时发生未知错误'
+                    description: t(res.message) ?? '登录时发生未知错误'
                 });
             }
             ))

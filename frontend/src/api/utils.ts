@@ -34,3 +34,5 @@ export const handleApiError = async (err: ApiError | string | undefined): Promis
         }
     }
 }
+// Reference: https://stackoverflow.com/a/49889856/11612399
+export type ThenType<T> = T extends PromiseLike<infer U> ? U : T;

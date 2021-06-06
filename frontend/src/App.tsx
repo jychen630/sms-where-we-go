@@ -36,7 +36,9 @@ function App() {
           <MapPage />
         </Route>
         <Route path="/roster">roster</Route>
-        <Route path="/"><Redirect to="/login" /></Route>
+        <Route path="/">
+          <Redirect to="/login" />
+        </Route>
       </Switch>
     </Router>
   );

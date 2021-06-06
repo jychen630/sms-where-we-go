@@ -37,7 +37,6 @@ export default function Map({ getData, getPopup }: { getData: () => Promise<MapI
 
         getData().then((result) => {
             const data = geojson.parse(result ?? [], { Point: ['latitude', 'longitude'] });
-            console.log(data)
 
             map.on('load', () => {
                 map.addLayer({
@@ -61,7 +60,6 @@ export default function Map({ getData, getPopup }: { getData: () => Promise<MapI
                 let data = e.features[0].properties;
                 data.students = JSON.parse(data.students);
                 ReactDOM.render(getPopup(data), container);
-                console.log(container);
                 popup.setLngLat(coordinates).setDOMContent(container).addTo(map);
             });
 
