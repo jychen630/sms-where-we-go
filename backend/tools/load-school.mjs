@@ -62,13 +62,19 @@ export default async function initSchools(paths) {
 
         assert(cities[key] !== undefined);
 
+        let [lat, lng] = [school.latitude, school.longitude];
+        if (!!!school.latitude || !!!school.longitude) {
+          [lat, lng] = await getSchoolLngLat(school.name, school.city, country);
+        }
+
         // Having either inserted or retrieved the city, we can use the cities[key] to add the school
         const schoolUid = await addOrRetrieveSchool(
           school.name,
           cities[key],
-          school.latitude,
-          school.longitude,
-          !!school.aliases
+          lat,
+          lng,
+          !!school.aliases,
+          true
         );
 
         if (!!school.aliases) {
@@ -125,7 +131,14 @@ async function addOrRetrieveCity(
   return cityUid;
 }
 
-async function addOrRetrieveSchool(name, cityUid, lat, long, retrieve = true) {
+async function addOrRetrieveSchool(
+  name,
+  cityUid,
+  lat,
+  lng,
+  retrieve = true,
+  override = false
+) {
   let schoolUid = undefined;
   try {
     const result = await pg("wwg.school").insert(
@@ -133,7 +146,7 @@ async function addOrRetrieveSchool(name, cityUid, lat, long, retrieve = true) {
         name: name,
         city_uid: cityUid,
         latitude: lat,
-        longitude: long,
+        longitude: lng,
       },
       "school_uid"
     );
@@ -142,21 +155,39 @@ async function addOrRetrieveSchool(name, cityUid, lat, long, retrieve = true) {
   } catch (err) {
     if (err.code === UNIQUE_CONSTRAINT_CODE) {
       // If the school already exists and we are going to insert aliases for it, we retrieve it from the db
-      if (!retrieve) {
-        logger.debug(
-          `Not retrieving duplicate "${name}" as we have no further plans for it`
-        );
-        return schoolUid;
+      if (retrieve) {
+        const result = await pg("wwg.school")
+          .column("school_uid")
+          .select()
+          .where({
+            name: name,
+            city_uid: cityUid,
+          });
+        schoolUid = result[0].school_uid;
+        logger.debug(`Retrieved school "${name}" (city_uid: ${cityUid})`);
       }
-      const result = await pg("wwg.school")
-        .column("school_uid")
-        .select()
-        .where({
-          name: name,
-          city_uid: cityUid,
-        });
-      schoolUid = result[0].school_uid;
-      logger.debug(`Retrieved school "${name}" (city_uid: ${cityUid})`);
+
+      if (override && !!name && !!cityUid) {
+        try {
+          await pg("wwg.school")
+            .update({
+              latitude: lat,
+              longitude: lng,
+            })
+            .where({
+              name: name,
+              city_uid: cityUid,
+            });
+          logger.debug(
+            `Updated school coordinate ${lat}, ${lng} for ${name} at city ${cityUid}`
+          );
+        } catch (err) {
+          logger.error(
+            `Failed to update coordinate of ${name} at city ${cityUid} to ${lat}, ${lng}`
+          );
+          logger.error(err.message);
+        }
+      }
     } else {
       // If not, we consider the error fatal and exit the script
       logger.fatal(`Failed to add school: "${name}" (city_uid: ${cityUid})`);
@@ -188,4 +219,8 @@ async function addSchoolAliases(schoolUid, aliases) {
       }
     }
   }
+}
+
+async function getSchoolLngLat(name, city, country) {
+  return [Math.random() * 180 - 90, Math.random() * 360 - 180];
 }
