@@ -49,7 +49,7 @@ log4js.configure({
 const logger = log4js.getLogger("load");
 
 const RETRIES = 5;
-const DATA_PATHS = ["./tools/ChinaUniversityList.json"];
+const DATA_PATHS = ["./tools/ChinaUniversityList.json", "./tools/test.json"];
 dotenv.config();
 export const pg = knex.knex({
   client: "pg",

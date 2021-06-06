@@ -1,0 +1,39 @@
+{
+  "country": "United States",
+  "data": [
+    {
+      "state_province": "CA",
+      "schools": [
+        {
+          "name": "California Institute of Technology",
+          "city": "Pasadena",
+          "aliases": ["Caltech"]
+        },
+        {
+          "name": "Stanford University",
+          "city": "Palo Alto",
+          "aliases": ["Stanford"]
+        },
+        {
+          "name": "University of California, Santa Barbara",
+          "city": "Santa Babara",
+          "aliases": ["UCSB"]
+        },
+        {
+          "name": "Test School 2",
+          "city": "Test City",
+          "latitude": 44,
+          "longitude": 42,
+          "aliases": ["TS2"]
+        },
+        {
+          "name": "Test School",
+          "city": "Test City",
+          "latitude": 112,
+          "longitude": 34,
+          "aliases": ["ts"]
+        }
+      ]
+    }
+  ]
+}
