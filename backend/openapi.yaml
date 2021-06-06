@@ -315,6 +315,12 @@ paths:
         administration.
       parameters:
         - in: query
+          name: self
+          schema:
+            type: boolean
+            example: false
+            description: Indicate whether to only fetch the user themself. If set to true, all the other parameters will be ignored.
+        - in: query
           name: name
           schema:
             type: string

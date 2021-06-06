@@ -79,6 +79,7 @@ identifier: number,
     /**
      * Return the information of students. Result is scoped by the user role. For example: a "student" user cannot see others role and visibility settings, but an admin user, like those with the role "class" can. Apart from that, admin users can ignore the visibility settings of the students who are under their administration.
  * 
+     * @param self 
      * @param name 
      * @param phoneNumber 
      * @param curriculum 
@@ -89,6 +90,7 @@ identifier: number,
      * @throws ApiError
      */
     public static async getStudent(
+self?: boolean,
 name?: string,
 phoneNumber?: string,
 curriculum?: string,
@@ -109,6 +111,7 @@ self?: boolean,
             method: 'GET',
             path: `/student`,
             query: {
+                'self': self,
                 'name': name,
                 'phone_number': phoneNumber,
                 'curriculum': curriculum,

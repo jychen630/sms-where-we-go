@@ -25,6 +25,10 @@ export const get: Operation = async (req, res, next) => {
                 if (!(typeof self.level === 'number')) {
                     return;
                 }
+                if (!!data.self) {
+                    qb.select().where('student_uid', self.student_uid);
+                    return;
+                }
                 if (self.level >= 16) {
                     // System admin can access all students
                     qb.select();
@@ -83,6 +87,10 @@ export const get: Operation = async (req, res, next) => {
         .join(school, 't1.school_uid', 't2.school_uid')
         .joinRaw('NATURAL JOIN city')
         .modify<any, (StudentClassRole & School & City & { school_name: string })[]>((qb) => {
+            if (!!data['self']) {
+                qb.where('t1.student_uid', self.student_uid);
+                return;
+            }
             if (!!data['name']) {
                 qb.where('t1.name', 'LIKE', `%${data['name']}%`);
             }
@@ -127,7 +135,7 @@ export const get: Operation = async (req, res, next) => {
                         self: self.student_uid === student.student_uid ? true : undefined,
                         // Role and visibility are only visible to admins or the users themselves
                         role: privilege.level > 0 || self.student_uid === student.student_uid ? student.role : undefined,
-                        visibiliy: privilege.level > 0 || self.student_uid === student.student_uid ? student.visibility_type : undefined
+                        visibility: privilege.level > 0 || self.student_uid === student.student_uid ? student.visibility_type : undefined
                     });
                 }))
             });
