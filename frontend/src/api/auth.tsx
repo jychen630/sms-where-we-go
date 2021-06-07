@@ -39,6 +39,9 @@ export const useAuthProvider = () => {
                             setRole(res.students[0].role);
                             setStudentUid(res.students[0].uid);
                         }
+                    })
+                    .catch(err => {
+                        console.error(err);
                     });
                 return res;
             }
