@@ -1,7 +1,8 @@
 import { Form, Space, Spin, notification, Input, Button } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import { Result, Service } from 'wwg-api';
+import { useAuth } from '../api/auth';
 import { handleApiError } from '../api/utils';
 
 // constants
@@ -14,8 +15,10 @@ type Value = Parameters<typeof Service.login>[0];
 
 const LoginForm = () => {
     const [form] = Form.useForm<Value>();
+    const location = useLocation();
     const history = useHistory();
     const [t] = useTranslation();
+    const auth = useAuth();
     const validateLogin = async (
         { password,
             identifier,
@@ -24,20 +27,22 @@ const LoginForm = () => {
         if (!!!password || !!!identifier) {
             return;
         }
-        return Service.login({
-            password: password,
-            identifier: identifier as any,
-            use_uid: use_uid ?? false,
-        })
+        return auth.login(
+            password,
+            identifier,
+            use_uid,
+        )
             .then((res) => {
                 // success
                 if (res.result === Result.result.SUCCESS) {
                     notification.success({
                         message: '登录成功',
-                        description: <Space>即将进入地图 <Spin /></Space>,
-                        duration: 1.5
+                        description: <Space>加载中 <Spin /></Space>,
+                        duration: 1
                     });
-                    setTimeout(() => history.push('/map'), 1500);
+                    console.log(location.state);
+                    const dest = (typeof location.state === 'object' && location.state !== null && 'pathname' in (location.state)) ? (location.state as any).pathname : '/map';
+                    setTimeout(() => history.push(dest), 1500);
                     return Promise.resolve();
                 }
                 // fail

@@ -1,6 +1,7 @@
 import { Card, Layout, notification } from "antd";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
+import { useHistory } from "react-router";
 import { Service } from "wwg-api";
 import { handleApiError } from "../api/utils";
 import InfoUpdateForm from "../components/InfoUpdateForm";
@@ -9,6 +10,7 @@ import AppPage, { menuOptions } from "./AppPage";
 const { Content } = Layout;
 const UserPage = () => {
     const [t] = useTranslation();
+    const history = useHistory();
 
     const getCurrentStudent = useCallback(async () => {
         try {
@@ -26,9 +28,14 @@ const UserPage = () => {
                     message: "错误",
                     description: t(res.message)
                 })
+                if (res.requireLogin) {
+                    setTimeout(() => {
+                        history.push('/login', history.location);
+                    }, 200);
+                }
             });
         }
-    }, [t]);
+    }, [t, history]);
 
     return (
         <AppPage activeKey={menuOptions.SETTINGS}>

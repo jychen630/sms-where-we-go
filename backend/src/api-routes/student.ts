@@ -149,7 +149,7 @@ export const put: Operation = async (req, res, next) => {
 
     if (!!!req.session.student_uid) {
         logger.error(`Attempt to update ${data.student_uid ?? '[uid not specified]'} without authentication`);
-        sendError(res, 403, 'Login to update student information');
+        sendError(res, 401, 'Login to update student information');
         return;
     }
 
@@ -231,7 +231,7 @@ export const DELETE: Operation = async (req, res, next) => {
     const logger = log4js.getLogger('student.delete');
 
     if (!!!req.session.student_uid) {
-        sendError(res, 403, 'Login to delete student');
+        sendError(res, 401, 'Login to delete student');
         return;
     }
 

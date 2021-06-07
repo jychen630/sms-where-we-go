@@ -10,7 +10,7 @@ export const get: Operation = async (req, res, next) => {
     const logger = log4js.getLogger('roster');
     if (!!!req.session.identifier) {
         logger.info('User not identified');
-        sendError(res, 403, 'Please login to access the roster');
+        sendError(res, 401, 'Please login to access the roster');
     }
     else {
         const student = await pg.select<StudentClass>().from('wwg.student_class')
