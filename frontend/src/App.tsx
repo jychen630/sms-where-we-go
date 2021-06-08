@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   BrowserRouter as Router,
   Switch,
@@ -18,7 +18,9 @@ OpenAPI.WITH_CREDENTIALS = true;
 OpenAPI.TOKEN = '';
 function App() {
   const authProvider = useAuthProvider();
-  console.log(authProvider.studentUid);
+  useEffect(() => {
+    authProvider.update();
+  });
   return (
     <AuthProvider value={authProvider}>
       <Router>

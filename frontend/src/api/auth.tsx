@@ -35,7 +35,7 @@ export const useAuthProvider = () => {
             if (res.result === Result.result.SUCCESS) {
                 Service.getStudent(true).then(
                     (res) => {
-                        if (!!res.students) {
+                        if (!!res.students && res.students.length > 0) {
                             setRole(res.students[0].role);
                             setStudentUid(res.students[0].uid);
                         }
@@ -57,7 +57,24 @@ export const useAuthProvider = () => {
         }
     }
 
-    return { role, studentUid, login };
+    const update = async () => {
+        Service.getStudent(true)
+            .then(res => {
+                if (!!res.students) {
+                    setRole(res.students[0].role);
+                    setStudentUid(res.students[0].uid);
+                }
+                else {
+                    return Promise.reject();
+                }
+            })
+            .catch(err => {
+                setRole(undefined);
+                setStudentUid(undefined);
+            });
+    }
+
+    return { role, studentUid, login, update };
 }
 
 export const AuthProvider = ({ value, children }: HasChildren<{ value?: AuthContext }>) => {
