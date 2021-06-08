@@ -7,7 +7,8 @@
       "CLASS": "Class",
       "CURRICULUM": "Curriculum",
       "YEAR": "Year",
-      "STUDENTS": "Everyone"
+      "STUDENTS": "Everyone",
+      "DELETE ACCOUNT": "Warning: When an account is deleted, the data is wiped from the server and there is no way to retrieve it"
     }
   },
   "zh-CN": {
@@ -28,7 +29,12 @@
       "Only visible to the students in the same curriculum": "仅对同体系学生可见",
       "Only visible to the students graduating in the same year": "仅对同年毕业学生可见",
       "Visible to every registered user": "对所有注册用户可见",
-      "This setting determines the scope of users who can access your personal information (admin users excluded)": "此项决定了个人信息将对哪些用户可见，但是不影响特定管理员的访问权限"
+      "This setting determines the scope of users who can access your personal information (admin users excluded)": "此项决定了个人信息将对哪些用户可见，但是不影响特定管理员的访问权限",
+      "DELETE ACCOUNT": "警告：删除账号将会抹除服务器上存储的用户数据，这个操作是不可逆的",
+      "Advanced Options": "高级选项",
+      "Delete Account": "删除账号",
+      "cancel": "取消",
+      "This user is invalid, please login again": "此用户无效，请尝试重新登陆"
     }
   }
 }
