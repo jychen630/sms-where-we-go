@@ -6,7 +6,7 @@ import '../app.css';
 
 const { Header, Content } = Layout;
 export enum menuOptions {
-    MAP = 'map', LIST = 'list', SETTINGS = 'settings'
+    MAP = 'map', LIST = 'list', SETTINGS = 'settings', ADMIN = 'admin'
 }
 
 const AppPage = ({ activeKey, children }: { activeKey: menuOptions, children: React.ReactNode }) => {
