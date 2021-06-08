@@ -321,6 +321,12 @@ paths:
             example: false
             description: Indicate whether to only fetch the user themself. If set to true, all the other parameters will be ignored.
         - in: query
+          name: can_update_only
+          schema:
+            type: boolean
+            default: false
+            description: Only return students that can be updated by the caller
+        - in: query
           name: name
           schema:
             type: string

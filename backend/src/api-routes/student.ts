@@ -111,11 +111,14 @@ export const get: Operation = async (req, res, next) => {
             }
         })
         .then(async (students) => {
-            students = students.filter(async (student) => (await RoleService.privilege(self, student)).read);
+            const privilegeTemp = await Promise.all(students.map(async (student) => {
+                return await RoleService.privilege(self, student);
+            }))
+            students = students.filter((_, index) => privilegeTemp[index].read && (!!!data['can_update_only'] || privilegeTemp[index].update));
             logger.info(`Retrieved students for ${self.student_uid}`);
             sendSuccess(res, {
-                students: await Promise.all(students.map(async (student) => {
-                    const privilege = await RoleService.privilege(self, student);
+                students: await Promise.all(students.map(async (student, index) => {
+                    const privilege = privilegeTemp[index];
                     return removeNull({
                         uid: student.student_uid,
                         name: student.name,
