@@ -35,9 +35,9 @@ export class RoleService {
             .first<Role>();
     }
     static async privilege(current_uid: number, target_uid: number): Promise<Privilege>;
-    static async privilege(current: StudentClassRole, target: StudentClassRole): Promise<Privilege>;
+    static async privilege(current: StudentClassRole | undefined, target: StudentClassRole | undefined): Promise<Privilege>;
     static async privilege(...args: any[]): Promise<Privilege> {
-        let current: StudentClassRole, target: StudentClassRole;
+        let current: StudentClassRole | undefined, target: StudentClassRole | undefined;
         if (typeof args[0] === 'number' && typeof args[1] === 'number') {
             [current, target] = [await StudentService.get(args[0]), await StudentService.get(args[1])];
         }
@@ -50,7 +50,7 @@ export class RoleService {
             update: false,
             delete: false,
             grant: false,
-            level: current.level as number,
+            level: current?.level as number ?? 0,
         }
 
         if (!!!current || !!!target) {
@@ -99,7 +99,7 @@ export class RoleService {
                 // Prevent overriding the value of privilege.read by false
                 privilege.read = privilege.read || compare.isSameYear;
                 privilege.update = compare.isSameYear;
-                privilege.delete = privilege.grant = compare.isAdminable;
+                privilege.delete = privilege.grant = compare.isAdminable || compare.isSameStudent;
                 return privilege;
             case StudentRole.System:
                 privilege.read = privilege.update = true;
@@ -113,7 +113,7 @@ export class RoleService {
 }
 
 export const StudentService = {
-    get: async (student_uid: number): Promise<StudentClassRole> => {
+    get: async (student_uid: number): Promise<StudentClassRole | undefined> => {
         return pg('student_class_role')
             .select()
             .where('student_uid', student_uid)

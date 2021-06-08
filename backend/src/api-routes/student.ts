@@ -18,6 +18,11 @@ export const get: Operation = async (req, res, next) => {
     }
 
     const self = await StudentService.get(req.session.student_uid);
+    if (self === undefined) {
+        logger.error(`Invalid user`);
+        sendError(res, 403, 'Invalid user for this operation');
+        return;
+    }
 
     const subquery = pg('wwg.student_class_role')
         .modify<any, StudentClassRole[]>(
@@ -241,6 +246,7 @@ export const DELETE: Operation = async (req, res, next) => {
     const privilege = await RoleService.privilege(req.session.student_uid, data.student_uid);
 
     if (!privilege.delete) {
+        logger.error(`${req.session.student_uid} is denied from deleting ${data.student_uid}`);
         sendError(res, 403, 'You are not authorized to delete this user');
         return;
     }
@@ -294,6 +300,12 @@ export const post: Operation = async (req, res, next) => {
         }
 
         const student = await StudentService.get(req.session.student_uid);
+
+        if (student === undefined) {
+            logger.error(`Invalid user`);
+            sendError(res, 403, 'Invalid user for this operation');
+            return;
+        }
 
         if ((student.level as number) === 0) {
             sendError(res, 403, 'Only administrator can add users without registration keys');

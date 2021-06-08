@@ -29,7 +29,7 @@ const MapPage = () => {
                     }
                     return [];
                 }));
-    }, [history]);
+    }, [t, history]);
 
     return (
         <AppPage activeKey={menuOptions.MAP}>
