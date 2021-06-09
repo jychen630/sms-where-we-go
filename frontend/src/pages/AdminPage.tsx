@@ -1,31 +1,18 @@
-import { List, Modal, Button, Layout } from "antd";
-import { Service, StudentVerbose, Student } from "wwg-api";
+import { List, Modal, Button, Layout, Card, notification } from "antd";
+import { Service, StudentVerbose, Student, Role } from "wwg-api";
 import AppPage, { menuOptions } from "./AppPage";
 import { useCallback, useEffect, useState } from "react";
-import React from "react";
 import { handleApiError } from "../api/utils";
-import { result, values } from "lodash";
 import InfoUpdateForm from "../components/InfoUpdateForm";
+import { useAuth } from "../api/auth";
+import { useTranslation } from "react-i18next";
 
 const AdminPage = () => {
-    const [students, setStudents] = useState<(Student & StudentVerbose)[]>([]);
-    const [visible, setVisible] = useState(false);
-    const [confirmLoading, setConfirmLoading] = useState(false);
-    const [modalText, setModalText] = useState("Content of the modal");
+    const auth = useAuth();
+    const [t] = useTranslation();
     const [index, setIndex] = useState(-1);
-
-    const showModal = () => {
-        setVisible(true);
-    };
-
-    const handleOk = () => {
-        setModalText("保存中...");
-        setConfirmLoading(true);
-        setTimeout(() => {
-            setVisible(false);
-            setConfirmLoading(false);
-        }, 500);
-    };
+    const [visible, setVisible] = useState(false);
+    const [students, setStudents] = useState<(Student & StudentVerbose)[]>([]);
 
     const handleCancel = () => {
         setVisible(false);
@@ -34,54 +21,59 @@ const AdminPage = () => {
     useEffect(() => {
         Service.getStudent()
             .then((result) => setStudents(result.students ?? []))
-            .catch((err) =>
-                handleApiError(err).then((result) =>
-                    console.log(result.message)
+            .catch((err) => handleApiError(err)
+                .then((result) =>
+                    notification.error({
+                        message: '错误',
+                        description: <>未能获取学生数据<p>错误信息：{result.message}</p></>
+                    })
                 )
             );
-    });
+    }, [auth]);
 
     const getCurrentStudent = useCallback(
-        async () => (index === -1 ? undefined : students[index]),
+        async () => index === -1 ? undefined : students[index],
         [students, index]
     );
 
     return (
         <AppPage activeKey={menuOptions.ADMIN}>
-            <Layout>
+            <Layout className='centered-layout'>
                 <Layout.Content>
-                    <List  itemLayout="horizontal">
-                    {students.map((value, index) => (
-                        <List.Item
-                            actions={[
-                                <Button
-                                    onClick={() => {
-                                        setVisible(true);
-                                        setIndex(index);
-                                    }}
+                    <Card>
+                        <List itemLayout="horizontal">
+                            {students.map((value, index) => (
+                                <List.Item
+                                    actions={[
+                                        <Button
+                                            onClick={() => {
+                                                setVisible(true);
+                                                setIndex(index);
+                                            }}
+                                        >
+                                            edit
+                                    </Button>,
+                                    ]}
                                 >
-                                    edit
-                                </Button>,
-                            ]}
-                        >
-                            <List.Item.Meta
-                                title={<a href="">{value.name}</a>}
-                                description={<p>info </p>}
-                            />
-                        </List.Item>
-                    ))}
-
-                    <Modal
-                        title="编辑学生信息：" //{value.name}
-                        visible={visible}
-                        onOk={handleOk}
-                        confirmLoading={confirmLoading}
-                        onCancel={handleCancel}
-                    >
-                        <InfoUpdateForm getStudent={getCurrentStudent} />
-                    </Modal></List>
+                                    <List.Item.Meta
+                                        title={value.name}
+                                        description={<p>{value.class_number}/{value.grad_year} [{t(value.curriculum ?? '')}]</p>}
+                                    />
+                                </List.Item>
+                            ))}
+                        </List>
+                    </Card>
                 </Layout.Content>
             </Layout>
+            <Modal
+                title="编辑学生信息：" //{value.name}
+                visible={visible}
+                okText={<></>}
+                cancelText={t('Close')}
+                onCancel={handleCancel}
+            >
+                <InfoUpdateForm showRoleOptions={auth.role !== Role.STUDENT} getStudent={getCurrentStudent} />
+            </Modal>
         </AppPage>
     );
 };

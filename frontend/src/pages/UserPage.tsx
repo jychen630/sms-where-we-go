@@ -97,7 +97,7 @@ const UserPage = () => {
                 okText='确认删除'
                 onOk={() => { setShowModal(false); deleteAccount(); }}
                 onCancel={() => setShowModal(false)}
-                cancelText={t('cancel')}
+                cancelText={t('Cancel')}
                 style={{ maxWidth: '300px' }}
                 title={t('Delete Account')}
             >

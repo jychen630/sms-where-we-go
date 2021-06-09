@@ -8,7 +8,15 @@
       "CURRICULUM": "Curriculum",
       "YEAR": "Year",
       "STUDENTS": "Everyone",
-      "DELETE ACCOUNT": "Warning: When an account is deleted, the data is wiped from the server and there is no way to retrieve it"
+      "SYSTEM": "System",
+      "STUDENT": "Student",
+      "DELETE ACCOUNT": "Warning: When an account is deleted, the data is wiped from the server and there is no way to retrieve it",
+      "ROLE TIP": "This determines the privilege level of the student within the system",
+      "ROLE TIP STUDENT": "Normal user who has no administrative privilege",
+      "ROLE TIP CLASS": "Admin user who can add, read, update or delete students within the same class, generate registration key, or change the privilege of normal users",
+      "ROLE TIP CURRICULUM": "Admin user who can add, read, update or delete students within the same curriculum, generate registration key, or change the privilege of normal users or class admins",
+      "ROLE TIP YEAR": "Admin user who can add, read, update or delete students within the same year, generate registration key, or change the privilege of normal users or class/curriculum admins",
+      "ROLE TIP SYSTEM": "Admin user who can add, read, update or delete students within the same system, generate registration key, or change the privilege of normal users or class/curriculum/year admins"
     }
   },
   "zh-CN": {
@@ -24,16 +32,25 @@
       "CURRICULUM": "体系",
       "YEAR": "年级",
       "STUDENTS": "所有人",
+      "SYSTEM": "系统",
+      "STUDENT": "学生",
       "Only visible to the user": "仅对用户本人可见",
       "Only visible to the students in the same class": "仅对同班学生可见",
       "Only visible to the students in the same curriculum": "仅对同体系学生可见",
       "Only visible to the students graduating in the same year": "仅对同年毕业学生可见",
       "Visible to every registered user": "对所有注册用户可见",
       "This setting determines the scope of users who can access your personal information (admin users excluded)": "此项决定了个人信息将对哪些用户可见，但是不影响特定管理员的访问权限",
+      "ROLE TIP": "此项决定了用户的权限等级",
+      "ROLE TIP STUDENT": "普通用户，无管理员权限",
+      "ROLE TIP CLASS": "可以添加，查看，更改，删除同班学生，生成注册码，改变普通用户的权限",
+      "ROLE TIP CURRICULUM": "可以添加，查看，更改，删除同体系学生，生成注册码，改变普通用户或班级管理员的权限",
+      "ROLE TIP YEAR": "可以添加，查看，更改，删除同届学生，生成注册码，改变普通用户或班级，年级管理员的权限",
+      "ROLE TIP SYSTEM": "可以添加，查看，更改，删除任意学生，生成注册码，改变任意管理员的权限",
       "DELETE ACCOUNT": "警告：删除账号将会抹除服务器上存储的用户数据，这个操作是不可逆的",
       "Advanced Options": "高级选项",
       "Delete Account": "删除账号",
-      "cancel": "取消",
+      "Cancel": "取消",
+      "Close": "关闭",
       "This user is invalid, please login again": "此用户无效，请尝试重新登陆"
     }
   }

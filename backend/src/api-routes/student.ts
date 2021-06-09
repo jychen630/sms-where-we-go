@@ -89,8 +89,8 @@ export const get: Operation = async (req, res, next) => {
         .as('t2')
     pg(subquery)
         .select()
-        .join(school, 't1.school_uid', 't2.school_uid')
-        .joinRaw('NATURAL JOIN city')
+        .leftOuterJoin(school, 't1.school_uid', 't2.school_uid')
+        .leftOuterJoin('city', 'city.city_uid', 't2.city_uid')
         .modify<any, (StudentClassRole & School & City & { school_name: string })[]>((qb) => {
             if (!!data['self']) {
                 qb.where('t1.student_uid', self.student_uid);
@@ -189,7 +189,7 @@ export const put: Operation = async (req, res, next) => {
         (data.role === StudentRole.Curriculum.valueOf() && privileges.level < 8) ||
         (data.role === StudentRole.Year.valueOf() && privileges.level < 16) ||
         (data.role === StudentRole.System.valueOf() && privileges.level < 16))) {
-        logger.error(`${req.session.identifier} (level: ${privileges.level}) is denied for updating ${target_uid} ${!privileges.grant ? 'for lower privilege level' : 'for role not allowed'}`);
+        logger.error(`${req.session.identifier} (level: ${privileges.level}) is denied for updating ${target_uid} ${privileges.grant ? 'for lower privilege level' : 'for role not allowed'}`);
         logger.error(data);
         sendError(res, 403, `You are not allowed to alter this student\'s role${privileges.grant ? ` to '${data.role}' as your privilege level is ${privileges.level}` : ''}`);
         return;
@@ -221,7 +221,7 @@ export const put: Operation = async (req, res, next) => {
             major: data.major,
             class_number: data.class_number,
             grad_year: data.grad_year,
-            school_uid: data.school_uid,
+            school_uid: data.school_uid === -1 ? null : data.school_uid,
             visibility_type: data.visibility,
             role: data.role
         })

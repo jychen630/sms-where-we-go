@@ -10,10 +10,11 @@ import SchoolSearchTool from "./SchoolSearchTool";
 type Values = Parameters<typeof Service.updateStudent>[0];
 const { Item } = Form;
 
-const InfoUpdateForm = ({ getStudent }: { getStudent: () => Promise<Partial<Student & StudentVerbose & School & { role?: Role, visibility?: Visibility }> | undefined> }) => {
+const InfoUpdateForm = ({ getStudent, showRoleOptions = false }: { showRoleOptions?: boolean, getStudent: () => Promise<Partial<Student & StudentVerbose & School & { role?: Role, visibility?: Visibility }> | undefined> }) => {
     const [t] = useTranslation();
     const [form] = Form.useForm<Values>();
-    const [schoolUid, setSchoolUid] = useState(0);
+    const [schoolUid, setSchoolUid] = useState(-1);
+    const [studentUid, setStudentUid] = useState(-1);
     const [initialSchool, setInitialSchool] = useState('');
     const [fields, setFields] = useState<ThenType<ReturnType<typeof getStudent>>>(undefined);
     const [saving, setSaving] = useState(false);
@@ -33,33 +34,45 @@ const InfoUpdateForm = ({ getStudent }: { getStudent: () => Promise<Partial<Stud
                 return t('');
         }
     }, [t]);
+    const getRoleDescription = useCallback((role: Role) => {
+        switch (role) {
+            case Role.STUDENT:
+                return t('ROLE TIP STUDENT');
+            case Role.CLASS:
+                return t('ROLE TIP CLASS');
+            case Role.CURRICULUM:
+                return t('ROLE TIP CURRICULUM');
+            case Role.YEAR:
+                return t('ROLE TIP YEAR');
+            case Role.SYSTEM:
+                return t('ROLE TIP SYSTEM');
+            default:
+                return t('');
+        }
+    }, [t]);
 
     const getFields = useCallback(async () => {
-        if (!!fields) {
-            return fields;
-        }
-        else {
-            return getStudent().then(res => {
-                const data = {
-                    name: res?.name,
-                    class_number: res?.class_number,
-                    grad_year: res?.grad_year,
-                    curriculum: res?.curriculum,
-                    phone_number: res?.phone_number,
-                    email: res?.email,
-                    wxid: res?.wxid,
-                    department: res?.department,
-                    major: res?.major,
-                    visibility: res?.visibility,
-                    role: res?.role,
-                    school_uid: res?.school_uid ?? -1,
-                    school_name: res?.school_name
-                };
-                setFields(data);
-                return data
-            });
-        }
-    }, [fields, setFields, getStudent]);
+        return getStudent().then(res => {
+            const data = {
+                name: res?.name,
+                class_number: res?.class_number,
+                grad_year: res?.grad_year,
+                curriculum: res?.curriculum,
+                phone_number: res?.phone_number,
+                email: res?.email,
+                wxid: res?.wxid,
+                department: res?.department,
+                major: res?.major,
+                visibility: res?.visibility,
+                role: res?.role,
+                school_uid: res?.school_uid ?? -1,
+                school_name: res?.school_name
+            };
+            setStudentUid(res?.uid ?? -1);
+            setFields(data);
+            return data
+        });
+    }, [setFields, getStudent]);
 
     const initialize = useCallback(() => {
         getFields()
@@ -74,7 +87,8 @@ const InfoUpdateForm = ({ getStudent }: { getStudent: () => Promise<Partial<Stud
     const doUpdate = useCallback(_.throttle((data) => {
         Service.updateStudent({
             ...data,
-            school_uid: schoolUid
+            school_uid: schoolUid,
+            student_uid: studentUid !== -1 ? studentUid : undefined,
         })
             .then((res) => {
                 if (res.result === Result.result.SUCCESS) {
@@ -100,7 +114,7 @@ const InfoUpdateForm = ({ getStudent }: { getStudent: () => Promise<Partial<Stud
             .finally(() => {
                 setSaving(false);
             });
-    }, 1500), [schoolUid, setFields, setSaving]);
+    }, 1500), [schoolUid, studentUid, setFields, setSaving]);
 
     const handleFinished = useCallback((data: Values) => {
         if (!saving) {
@@ -209,6 +223,24 @@ const InfoUpdateForm = ({ getStudent }: { getStudent: () => Promise<Partial<Stud
                     }
                 </Select>
             </Form.Item>
+            {showRoleOptions &&
+                < Form.Item
+                    name='role'
+                    label='权限设置'
+                    tooltip={t('This setting determines the scope of users who can access your personal information (admin users excluded)')}
+                >
+                    <Select>
+                        {Object.entries(Role).map(([key, value]) => (
+                            <Select.Option key={key} value={value}>
+                                <Tooltip title={getRoleDescription(value)} className='underdotted'>
+                                    {t(key.toString())}
+                                </Tooltip>
+                            </Select.Option>
+                        ))
+                        }
+                    </Select>
+                </Form.Item>
+            }
             <Form.Item>
                 <Space>
                     <Button type='primary' htmlType='submit'>保存更改</Button>
