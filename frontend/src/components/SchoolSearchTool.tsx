@@ -1,5 +1,5 @@
 import { CheckCircleFilled, PlusOutlined } from "@ant-design/icons";
-import { Button, Col, Row, Space, Tooltip } from "antd";
+import { Button, Col, Empty, Row, Space, Tooltip } from "antd";
 import Modal from "antd/lib/modal/Modal";
 import { useState } from "react";
 import { Result, Service } from "wwg-api";
@@ -47,6 +47,19 @@ const SchoolSearchTool = ({ schoolUid, setSchoolUid, initialValue }: { schoolUid
                                 </Button>
                             </Tooltip>
                         )}
+                        EmptyPlaceholder={() => {
+                            return (
+                                schoolUid !== -1 ?
+                                    <Button
+                                        onClick={() => setSchoolUid(-1)}
+                                        block
+                                    >
+                                        清空
+                                    </Button>
+                                    :
+                                    <Empty />
+                            )
+                        }}
                         initialValue={initialValue}
                         placeholder='输入学校名称'
                     />

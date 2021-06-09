@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 
 export type SearchToolProps<T> = {
     searchHandler: (props: SearchHandlerProps) => Promise<T[] | undefined>,
+    EmptyPlaceholder?: () => JSX.Element,
     placeholder: string,
     item: (value: T, index: number) => JSX.Element,
     initialValue?: string,
@@ -17,7 +18,7 @@ export type SearchHandlerProps = {
     value: string,
 }
 
-const SearchTool = <T extends unknown>({ searchHandler, placeholder, item, initialValue, searchLimit = 5 }: SearchToolProps<T>) => {
+const SearchTool = <T extends unknown>({ searchHandler, placeholder, item, initialValue, searchLimit = 5, EmptyPlaceholder = () => <Empty /> }: SearchToolProps<T>) => {
     const [value, setValue] = useState('');
     const [offset, setOffset] = useState(0);
     const [loading, setLoading] = useState(false);
@@ -85,7 +86,7 @@ const SearchTool = <T extends unknown>({ searchHandler, placeholder, item, initi
                     }
                 >
                     {resultList.length === 0 &&
-                        <Empty />
+                        <EmptyPlaceholder />
                     }
 
                     {
