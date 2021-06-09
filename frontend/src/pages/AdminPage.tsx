@@ -6,10 +6,12 @@ import { handleApiError } from "../api/utils";
 import InfoUpdateForm from "../components/InfoUpdateForm";
 import { useAuth } from "../api/auth";
 import { useTranslation } from "react-i18next";
+import { useHistory } from "react-router";
 
 const AdminPage = () => {
     const auth = useAuth();
     const [t] = useTranslation();
+    const history = useHistory();
     const [index, setIndex] = useState(-1);
     const [visible, setVisible] = useState(false);
     const [students, setStudents] = useState<(Student & StudentVerbose)[]>([]);
@@ -22,14 +24,18 @@ const AdminPage = () => {
         Service.getStudent()
             .then((result) => setStudents(result.students ?? []))
             .catch((err) => handleApiError(err)
-                .then((result) =>
+                .then((result) => {
                     notification.error({
                         message: '错误',
                         description: <>未能获取学生数据<p>错误信息：{result.message}</p></>
-                    })
+                    });
+                    if (result.requireLogin) {
+                        setTimeout(() => history.push('/login', history.location), 1500);
+                    }
+                }
                 )
             );
-    }, [auth]);
+    }, [auth, history]);
 
     const getCurrentStudent = useCallback(
         async () => index === -1 ? undefined : students[index],

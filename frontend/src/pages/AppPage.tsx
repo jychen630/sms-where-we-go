@@ -1,7 +1,9 @@
-import { BarsOutlined, CompassOutlined, SettingOutlined } from '@ant-design/icons';
+import { BarsOutlined, CompassOutlined, ControlOutlined, SettingOutlined } from '@ant-design/icons';
 import { Layout, Menu, Space } from 'antd';
 import React from 'react';
 import { useHistory } from 'react-router';
+import { Role } from 'wwg-api';
+import { useAuth } from '../api/auth';
 import '../app.css';
 
 const { Header, Content } = Layout;
@@ -10,6 +12,7 @@ export enum menuOptions {
 }
 
 const AppPage = ({ activeKey, children }: { activeKey: menuOptions, children: React.ReactNode }) => {
+    const auth = useAuth();
     const history = useHistory();
 
     return (
@@ -34,6 +37,13 @@ const AppPage = ({ activeKey, children }: { activeKey: menuOptions, children: Re
                             <SettingOutlined /> 设置
                         </Space>
                     </Menu.Item>
+                    {!!auth.role && auth.role !== Role.STUDENT &&
+                        <Menu.Item key='admin' onClick={() => history.push('/admin')}>
+                            <Space>
+                                <ControlOutlined /> 管理
+                            </Space>
+                        </Menu.Item>
+                    }
                 </Menu>
             </Header>
             <Content className='app-content'>
