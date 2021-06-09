@@ -49,6 +49,8 @@
       "DELETE ACCOUNT": "警告：删除账号将会抹除服务器上存储的用户数据，这个操作是不可逆的",
       "Advanced Options": "高级选项",
       "Delete Account": "删除账号",
+      "Password Reset": "重设密码",
+      "Edit": "编辑",
       "Cancel": "取消",
       "Close": "关闭",
       "This user is invalid, please login again": "此用户无效，请尝试重新登陆"

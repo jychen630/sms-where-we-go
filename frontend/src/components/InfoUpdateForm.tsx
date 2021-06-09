@@ -141,6 +141,12 @@ const InfoUpdateForm = ({ getStudent, showRoleOptions = false }: { showRoleOptio
             <Item
                 name="name"
                 label={t("name")}
+                rules={[
+                    {
+                        required: true,
+                        message: '姓名不能为空'
+                    }
+                ]}
             >
                 <Input placeholder='中文姓名' />
             </Item>
@@ -148,16 +154,20 @@ const InfoUpdateForm = ({ getStudent, showRoleOptions = false }: { showRoleOptio
                 name='phone_number'
                 label='电话号码'
                 rules={[
-                    {
+                    ({ getFieldValue }) => ({
                         validator(_, value) {
-                            if (!!value && !value.match(phonePattern)) {
+                            const email = getFieldValue('email');
+                            if (!!!email && !!!value) {
+                                return Promise.reject('请在电话号码和邮箱中至少填写一项');
+                            }
+                            else if (!!value && !value.match(phonePattern)) {
                                 return Promise.reject('请正确填写电话号码');
                             }
                             else {
                                 return Promise.resolve();
                             }
                         }
-                    }
+                    })
                 ]}
                 tooltip='电话号码和邮箱请至少填写一项，两者都将能够作为登录的凭证'
             >
@@ -167,16 +177,20 @@ const InfoUpdateForm = ({ getStudent, showRoleOptions = false }: { showRoleOptio
                 name='email'
                 label='邮箱'
                 rules={[
-                    {
+                    ({ getFieldValue }) => ({
                         validator(_, value) {
-                            if (!!value && !value.match(emailPattern)) {
+                            const phoneNumber = getFieldValue('phone_number');
+                            if (!!!phoneNumber && !!!value) {
+                                return Promise.reject('请在电话号码和邮箱中至少填写一项');
+                            }
+                            else if (!!value && !value.match(emailPattern)) {
                                 return Promise.reject('请正确填写邮箱');
                             }
                             else {
                                 return Promise.resolve();
                             }
                         }
-                    }
+                    })
                 ]}
             >
                 <Input placeholder='请输入邮箱' />

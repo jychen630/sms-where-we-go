@@ -7,6 +7,7 @@ import InfoUpdateForm from "../components/InfoUpdateForm";
 import { useAuth } from "../api/auth";
 import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router";
+import PasswordResetForm from "../components/PasswordResetForm";
 
 const AdminPage = () => {
     const auth = useAuth();
@@ -14,6 +15,7 @@ const AdminPage = () => {
     const history = useHistory();
     const [index, setIndex] = useState(-1);
     const [visible, setVisible] = useState(false);
+    const [passwordFormVisible, setPasswordFormVisibile] = useState(false);
     const [students, setStudents] = useState<(Student & StudentVerbose)[]>([]);
 
     const handleCancel = () => {
@@ -32,8 +34,7 @@ const AdminPage = () => {
                     if (result.requireLogin) {
                         setTimeout(() => history.push('/login', history.location), 1500);
                     }
-                }
-                )
+                })
             );
     }, [auth, history]);
 
@@ -57,8 +58,17 @@ const AdminPage = () => {
                                                 setIndex(index);
                                             }}
                                         >
-                                            edit
-                                    </Button>,
+                                            {t("Edit")}
+                                        </Button>,
+                                        <Button
+                                            onClick={() => {
+                                                setPasswordFormVisibile(true);
+                                                setIndex(index);
+                                            }}
+                                            type='link'
+                                        >
+                                            {t("Password Reset")}
+                                        </Button>
                                     ]}
                                 >
                                     <List.Item.Meta
@@ -79,6 +89,14 @@ const AdminPage = () => {
                 onCancel={handleCancel}
             >
                 <InfoUpdateForm showRoleOptions={auth.role !== Role.STUDENT} getStudent={getCurrentStudent} />
+            </Modal>
+            <Modal
+                visible={passwordFormVisible}
+                okText={<></>}
+                cancelText={t('Close')}
+                onCancel={() => setPasswordFormVisibile(false)}
+            >
+                <PasswordResetForm studentUid={(!!students && index >= 0 && students.length > 0) ? students[index].uid : undefined} />
             </Modal>
         </AppPage>
     );

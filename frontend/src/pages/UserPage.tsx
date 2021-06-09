@@ -1,5 +1,5 @@
 import { QuestionCircleOutlined, WarningOutlined } from "@ant-design/icons";
-import { Button, Card, Collapse, Layout, notification, Tooltip } from "antd";
+import { Button, Card, Collapse, Divider, Layout, notification, Tooltip, Typography } from "antd";
 import Modal from "antd/lib/modal/Modal";
 import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -8,6 +8,7 @@ import { Result, Service } from "wwg-api";
 import { useAuth } from "../api/auth";
 import { handleApiError } from "../api/utils";
 import InfoUpdateForm from "../components/InfoUpdateForm";
+import PasswordResetForm from "../components/PasswordResetForm";
 import AppPage, { menuOptions } from "./AppPage";
 
 const { Content } = Layout;
@@ -81,6 +82,9 @@ const UserPage = () => {
                         <InfoUpdateForm getStudent={getCurrentStudent} />
                         <Collapse ghost>
                             <Collapse.Panel key={0} header={<span><WarningOutlined /> {t('Advanced Options')}</span>}>
+                                <Divider orientation='center' plain>{t('Password Reset')}</Divider>
+                                <PasswordResetForm />
+                                <Divider orientation='center' plain>{t('Delete Account')}</Divider>
                                 <Button onClick={() => setShowModal(true)} style={{ backgroundColor: 'red', color: 'white' }}>{t('Delete Account')}
                                     <Tooltip title={t('DELETE ACCOUNT')}>
                                         <QuestionCircleOutlined />
