@@ -12,7 +12,7 @@ import UserPage from './pages/UserPage';
 import MapPage from './pages/MapPage';
 import AdminPage from './pages/AdminPage';
 import 'antd/dist/antd.css';
-import { OpenAPI } from 'wwg-api';
+import { OpenAPI, Role } from 'wwg-api';
 import { AuthProvider, useAuthProvider } from './api/auth';
 
 OpenAPI.WITH_CREDENTIALS = true;
@@ -42,7 +42,11 @@ function App() {
           <Route path="/map">
             <MapPage />
           </Route>
-          <Route path="/admin"><AdminPage /></Route>
+          {authProvider.role !== Role.STUDENT &&
+            <Route path="/admin">
+              <AdminPage />
+            </Route>
+          }
           <Route path="/roster">roster</Route>
           <Route path="/">
             {authProvider.studentUid ?
@@ -51,7 +55,6 @@ function App() {
               <Redirect to="/login" />
             }
           </Route>
-          
         </Switch>
       </Router>
     </AuthProvider>
