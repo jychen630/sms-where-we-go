@@ -31,6 +31,8 @@ export default function Map({ getData, getPopup }: { getData: () => Promise<MapI
         const map = new mapboxgl.Map({
             container: mapContainer.current as any,
             style: 'mapbox://styles/mapbox/streets-v10',
+            center: [114.121677, 22.551557],
+            zoom: 1,
         }).addControl(lang);
 
         let popup = new mapboxgl.Popup({ closeOnMove: true, closeOnClick: true });
@@ -47,14 +49,17 @@ export default function Map({ getData, getPopup }: { getData: () => Promise<MapI
                         'data': data
                     },
                     'paint': {
-                        'circle-radius': 7,
-                        'circle-color': "rgba(106,0,210,0.48)"
+                        'circle-radius': 10,
+                        'circle-color': "rgba(24, 144, 255, 0.23)"
                     }
                 });
             });
 
             map.on('mouseenter', 'schools', (e: any) => {
-                const coordinates = e.features[0].geometry.coordinates.slice();
+                let coordinates = e.features[0].geometry.coordinates.slice();
+                while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                    coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+                }
                 map.getCanvas().style.cursor = "pointer";
                 const container = document.createElement('div');
                 let data = e.features[0].properties;
@@ -65,7 +70,7 @@ export default function Map({ getData, getPopup }: { getData: () => Promise<MapI
 
             map.on('mouseup', 'schools', displayModalData)
 
-            map.on('touchstart', 'schools', displayModalData)
+            //map.on('touchstart', 'schools', displayModalData)
 
             map.on('mouseleave', 'schools', (e: any) => {
                 map.getCanvas().style.cursor = "";
