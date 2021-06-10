@@ -60,7 +60,7 @@ const SchoolSearchTool = ({ schoolUid, setSchoolUid, initialValue }: { schoolUid
                                     <Empty />
                             )
                         }}
-                        initialValue={initialValue}
+                        initialValue={schoolUid !== -1 ? initialValue : ''}
                         placeholder='输入学校名称'
                     />
                 </Col>
@@ -76,6 +76,6 @@ const SchoolSearchTool = ({ schoolUid, setSchoolUid, initialValue }: { schoolUid
             </Modal>
         </>
     )
-}
+};
 
 export default SchoolSearchTool;

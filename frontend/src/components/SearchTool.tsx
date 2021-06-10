@@ -1,7 +1,7 @@
 import { LoadingOutlined } from "@ant-design/icons";
 import { Button, Collapse, Empty, Input, Row, Space, Spin } from "antd";
 import _ from "lodash";
-import { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 export type SearchToolProps<T> = {
     searchHandler: (props: SearchHandlerProps) => Promise<T[] | undefined>,
@@ -10,6 +10,7 @@ export type SearchToolProps<T> = {
     item: (value: T, index: number) => JSX.Element,
     initialValue?: string,
     searchLimit?: number,
+    inputRef?: React.Ref<Input>,
 }
 
 export type SearchHandlerProps = {
@@ -18,7 +19,8 @@ export type SearchHandlerProps = {
     value: string,
 }
 
-const SearchTool = <T extends unknown>({ searchHandler, placeholder, item, initialValue, searchLimit = 5, EmptyPlaceholder = () => <Empty /> }: SearchToolProps<T>) => {
+// See also for why we don't use forwardRef: https://github.com/microsoft/TypeScript/pull/30215
+const SearchTool = <T extends unknown>({ searchHandler, placeholder, item, initialValue, inputRef, searchLimit = 5, EmptyPlaceholder = () => <Empty /> }: SearchToolProps<T>) => {
     const [value, setValue] = useState('');
     const [offset, setOffset] = useState(0);
     const [loading, setLoading] = useState(false);
@@ -56,7 +58,7 @@ const SearchTool = <T extends unknown>({ searchHandler, placeholder, item, initi
     }, [setLoading, resultList, search, searchLimit]);
 
     useEffect(() => {
-        if (!!initialValue) {
+        if (initialValue !== undefined) {
             setValue(initialValue);
             search({ value: initialValue, offset: 0, limit: 1, append: false });
         }
@@ -65,6 +67,7 @@ const SearchTool = <T extends unknown>({ searchHandler, placeholder, item, initi
     return (
         <>
             <Input.Search
+                ref={inputRef}
                 placeholder={placeholder}
                 value={value}
                 onSearch={(val) => handleSearch({ value: val })}
@@ -113,6 +116,6 @@ const SearchTool = <T extends unknown>({ searchHandler, placeholder, item, initi
             </Collapse>
         </>
     )
-}
+};
 
 export default SearchTool;
