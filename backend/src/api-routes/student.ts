@@ -6,6 +6,7 @@ import { Service } from '../generated';
 import { dbHandleError, parseBody, parseQuery, removeNull, sendError, sendSuccess } from '../utils';
 import { ClassService, RoleService, StudentService } from '../services';
 import { City, School, StudentClassRole, StudentRole, StudentVisibility } from '../generated/schema';
+import { ArrayType } from '../wwg_typings/custom_types';
 
 export const get: Operation = async (req, res, next) => {
     const data = parseQuery<typeof Service.getStudent>(req) as any;
@@ -154,10 +155,23 @@ export const get: Operation = async (req, res, next) => {
 export const put: Operation = async (req, res, next) => {
     const data = parseBody<typeof Service.updateStudent>(req);
     const logger = log4js.getLogger('student.update');
+    // TODO: A student can clear their email first and then clear the phone number later in separate requests
+    // to bypass the restriction that either email or phone number should be set. This needs to be solved in
+    // the future by adding SQL constraints or manual checks through fetching students beforehand.
+    const clear = data.clear?.reduce<Set<ArrayType<typeof data.clear>>>((accu, curr) => {
+        accu.add(curr);
+        return accu;
+    }, new Set()) ?? new Set();
 
     if (!!!req.session.student_uid) {
         logger.error(`Attempt to update ${data.student_uid ?? '[uid not specified]'} without authentication`);
         sendError(res, 401, 'Login to update student information');
+        return;
+    }
+
+    if (clear.has('email') && clear.has('phone_number')) {
+        logger.error(`Attempt to clear ${data.student_uid ?? req.session.student_uid}'s phone_number and email at the same time`)
+        sendError(res, 400, 'You cannot clear email and phone number at the same time');
         return;
     }
 
@@ -166,20 +180,20 @@ export const put: Operation = async (req, res, next) => {
     const privileges = await RoleService.privilege(req.session.student_uid, target_uid);
 
     if (!privileges.update) {
-        logger.error(`User update denied for ${data.student_uid} from ${req.session.student_uid} with privileges ${privileges}`);
+        logger.error(`User update denied for ${data.student_uid} from ${req.session.student_uid} with privileges ${JSON.stringify(privileges)}`);
         logger.error(data);
         sendError(res, 403, 'You are not allowed to update this student\'s information');
         return;
     }
 
     if (privileges.level < 16 && !!data.grad_year) {
-        sendError(res, 400, `You are not allowed to update the graduation year`);
+        sendError(res, 403, `You are not allowed to update the graduation year`);
         logger.error(`${req.session.identifier} attempts to update grad_year`);
         return;
     }
 
     if (privileges.level < 4 && !!data.class_number) {
-        sendError(res, 400, `You are not allowed to update the class number`);
+        sendError(res, 403, `You are not allowed to update the class number`);
         logger.error(`${req.session.identifier} attempts to update class_number`);
         return;
     }
@@ -213,15 +227,15 @@ export const put: Operation = async (req, res, next) => {
         .where('student_uid', target_uid)
         .update({
             name: data.name,
-            phone_number: data.phone_number,
-            email: data.email,
+            phone_number: clear.has('phone_number') ? null : data.phone_number,
+            email: clear.has('email') ? null : data.email,
             password_hash: hashed,
             wxid: data.wxid,
             department: data.department,
             major: data.major,
             class_number: data.class_number,
             grad_year: data.grad_year,
-            school_uid: data.school_uid === -1 ? null : data.school_uid,
+            school_uid: clear.has('school_uid') ? null : data.school_uid,
             visibility_type: data.visibility,
             role: data.role
         })

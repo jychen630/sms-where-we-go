@@ -486,6 +486,11 @@ paths:
                     example: 2021
                   curriculum:
                     enum: [""]
+                  clear:
+                    description: The fields that need to be cleared
+                    type: array
+                    items:
+                      enum: ["email", "phone_number", "school_uid"]
       responses:
         200:
           $ref: "#/components/responses/Default"

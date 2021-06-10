@@ -8,3 +8,5 @@ declare module 'express-session' {
         identifier: string | number
     }
 }
+
+export type ArrayType<T> = T extends Array<infer U> ? U : never;

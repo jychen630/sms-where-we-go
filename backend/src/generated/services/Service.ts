@@ -189,6 +189,10 @@ password?: string,
 class_number?: number,
 grad_year?: number,
 curriculum?: any,
+/**
+ * The fields that need to be cleared
+ */
+clear?: Array<'email' | 'phone_number' | 'school_uid'>,
 }),
 ): Promise<Result> {
         const result = await __request({
