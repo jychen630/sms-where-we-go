@@ -1,4 +1,4 @@
-import { List, Modal, Button, Layout, Card, notification } from "antd";
+import { List, Modal, Button, Layout, Card, notification, Tabs } from "antd";
 import { Service, StudentVerbose, Student, Role } from "wwg-api";
 import AppPage, { menuOptions } from "./AppPage";
 import { useCallback, useEffect, useState } from "react";
@@ -48,36 +48,47 @@ const AdminPage = () => {
             <Layout className='centered-layout'>
                 <Layout.Content>
                     <Card>
-                        <List itemLayout="horizontal">
-                            {students.map((value, index) => (
-                                <List.Item
-                                    actions={[
-                                        <Button
-                                            onClick={() => {
-                                                setVisible(true);
-                                                setIndex(index);
-                                            }}
+                        <Tabs defaultActiveKey=''>
+                            <Tabs.TabPane tab={t('User List')} key='users'>
+                                <List itemLayout="horizontal">
+                                    {students.map((value, index) => (
+                                        <List.Item
+                                            key={index}
+                                            actions={[
+                                                <Button
+                                                    onClick={() => {
+                                                        setVisible(true);
+                                                        setIndex(index);
+                                                    }}
+                                                >
+                                                    {t("Edit")}
+                                                </Button>,
+                                                <Button
+                                                    onClick={() => {
+                                                        setPasswordFormVisibile(true);
+                                                        setIndex(index);
+                                                    }}
+                                                    type='link'
+                                                >
+                                                    {t("Password Reset")}
+                                                </Button>
+                                            ]}
                                         >
-                                            {t("Edit")}
-                                        </Button>,
-                                        <Button
-                                            onClick={() => {
-                                                setPasswordFormVisibile(true);
-                                                setIndex(index);
-                                            }}
-                                            type='link'
-                                        >
-                                            {t("Password Reset")}
-                                        </Button>
-                                    ]}
-                                >
-                                    <List.Item.Meta
-                                        title={value.name}
-                                        description={<p>{value.class_number}/{value.grad_year} [{t(value.curriculum ?? '')}]</p>}
-                                    />
-                                </List.Item>
-                            ))}
-                        </List>
+                                            <List.Item.Meta
+                                                title={value.name}
+                                                description={<p>{value.class_number}/{value.grad_year} [{t(value.curriculum ?? '')}]</p>}
+                                            />
+                                        </List.Item>
+                                    ))}
+                                </List>
+                            </Tabs.TabPane>
+                            <Tabs.TabPane tab={t('Class List')} key='classes'>
+
+                            </Tabs.TabPane>
+                            <Tabs.TabPane tab={t('Registration Keys')} key='registrationKeys'>
+
+                            </Tabs.TabPane>
+                        </Tabs>
                     </Card>
                 </Layout.Content>
             </Layout>
