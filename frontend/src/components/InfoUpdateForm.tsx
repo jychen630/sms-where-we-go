@@ -84,10 +84,24 @@ const InfoUpdateForm = ({ getStudent, showRoleOptions = false }: { showRoleOptio
     }, [getFields, form])
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    const doUpdate = useCallback(_.throttle((data) => {
+    const doUpdate = useCallback(_.throttle((data: Values) => {
+        let toClear: Parameters<typeof Service.updateStudent>[0]['clear'] = [];
+        if (schoolUid === -1) {
+            delete data.school_uid;
+            toClear.push('school_uid');
+        }
+        if (!!!data.phone_number) {
+            delete data.phone_number;
+            toClear.push('phone_number')
+        }
+        if (!!!data.email) {
+            delete data.email;
+            toClear.push('email');
+        }
         Service.updateStudent({
             ...data,
             school_uid: schoolUid,
+            clear: toClear,
             student_uid: studentUid !== -1 ? studentUid : undefined,
         })
             .then((res) => {
