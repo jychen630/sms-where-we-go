@@ -1,8 +1,7 @@
 import log4js from 'log4js';
 import { pg } from '.';
-import { Class, Student, StudentClassRole, StudentRole, StudentVisibility } from './generated/schema';
+import { Class, RegistrationKey, StudentClassRole, StudentRole, StudentVisibility } from './generated/schema';
 import { Role } from './generated/schema';
-import { compareStudents } from './utils';
 
 type Privilege = {
     read: boolean,
@@ -15,7 +14,7 @@ type Privilege = {
 const logger = log4js.getLogger('service');
 
 export const ClassService = {
-    get: async (grad_year: number, class_number: number): Promise<Class> => {
+    get: async (grad_year: number, class_number: number): Promise<Class | undefined> => {
         return pg('class')
             .select()
             .where({
@@ -23,6 +22,34 @@ export const ClassService = {
                 class_number: class_number
             })
             .first<Class>();
+    }
+}
+
+export interface IRoleResource {
+    uid?: number
+    gradYear: number
+    curriculum: string
+    classNumber: number
+    role?: StudentRole
+    visibility?: StudentVisibility
+    level?: number
+}
+export class RoleResource implements IRoleResource {
+    uid?: number
+    gradYear: number
+    curriculum: string
+    classNumber: number
+    role?: StudentRole
+    visibility?: StudentVisibility
+    level?: number
+    constructor(props: IRoleResource) {
+        this.uid = props.uid;
+        this.gradYear = props.gradYear;
+        this.curriculum = props.curriculum
+        this.classNumber = props.classNumber;
+        this.role = props.role;
+        this.visibility = props.visibility;
+        this.level = props.level;
     }
 }
 
@@ -34,16 +61,62 @@ export class RoleService {
             .where('student_uid', student_uid)
             .first<Role>();
     }
+    static compare(self: RoleResource, target: RoleResource) {
+        const isSameYear = self.gradYear === target.gradYear
+        return {
+            isSame: self.uid === target.uid,
+            isSameYear: isSameYear,
+            isSameCurriculum: isSameYear && self.curriculum === target.curriculum,
+            isSameClass: isSameYear && self.classNumber === target.classNumber,
+            // Only students in the same year with higher privilege level are adminable over another student
+            isAdminable: isSameYear && (self.level !== undefined && target.level !== undefined) && (self.level > target.level),
+        }
+    }
+    static registrationKeyToRoleResource(registrationKey?: RegistrationKey & Class): RoleResource | undefined {
+        if (registrationKey === undefined) {
+            return undefined;
+        }
+
+        return new RoleResource({
+            gradYear: registrationKey?.grad_year ?? -1,
+            curriculum: registrationKey?.curriculum_name ?? '',
+            classNumber: registrationKey?.class_number as number ?? -1,
+            level: 0
+        });
+    }
+    static studentToRoleResource(student?: StudentClassRole): RoleResource | undefined {
+        if (student === undefined) {
+            return undefined;
+        }
+        if (typeof student.level !== 'number' || typeof student.class_number !== 'number' || student.grad_year === null || student.curriculum_name === null) {
+            throw new Error('Invalid student');
+        }
+
+        return new RoleResource({
+            uid: student.student_uid ?? undefined,
+            gradYear: student.grad_year,
+            curriculum: student.curriculum_name,
+            classNumber: student.class_number,
+            level: student.level,
+            role: student.role ?? undefined,
+            visibility: student.visibility_type ?? undefined
+        })
+    }
     static async privilege(current_uid: number, target_uid: number): Promise<Privilege>;
     static async privilege(current: StudentClassRole | undefined, target: StudentClassRole | undefined): Promise<Privilege>;
+    static async privilege(current: RoleResource | undefined, target: RoleResource | undefined): Promise<Privilege>;
     static async privilege(...args: any[]): Promise<Privilege> {
-        let current: StudentClassRole | undefined, target: StudentClassRole | undefined;
+        let current: RoleResource | undefined, target: RoleResource | undefined;
         if (typeof args[0] === 'number' && typeof args[1] === 'number') {
-            [current, target] = [await StudentService.get(args[0]), await StudentService.get(args[1])];
+            [current, target] = [this.studentToRoleResource(await StudentService.get(args[0])), (this.studentToRoleResource(await StudentService.get(args[1])))];
         }
-        else {
+        else if (args[0] instanceof RoleResource && args[1] instanceof RoleResource) {
             [current, target] = args;
         }
+        else {
+            [current, target] = [this.studentToRoleResource(args[0]), this.studentToRoleResource(args[1])];
+        }
+        console.log(current, target);
 
         let privilege = {
             read: false,
@@ -54,16 +127,17 @@ export class RoleService {
         }
 
         if (!!!current || !!!target) {
-            // If either of the users in action don't exist, we consider target inaccessible at all
+            // If either of the resources in action don't exist, we consider target inaccessible at all
             return privilege;
         }
 
-        const compare = compareStudents(current, target);
+        const compare = this.compare(current, target);
+        console.log(compare);
 
         // For any user, we check the visibility first
-        switch (target.visibility_type) {
+        switch (target.visibility) {
             case StudentVisibility.Private:
-                privilege.read = compare.isSameStudent;
+                privilege.read = compare.isSame;
                 break;
             case StudentVisibility.Class:
                 privilege.read = compare.isSameClass;
@@ -81,7 +155,7 @@ export class RoleService {
 
         switch (current.role) {
             case StudentRole.Student:
-                privilege.update = privilege.delete = compare.isSameStudent;
+                privilege.update = privilege.delete = compare.isSame;
                 return privilege;
             case StudentRole.Class:
                 // Prevent overriding the value of privilege.read by false
@@ -99,12 +173,13 @@ export class RoleService {
                 // Prevent overriding the value of privilege.read by false
                 privilege.read = privilege.read || compare.isSameYear;
                 privilege.update = compare.isSameYear;
-                privilege.delete = privilege.grant = (compare.isSameYear && compare.isAdminable) || compare.isSameStudent;
+                privilege.delete = privilege.grant = (compare.isSameYear && compare.isAdminable) || compare.isSame;
                 return privilege;
             case StudentRole.System:
                 privilege.read = privilege.update = true;
                 // Prevent system admins from lowering their own privilege level or deleting themselves
-                privilege.grant = privilege.delete = !compare.isSameStudent;
+                privilege.grant = privilege.delete = !compare.isSame;
+                console.log(privilege);
                 return privilege;
             default:
                 return privilege;

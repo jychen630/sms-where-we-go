@@ -53,6 +53,7 @@ export type RegistrationKey = {
   expiration_date: Date;
   class_number: unknown;
   grad_year: number;
+  activated: boolean;
 };
 
 export type Role = {

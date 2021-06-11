@@ -52,6 +52,7 @@ CREATE TABLE wwg.registration_key (
     expiration_date TIMESTAMP,
     class_number SMALLINT NOT NULL,
     grad_year INT NOT NULL,
+    activated BOOLEAN NOT NULL DEFAULT true,
     PRIMARY KEY (registration_key, expiration_date),
     FOREIGN KEY (class_number, grad_year) REFERENCES wwg.class(class_number, grad_year)
 );

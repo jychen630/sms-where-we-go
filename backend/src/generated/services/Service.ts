@@ -2,6 +2,9 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { City } from '../models/City';
+import type { Limit } from '../models/Limit';
+import type { Offset } from '../models/Offset';
+import type { RegistrationKeyInfo } from '../models/RegistrationKeyInfo';
 import type { Result } from '../models/Result';
 import type { Role } from '../models/Role';
 import type { School } from '../models/School';
@@ -244,12 +247,7 @@ student_uid: number,
 requestBody: {
 registration_key: string,
 },
-): Promise<(Result & {
-class_number?: number,
-grad_year?: number,
-curriculum?: string,
-expiration_date?: string,
-})> {
+): Promise<(Result & RegistrationKeyInfo)> {
         const result = await __request({
             method: 'POST',
             path: `/validate`,
@@ -381,6 +379,180 @@ cities?: Array<City>,
                 'city': city,
                 'state_province': stateProvince,
                 'country': country,
+            },
+        });
+        return result.body;
+    }
+
+    /**
+     * Get the registration keys that the current student can access. It is only usable for admin users
+     * @param offset 
+     * @param limit 
+     * @param notExpired When set to true, only registration keys that haven't expired will be returned
+     * @returns any Return the information about
+     * @throws ApiError
+     */
+    public static async getRegistrationKey(
+offset?: Offset,
+limit?: Limit,
+notExpired: boolean = true,
+): Promise<(Result & {
+registration_keys?: Array<(RegistrationKeyInfo & {
+registration_key?: string,
+/**
+ * Whether the registration key is activated or deactivated. This is irrelevant to the expiration date
+ */
+activated?: boolean,
+})>,
+})> {
+        const result = await __request({
+            method: 'GET',
+            path: `/registration-key`,
+            query: {
+                'offset': offset,
+                'limit': limit,
+                'not_expired': notExpired,
+            },
+            errors: {
+                401: `Unauthorized to access the resource`,
+                403: `The user is not allowed to access the resource`,
+            },
+        });
+        return result.body;
+    }
+
+    /**
+     * Add a new registration key
+     * @param requestBody If the requestbody is not given, the registration key will be created for the class of the requester
+     * @returns any When the registration key is successfully created or rejected due to duplication or invalid class
+     * @throws ApiError
+     */
+    public static async postRegistrationKey(
+requestBody?: {
+/**
+ * The class number for the registration key. If not specified, the class number of the requester is used. Only curriculum, year or system admin can specify class numbers other than their current class number
+ */
+class_number?: number,
+/**
+ * The grad year for the registration key. If not specified, the grad year of the requester is used. Only system admin can specify grad year other than their grad year
+ */
+grad_year?: number,
+},
+): Promise<(Result & RegistrationKeyInfo & {
+/**
+ * The registration key you have just created
+ */
+registration_key?: string,
+})> {
+        const result = await __request({
+            method: 'POST',
+            path: `/registration-key`,
+            body: requestBody,
+            errors: {
+                401: `Unauthorized to access the resource`,
+                403: `The user is not allowed to access the resource`,
+            },
+        });
+        return result.body;
+    }
+
+    /**
+     * Update the state of the regitration key
+     * @param requestBody 
+     * @returns Result Success
+     * @throws ApiError
+     */
+    public static async updateRegistrationKey(
+requestBody: {
+/**
+ * The registration key
+ */
+registration_key?: string,
+/**
+ * The expiration date is used to identify registration key and it cannot be changed
+ */
+expiration_date?: string,
+/**
+ * Whether to activate or deactivate the registration key
+ */
+activate?: boolean,
+},
+): Promise<Result> {
+        const result = await __request({
+            method: 'PUT',
+            path: `/registration-key`,
+            body: requestBody,
+            errors: {
+                401: `Unauthorized to access the resource`,
+                403: `The user is not allowed to access the resource`,
+            },
+        });
+        return result.body;
+    }
+
+    /**
+     * Get classes that are accessible to the current user.
+     * @returns Result Success
+     * @throws ApiError
+     */
+    public static async getClass(): Promise<Result> {
+        const result = await __request({
+            method: 'GET',
+            path: `/class`,
+            errors: {
+                401: `Unauthorized to access the resource`,
+                403: `The user is not allowed to access the resource`,
+            },
+        });
+        return result.body;
+    }
+
+    /**
+     * Add a new class. This is only usable for curriculum admins or higher level admins
+     * @param requestBody 
+     * @returns Result Success
+     * @throws ApiError
+     */
+    public static async postClass(
+requestBody: {
+class_number?: number,
+grad_year?: number,
+curriculum?: 'international' | 'gaokao',
+},
+): Promise<Result> {
+        const result = await __request({
+            method: 'POST',
+            path: `/class`,
+            body: requestBody,
+            errors: {
+                401: `Unauthorized to access the resource`,
+                403: `The user is not allowed to access the resource`,
+            },
+        });
+        return result.body;
+    }
+
+    /**
+     * Delete an existing class. This is only usable for curriculum admins or higher level admins
+     * @param requestBody 
+     * @returns Result Default response telling whether the request is successful
+     * @throws ApiError
+     */
+    public static async deleteClass(
+requestBody?: {
+/**
+ * Delete the class anyway even if there are students associated with it. This will delete those students as well
+ */
+force: boolean,
+},
+): Promise<Result> {
+        const result = await __request({
+            method: 'DELETE',
+            path: `/class`,
+            body: requestBody,
+            errors: {
+                401: `Unauthorized to access the resource`,
+                403: `The user is not allowed to access the resource`,
             },
         });
         return result.body;

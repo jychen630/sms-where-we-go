@@ -40,6 +40,16 @@ components:
           schema:
             $ref:  "#/components/schemas/Result"
   schemas:
+    Offset:
+      type: integer
+      default: 0
+      example: 0
+      minimum: 0
+    Limit:
+      type: integer
+      example: 100
+      minimum: 1
+      maximum: 100
     Result:
       type: object
       required:
@@ -125,6 +135,21 @@ components:
           description: The year when the student graduates from high school
           format: year
           example: 2021
+    RegistrationKeyInfo:
+      type: object
+      properties:
+        class_number:
+          type: integer
+          example: 12
+        grad_year:
+          type: integer
+          example: 2021
+        curriculum:
+          type: string
+          example: international
+        expiration_date:
+          type: string
+          format: date
     School:
       type: object
       required:
@@ -551,20 +576,7 @@ paths:
               schema:
                 allOf:
                   - $ref: "#/components/schemas/Result"
-                  - type: object
-                    properties:
-                      class_number:
-                        type: integer
-                        example: 12
-                      grad_year:
-                        type: integer
-                        example: 2021
-                      curriculum:
-                        type: string
-                        example: international
-                      expiration_date:
-                        type: string
-                        format: date
+                  - $ref: "#/components/schemas/RegistrationKeyInfo"
   /school:
     get:
       operationId: getSchool
@@ -739,3 +751,172 @@ paths:
                         type: array
                         items:
                           $ref: "#/components/schemas/City"
+  /registration-key:
+    get:
+      operationId: getRegistrationKey
+      description: Get the registration keys that the current student can access. It is only usable for admin users
+      parameters:
+        - name: offset
+          in: query
+          schema:
+            $ref: '#/components/schemas/Offset'
+        - name: limit
+          in: query
+          schema:
+            $ref: '#/components/schemas/Limit'
+        - name: not_expired
+          in: query
+          description: When set to true, only registration keys that haven't expired will be returned
+          schema:
+            type: boolean
+            default: true
+      responses:
+        200:
+          description: Return the information about
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Result"
+                  - type: object
+                    properties:
+                      registration_keys:
+                        type: array
+                        items:
+                          allOf:
+                          - $ref: "#/components/schemas/RegistrationKeyInfo"
+                          - type: object
+                            properties:
+                              registration_key:
+                                type: string
+                                minLength: 8
+                                maxLength: 8
+                                example: asdfghjk
+                              activated:
+                                type: boolean
+                                description: Whether the registration key is activated or deactivated. This is irrelevant to the expiration date
+        401:
+          $ref: "#/components/responses/UnAuthorized"
+        403:
+          $ref: "#/components/responses/Forbidden"
+    post:
+      operationId: postRegistrationKey
+      description: Add a new registration key
+      requestBody:
+        required: false
+        description: If the requestbody is not given, the registration key will be created for the class of the requester
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                class_number:
+                  type: number
+                  description: The class number for the registration key. If not specified, the class number of the requester is used. Only curriculum, year or system admin can specify class numbers other than their current class number
+                grad_year:
+                  type: number
+                  description: The grad year for the registration key. If not specified, the grad year of the requester is used. Only system admin can specify grad year other than their grad year
+      responses:
+        200:
+          description: When the registration key is successfully created or rejected due to duplication or invalid class
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Result"
+                  - $ref: '#/components/schemas/RegistrationKeyInfo'
+                  - type: object
+                    properties:
+                      registration_key:
+                        type: string
+                        description: The registration key you have just created
+        401:
+          $ref: "#/components/responses/UnAuthorized"
+        403:
+          $ref: "#/components/responses/Forbidden"
+    put:
+      operationId: updateRegistrationKey
+      description: Update the state of the regitration key
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                registration_key:
+                  type: string
+                  description: The registration key
+                  maxLength: 8
+                  minLength: 8
+                expiration_date:
+                  type: string
+                  description: The expiration date is used to identify registration key and it cannot be changed
+                activate:
+                  type: boolean
+                  description: Whether to activate or deactivate the registration key
+      responses:
+        200:
+          $ref: "#/components/responses/Success"
+        401:
+          $ref: "#/components/responses/UnAuthorized"
+        403:
+          $ref: "#/components/responses/Forbidden"
+  /class:
+    get:
+      operationId: getClass
+      description: Get classes that are accessible to the current user.
+      responses:
+        200:
+          $ref: "#/components/responses/Success"
+        401:
+          $ref: "#/components/responses/UnAuthorized"
+        403:
+          $ref: "#/components/responses/Forbidden"
+    post:
+      operationId: postClass
+      description: Add a new class. This is only usable for curriculum admins or higher level admins
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                class_number:
+                  type: number
+                grad_year:
+                  type: number
+                curriculum:
+                  type: string
+                  enum:
+                    - international
+                    - gaokao
+      responses:
+        200:
+          $ref: "#/components/responses/Success"
+        401:
+          $ref: "#/components/responses/UnAuthorized"
+        403:
+          $ref: "#/components/responses/Forbidden"
+    delete:
+      operationId: deleteClass
+      description: Delete an existing class. This is only usable for curriculum admins or higher level admins
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                force:
+                  type: boolean
+                  default: false
+                  description: Delete the class anyway even if there are students associated with it. This will delete those students as well
+      responses:
+        200:
+          $ref: "#/components/responses/Default"
+        401:
+          $ref: "#/components/responses/UnAuthorized"
+        403:
+          $ref: "#/components/responses/Forbidden"
