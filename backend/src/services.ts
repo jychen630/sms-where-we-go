@@ -87,19 +87,19 @@ export class RoleService {
                 // Prevent overriding the value of privilege.read by false
                 privilege.read = privilege.read || compare.isSameClass;
                 privilege.update = privilege.delete = compare.isSameClass;
-                privilege.grant = compare.isAdminable;
+                privilege.grant = compare.isSameClass && compare.isAdminable;
                 return privilege;
             case StudentRole.Curriculum:
                 // Prevent overriding the value of privilege.read by false
                 privilege.read = privilege.read || compare.isSameCurriculum;
                 privilege.update = privilege.delete = compare.isSameCurriculum;
-                privilege.grant = compare.isAdminable;
+                privilege.grant = compare.isSameCurriculum && compare.isAdminable;
                 return privilege;
             case StudentRole.Year:
                 // Prevent overriding the value of privilege.read by false
                 privilege.read = privilege.read || compare.isSameYear;
                 privilege.update = compare.isSameYear;
-                privilege.delete = privilege.grant = compare.isAdminable || compare.isSameStudent;
+                privilege.delete = privilege.grant = (compare.isSameYear && compare.isAdminable) || compare.isSameStudent;
                 return privilege;
             case StudentRole.System:
                 privilege.read = privilege.update = true;
