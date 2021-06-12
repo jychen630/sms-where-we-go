@@ -121,7 +121,7 @@ export const post: Operation = async (req, res) => {
         } as RegistrationKey)
         .returning('registration_key')
         .then(result => {
-            sendSuccess(res, { registrationkey: JSON.stringify(result) });
+            sendSuccess(res, { registration_key: JSON.stringify(result[0]) });
         })
         .catch((err) => dbHandleError(err, res, logger));
 }

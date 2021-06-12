@@ -12,6 +12,9 @@ export const post: Operation = (req, res, next) => {
         .where(
             'expiration_date', '>', new Date().toISOString()
         )
+        .where(
+            'activated', true
+        )
         .then((result) => {
             if (result.length > 0) {
                 sendSuccess(res, {

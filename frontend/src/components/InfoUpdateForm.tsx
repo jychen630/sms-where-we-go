@@ -16,7 +16,7 @@ const InfoUpdateForm = ({ getStudent, showRoleOptions = false }: { showRoleOptio
     const [schoolUid, setSchoolUid] = useState(-1);
     const [studentUid, setStudentUid] = useState(-1);
     const [initialSchool, setInitialSchool] = useState('');
-    const [fields, setFields] = useState<ThenType<ReturnType<typeof getStudent>>>(undefined);
+    const [, setFields] = useState<ThenType<ReturnType<typeof getStudent>>>(undefined);
     const [saving, setSaving] = useState(false);
     const getVisibilityDescription = useCallback((visibility: Visibility) => {
         switch (visibility) {

@@ -51,12 +51,14 @@
       "Delete Account": "删除账号",
       "Password Reset": "重设密码",
       "Edit": "编辑",
+      "Confirm": "确定",
       "Cancel": "取消",
       "Close": "关闭",
       "Registration Keys": "注册码",
       "User List": "用户列表",
       "Class List": "班级列表",
-      "This user is invalid, please login again": "此用户无效，请尝试重新登陆"
+      "This user is invalid, please login again": "此用户无效，请尝试重新登陆",
+      "Add Registration Key": "添加注册码"
     }
   }
 }
