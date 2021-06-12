@@ -6,8 +6,15 @@ import { handleApiError } from "../api/utils";
 import InfoUpdateForm from "../components/InfoUpdateForm";
 import { useAuth } from "../api/auth";
 import { useTranslation } from "react-i18next";
-import { useHistory } from "react-router";
+import { useHistory, useRouteMatch } from "react-router";
 import PasswordResetForm from "../components/PasswordResetForm";
+import RegistrationKey from "../components/Registrationkey";
+
+enum AdminTab {
+    Users = "users",
+    Classes = "classes",
+    Keys = "keys"
+}
 
 const AdminPage = () => {
     const auth = useAuth();
@@ -15,12 +22,19 @@ const AdminPage = () => {
     const history = useHistory();
     const [index, setIndex] = useState(-1);
     const [visible, setVisible] = useState(false);
+    const match = useRouteMatch<{ tab: string }>("/admin/:tab");
     const [passwordFormVisible, setPasswordFormVisibile] = useState(false);
     const [students, setStudents] = useState<(Student & StudentVerbose)[]>([]);
 
     const handleCancel = () => {
         setVisible(false);
     };
+
+    useEffect(() => {
+        if (match === null || (!Object.values(AdminTab).includes(match.params.tab as AdminTab))) {
+            history.replace(`/admin/${AdminTab.Users}`);
+        }
+    }, [history, match]);
 
     useEffect(() => {
         Service.getStudent()
@@ -48,8 +62,8 @@ const AdminPage = () => {
             <Layout className='centered-layout'>
                 <Layout.Content>
                     <Card>
-                        <Tabs defaultActiveKey=''>
-                            <Tabs.TabPane tab={t('User List')} key='users'>
+                        <Tabs activeKey={match !== null && Object.values(AdminTab).includes(match.params.tab as AdminTab) ? match.params.tab : AdminTab.Users} onChange={(key) => history.replace(`/admin/${key}`)}>
+                            <Tabs.TabPane tab={t('User List')} key={AdminTab.Users}>
                                 <List itemLayout="horizontal">
                                     {students.map((value, index) => (
                                         <List.Item
@@ -82,11 +96,11 @@ const AdminPage = () => {
                                     ))}
                                 </List>
                             </Tabs.TabPane>
-                            <Tabs.TabPane tab={t('Class List')} key='classes'>
+                            <Tabs.TabPane tab={t('Class List')} key={AdminTab.Classes}>
 
                             </Tabs.TabPane>
-                            <Tabs.TabPane tab={t('Registration Keys')} key='registrationKeys'>
-
+                            <Tabs.TabPane tab={t('Registration Keys')} key={AdminTab.Keys}>
+                                <RegistrationKey />
                             </Tabs.TabPane>
                         </Tabs>
                     </Card>
