@@ -116,7 +116,6 @@ export class RoleService {
         else {
             [current, target] = [this.studentToRoleResource(args[0]), this.studentToRoleResource(args[1])];
         }
-        console.log(current, target);
 
         let privilege = {
             read: false,
@@ -132,7 +131,6 @@ export class RoleService {
         }
 
         const compare = this.compare(current, target);
-        console.log(compare);
 
         // For any user, we check the visibility first
         switch (target.visibility) {

@@ -128,7 +128,7 @@ export const post: Operation = async (req, res) => {
 
 export const put: Operation = async (req, res) => {
     const data = parseBody<typeof Service.updateRegistrationKey>(req);
-    const logger = log4js.getLogger('updateRegistrationKey');
+    const logger = log4js.getLogger('registrationKey.update');
 
     if (!!!req.session.identifier) {
         logger.info('User not identified');
@@ -165,11 +165,13 @@ export const put: Operation = async (req, res) => {
         .returning('registration_key')
         .then((result) => {
             if (result.length > 0) {
+                logger.info(`${student.student_uid} updated ${registrationKey} to ${data.activate ?? true}`);
                 sendSuccess(res);
             }
             else {
+                logger.info(`${student.student_uid} failed to update ${registrationKey}`);
                 sendError(res, 200, 'No registration key was updated');
             }
         })
-        .catch(err => dbHandleError(err, res, logger))
+        .catch(err => dbHandleError(err, res, logger));
 }
