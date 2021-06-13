@@ -110,7 +110,11 @@ app.get('/', (req, res) => {
 });
 
 app.listen(port, () => {
-    console.log(`Start listening at ${port}`);
+    logger.info(`Environment: ${process.env.NODE_ENV}`);
+    if (process.env.NODE_ENV?.trim() === 'development') {
+        logger.info('This is a development build, run `start-prod` instead if you want to run it in production.')
+    }
+    logger.info(`Start listening at ${port}`);
 });
 
 const defaultErrorHandler = ((err, req, res, next) => {
