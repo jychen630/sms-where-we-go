@@ -329,6 +329,51 @@ paths:
           $ref: "#/components/responses/Default"
         default:
           $ref: "#/components/responses/Default"
+  /dev-login:
+    get:
+      operationId: getDevLogin
+      description: Only available in development. Get a list of available users to login
+      security: []
+      responses:
+        200:
+          description: Successfully return the list of users.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Result"
+                  - type: object
+                    properties:
+                      users:
+                        type: array
+                        items:
+                          allOf:
+                            - $ref: "#/components/schemas/StudentVerbose"
+                            - type: object
+                              required:
+                                - role
+                              properties:
+                                role:
+                                  $ref: "#/components/schemas/Role"
+    post:
+      operationId: postDevLogin
+      description: Only available in development. Login using the student with the specified uid, password is not required
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - uid
+              properties:
+                uid:
+                  type: integer
+                  description: The unique identifier of the user
+      responses:
+        200:
+          $ref: "#/components/responses/Success"
   /student:
     get:
       operationId: getStudent

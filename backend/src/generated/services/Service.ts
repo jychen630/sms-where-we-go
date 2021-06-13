@@ -80,6 +80,45 @@ identifier: number,
     }
 
     /**
+     * Only available in development. Get a list of available users to login
+     * @returns any Successfully return the list of users.
+     * @throws ApiError
+     */
+    public static async getDevLogin(): Promise<(Result & {
+users?: Array<(StudentVerbose & {
+role: Role,
+})>,
+})> {
+        const result = await __request({
+            method: 'GET',
+            path: `/dev-login`,
+        });
+        return result.body;
+    }
+
+    /**
+     * Only available in development. Login using the student with the specified uid, password is not required
+     * @param requestBody 
+     * @returns Result Success
+     * @throws ApiError
+     */
+    public static async postDevLogin(
+requestBody: {
+/**
+ * The unique identifier of the user
+ */
+uid: number,
+},
+): Promise<Result> {
+        const result = await __request({
+            method: 'POST',
+            path: `/dev-login`,
+            body: requestBody,
+        });
+        return result.body;
+    }
+
+    /**
      * Return the information of students. Result is scoped by the user role. For example: a "student" user cannot see others role and visibility settings, but an admin user, like those with the role "class" can. Apart from that, admin users can ignore the visibility settings of the students who are under their administration.
  * 
      * @param self 
