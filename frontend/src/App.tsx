@@ -14,6 +14,7 @@ import AdminPage from './pages/AdminPage';
 import 'antd/dist/antd.css';
 import { OpenAPI, Role } from 'wwg-api';
 import { AuthProvider, useAuthProvider } from './api/auth';
+import DevLoginForm from './components/DevLoginForm';
 
 OpenAPI.WITH_CREDENTIALS = true;
 OpenAPI.TOKEN = '';
@@ -26,6 +27,13 @@ function App() {
     <AuthProvider value={authProvider}>
       <Router>
         <Switch>
+          {process.env.NODE_ENV === 'development' &&
+            <Route path="/dev-login">
+              <CardPage title='Where We Go 调试登录'>
+                <DevLoginForm />
+              </CardPage>
+            </Route>
+          }
           <Route path="/login">
             <CardPage title='Where We Go 登录'>
               <LoginForm />
@@ -41,6 +49,9 @@ function App() {
           </Route>
           <Route path="/map">
             <MapPage />
+          </Route>
+          <Route path="/list">
+            List
           </Route>
           {authProvider.role !== Role.STUDENT &&
             <Route path="/admin">
