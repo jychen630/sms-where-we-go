@@ -1,5 +1,5 @@
 import { Button, Form, Input, notification, Select, Space, Tooltip } from "antd"
-import _ from "lodash";
+import throttle from "lodash/throttle";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Result, Role, School, Service, Student, StudentVerbose, Visibility } from "wwg-api";
@@ -84,7 +84,7 @@ const InfoUpdateForm = ({ getStudent, showRoleOptions = false }: { showRoleOptio
     }, [getFields, form])
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    const doUpdate = useCallback(_.throttle((data: Values) => {
+    const doUpdate = useCallback(throttle((data: Values) => {
         let toClear: Parameters<typeof Service.updateStudent>[0]['clear'] = [];
         if (schoolUid === -1) {
             delete data.school_uid;

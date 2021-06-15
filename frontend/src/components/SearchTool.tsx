@@ -1,6 +1,6 @@
 import { LoadingOutlined } from "@ant-design/icons";
 import { Button, Collapse, Empty, Input, Row, Space, Spin } from "antd";
-import _ from "lodash";
+import throttle from "lodash/throttle";
 import React, { useCallback, useEffect, useState } from "react";
 
 export type SearchToolProps<T> = {
@@ -26,7 +26,7 @@ const SearchTool = <T extends unknown>({ searchHandler, placeholder, item, initi
     const [loading, setLoading] = useState(false);
     const [resultList, setResultList] = useState<T[]>([]);
 
-    const search = useCallback(_.throttle(async ({ offset, limit, value, append, resultList }: SearchHandlerProps & { append: boolean, resultList?: T[] }) => { // eslint-disable-line react-hooks/exhaustive-deps
+    const search = useCallback(throttle(async ({ offset, limit, value, append, resultList }: SearchHandlerProps & { append: boolean, resultList?: T[] }) => { // eslint-disable-line react-hooks/exhaustive-deps
         if (!!!value) {
             setResultList([]);
             setLoading(false);

@@ -1,4 +1,5 @@
-import { QuestionCircleOutlined, WarningOutlined } from "@ant-design/icons";
+import QuestionCircleOutlined from "@ant-design/icons/QuestionCircleOutlined";
+import WarningOutlined from "@ant-design/icons/WarningOutlined";
 import { Button, Card, Collapse, Divider, Layout, notification, Tooltip } from "antd";
 import Modal from "antd/lib/modal/Modal";
 import { useCallback, useState } from "react";
