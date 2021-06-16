@@ -1,4 +1,6 @@
 import { Form, Space, Spin, notification, Input, Button } from 'antd';
+import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useHistory, useLocation } from 'react-router-dom';
 import { Result, Service } from 'wwg-api';
 import { useAuth } from '../api/auth';
@@ -13,15 +15,13 @@ type Value = Parameters<typeof Service.login>[0];
 // Functions
 
 const LoginForm = () => {
+    const [t] = useTranslation();
     const [form] = Form.useForm<Value>();
     const location = useLocation();
     const history = useHistory();
     const auth = useAuth();
-    const validateLogin = async (
-        { password,
-            identifier,
-            use_uid }: Value
-    ): Promise<any> => {
+
+    const validateLogin = useCallback(async ({ password, identifier, use_uid }: Value): Promise<any> => {
         if (!!!password || !!!identifier) {
             return;
         }
@@ -38,7 +38,6 @@ const LoginForm = () => {
                         description: <Space>加载中 <Spin /></Space>,
                         duration: 1
                     });
-                    console.log(location.state);
                     const dest = (typeof location.state === 'object' && location.state !== null && 'pathname' in (location.state)) ? (location.state as any).pathname : '/map';
                     setTimeout(() => history.push(dest), 1500);
                     return Promise.resolve();
@@ -49,8 +48,8 @@ const LoginForm = () => {
                     return Promise.reject(res.message);
                 }
             })
-            .catch((err) => handleApiError(err, createNotifyError('登录失败')))
-    };
+            .catch((err) => handleApiError(err, createNotifyError(t, '登录失败')))
+    }, [t, auth, history, location]);
 
     return (
         <>

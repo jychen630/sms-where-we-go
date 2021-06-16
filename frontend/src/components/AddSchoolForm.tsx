@@ -1,31 +1,34 @@
 import { CheckCircleFilled } from '@ant-design/icons';
 import { Button, Divider, Form, Input, Space, Tabs, notification } from 'antd';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Result, Service } from 'wwg-api';
 import { createNotifyError, handleApiError } from '../api/utils';
 import SearchTool, { SearchHandlerProps } from './SearchTool';
 
 type Values = Parameters<typeof Service.postSchool>[0];
 
-const fetchCity = async (props: SearchHandlerProps) => {
-    try {
-        const result = await Service.getCity(props.offset, props.limit, props.value);
-        if (!!result.cities && result.result === Result.result.SUCCESS) {
-            return result.cities;
-        }
-        else {
-            throw new Error('Failed to search for the cities');
-        }
-    }
-    catch (err) {
-        handleApiError(err, createNotifyError('错误', '获取城市列表失败'));
-    }
-}
 
 const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
+    const [t] = useTranslation();
     const [form] = Form.useForm<Values>();
     const [currentTab, setCurrentTab] = useState('select');
     const [cityUid, setCityUid] = useState(-1);
+
+    const fetchCity = useCallback(async (props: SearchHandlerProps) => {
+        try {
+            const result = await Service.getCity(props.offset, props.limit, props.value);
+            if (!!result.cities && result.result === Result.result.SUCCESS) {
+                return result.cities;
+            }
+            else {
+                throw new Error('Failed to search for the cities');
+            }
+        }
+        catch (err) {
+            handleApiError(err, createNotifyError(t, '错误', '获取城市列表失败'));
+        }
+    }, [t]);
 
     const handleFinish = (data: Values) => {
         Service.postSchool(currentTab === 'select' ? {

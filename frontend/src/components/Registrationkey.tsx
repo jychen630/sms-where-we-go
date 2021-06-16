@@ -35,6 +35,7 @@ const mockGetClass = async (): Promise<{ classes: Class[] }> => {
 }
 const RegistrationKeyForm = (props: { form: FormInstance<{ class: string }>, onSuccess?: () => void }) => {
     const history = useHistory();
+    const [t] = useTranslation();
     const [classes, setClasses] = useState<Class[]>([]);
 
     useEffect(() => {
@@ -44,8 +45,8 @@ const RegistrationKeyForm = (props: { form: FormInstance<{ class: string }>, onS
                 props.form.setFieldsValue({ class: res.classes.length > 0 ? JSON.stringify(res.classes[0]) : '' })
                 setClasses(res.classes);
             })
-            .catch(err => handleApiError(err, createNotifyError('失败', '未能获取可用班级', (err) => err.requireLogin && setTimeout(() => history.push('/login', history.location), 1500))))
-    }, [props.form, history]);
+            .catch(err => handleApiError(err, createNotifyError(t, '失败', '未能获取可用班级', (err) => err.requireLogin && setTimeout(() => history.push('/login', history.location), 1500))))
+    }, [t, props.form, history]);
 
     const handleFinish = useCallback((data: { class: string }) => {
         const class_ = JSON.parse(data.class) as Class;
@@ -65,8 +66,8 @@ const RegistrationKeyForm = (props: { form: FormInstance<{ class: string }>, onS
                     return Promise.reject(res.message);
                 }
             })
-            .catch(err => handleApiError(err, createNotifyError('失败', '未能添加注册码')))
-    }, [props]);
+            .catch(err => handleApiError(err, createNotifyError(t, '失败', '未能添加注册码')))
+    }, [t, props]);
 
     return (
         <Form
@@ -101,8 +102,8 @@ const RegistrationKey = () => {
     const fetchKeys = useCallback(() => {
         Service.getRegistrationKey()
             .then(result => setKeys(result.registration_keys ?? []))
-            .catch(err => handleApiError(err, createNotifyError('失败', '未能获取注册码')))
-    }, [])
+            .catch(err => handleApiError(err, createNotifyError(t, '失败', '未能获取注册码')))
+    }, [t])
 
     useEffect(() => {
         fetchKeys();
@@ -130,7 +131,7 @@ const RegistrationKey = () => {
                                             return Promise.reject(result.message);
                                         }
                                     })
-                                    .catch(err => handleApiError(err, createNotifyError('错误')));
+                                    .catch(err => handleApiError(err, createNotifyError(t, '错误')));
                             }}
                         ></Switch>]}
                     >

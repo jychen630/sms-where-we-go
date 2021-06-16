@@ -7,6 +7,7 @@ import { createNotifyError, handleApiError } from '../api/utils';
 
 import PrivacyPolicy from './PrivacyPolicy';
 import SchoolSearchTool from './SchoolSearchTool';
+import { useTranslation } from 'react-i18next';
 
 type Values = Parameters<typeof Service.postStudent>[0];
 export const phonePattern = /^1(?:3\d{3}|5[^4\D]\d{2}|8\d{3}|7(?:[0-35-9]\d{2}|4(?:0\d|1[0-2]|9\d))|9[0-35-9]\d{2}|6[2567]\d{2}|4(?:(?:10|4[01])\d{3}|[68]\d{4}|[579]\d{2}))\d{6}$/;
@@ -15,6 +16,7 @@ export const emailPattern = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+
 const { Text } = Typography;
 
 const RegistrationForm = () => {
+    const [t] = useTranslation();
     const [form] = Form.useForm<Values>();
     const history = useHistory();
     const [schoolUid, setSchoolUid] = useState(0);
@@ -65,7 +67,7 @@ const RegistrationForm = () => {
                     return Promise.reject(res.message);
                 }
             })
-            .catch((err) => handleApiError(err, createNotifyError('注册失败')));
+            .catch((err) => handleApiError(err, createNotifyError(t, '注册失败')));
     }
 
     return (

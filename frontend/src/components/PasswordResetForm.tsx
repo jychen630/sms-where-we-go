@@ -1,11 +1,13 @@
 import { Button, Form, Input, notification } from "antd"
 import { useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { Result, Service } from "wwg-api";
 import { createNotifyError, handleApiError } from "../api/utils";
 
 const { Item } = Form;
 type Values = { password: string }
 const PasswordResetForm = ({ studentUid }: { studentUid?: number }) => {
+    const [t] = useTranslation();
     const [form] = Form.useForm<Values>();
 
     const handleFinish = useCallback((data: Values) => {
@@ -24,8 +26,8 @@ const PasswordResetForm = ({ studentUid }: { studentUid?: number }) => {
                     return Promise.reject(res.message);
                 }
             })
-            .catch(err => handleApiError(err, createNotifyError('失败', '更改密码失败')))
-    }, [studentUid]);
+            .catch(err => handleApiError(err, createNotifyError(t, '失败', '更改密码失败')))
+    }, [t, studentUid]);
 
     return (
         <Form

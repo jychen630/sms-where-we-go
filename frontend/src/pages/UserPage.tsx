@@ -30,9 +30,9 @@ const UserPage = () => {
             }
         }
         catch (err) {
-            handleApiError(err, createNotifyError('错误', undefined, err => err.requireLogin && setTimeout(() => history.push('/login', history.location), 1500)));
+            handleApiError(err, createNotifyError(t, '错误', undefined, err => err.requireLogin && setTimeout(() => history.push('/login', history.location), 1500)));
         }
-    }, [history]);
+    }, [t, history]);
 
     const deleteAccount = useCallback(async () => {
         if (auth.studentUid === undefined) {
@@ -55,7 +55,7 @@ const UserPage = () => {
                     return Promise.reject(res);
                 }
             }).catch(err => {
-                handleApiError(err, createNotifyError('失败', '未能将你的账户移除'))
+                handleApiError(err, createNotifyError(t, '失败', '未能将你的账户移除'))
             })
     }, [t, history, auth.studentUid]);
 

@@ -39,8 +39,8 @@ const AdminPage = () => {
     useEffect(() => {
         Service.getStudent()
             .then((result) => setStudents(result.students ?? []))
-            .catch(err => handleApiError(err, createNotifyError('错误', '未能获取学生数据', (err) => err.requireLogin && setTimeout(() => history.push('/login', history.location), 1500))))
-    }, [auth, history]);
+            .catch(err => handleApiError(err, createNotifyError(t, '错误', '未能获取学生数据', (err) => err.requireLogin && setTimeout(() => history.push('/login', history.location), 1500))))
+    }, [t, auth, history]);
 
     const getCurrentStudent = useCallback(
         async () => index === -1 ? undefined : students[index],

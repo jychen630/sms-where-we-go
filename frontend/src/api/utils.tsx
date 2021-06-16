@@ -1,4 +1,5 @@
 import { notification } from 'antd';
+import { TFunction } from 'react-i18next';
 import React from 'react';
 import { ApiError, Result } from 'wwg-api';
 
@@ -45,7 +46,7 @@ export const handleApiError = async (err: ApiError | string | undefined, cb?: (p
     return error;
 }
 
-export const createNotifyError = (title?: string, errorMsg?: string, cb?: (err: ProcessedError) => void): (props: ProcessedError) => void => {
+export const createNotifyError = (t?: TFunction<'translation'>, title?: string, errorMsg?: string, cb?: (err: ProcessedError) => void): (props: ProcessedError) => void => {
     /**
      * Create a notify error function that can be used as the callback for handleApiError
      * @param title The title of the notification message
@@ -55,7 +56,7 @@ export const createNotifyError = (title?: string, errorMsg?: string, cb?: (err: 
     return (props) => {
         notification.error({
             message: title,
-            description: <>{errorMsg && <p>{errorMsg}</p>}{props.message && <p>{props.message}</p>}</>
+            description: <>{errorMsg && <p>{errorMsg}</p>}{props.message && <p>{t ? t(props.message) : props.message}</p>}</>
         });
         cb && cb(props);
     };
