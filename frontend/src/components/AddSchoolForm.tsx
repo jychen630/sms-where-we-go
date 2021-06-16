@@ -2,7 +2,7 @@ import { CheckCircleFilled } from '@ant-design/icons';
 import { Button, Divider, Form, Input, Space, Tabs, notification } from 'antd';
 import { useState } from 'react';
 import { Result, Service } from 'wwg-api';
-import { handleApiError } from '../api/utils';
+import { createNotifyError, handleApiError } from '../api/utils';
 import SearchTool, { SearchHandlerProps } from './SearchTool';
 
 type Values = Parameters<typeof Service.postSchool>[0];
@@ -18,9 +18,7 @@ const fetchCity = async (props: SearchHandlerProps) => {
         }
     }
     catch (err) {
-        handleApiError(err).then((res) => {
-            console.error(res.message);
-        });
+        handleApiError(err, createNotifyError('错误', '获取城市列表失败'));
     }
 }
 

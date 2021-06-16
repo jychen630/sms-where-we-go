@@ -1,7 +1,7 @@
 import { Button, Form, Input, notification } from "antd"
 import { useCallback } from "react";
 import { Result, Service } from "wwg-api";
-import { handleApiError } from "../api/utils";
+import { createNotifyError, handleApiError } from "../api/utils";
 
 const { Item } = Form;
 type Values = { password: string }
@@ -24,13 +24,7 @@ const PasswordResetForm = ({ studentUid }: { studentUid?: number }) => {
                     return Promise.reject(res.message);
                 }
             })
-            .catch(err => handleApiError(err)
-                .then((res) => {
-                    notification.error({
-                        message: '失败',
-                        description: <><p>更改密码失败</p><p>错误信息: {res.message}</p></>
-                    })
-                }))
+            .catch(err => handleApiError(err, createNotifyError('失败', '更改密码失败')))
     }, [studentUid]);
 
     return (

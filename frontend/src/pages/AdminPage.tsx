@@ -1,8 +1,8 @@
-import { List, Modal, Button, Layout, Card, notification, Tabs } from "antd";
+import { List, Modal, Button, Layout, Card, Tabs } from "antd";
 import { Service, StudentVerbose, Student, Role } from "wwg-api";
 import AppPage, { menuOptions } from "./AppPage";
 import { useCallback, useEffect, useState } from "react";
-import { handleApiError } from "../api/utils";
+import { createNotifyError, handleApiError } from "../api/utils";
 import InfoUpdateForm from "../components/InfoUpdateForm";
 import { useAuth } from "../api/auth";
 import { useTranslation } from "react-i18next";
@@ -39,17 +39,7 @@ const AdminPage = () => {
     useEffect(() => {
         Service.getStudent()
             .then((result) => setStudents(result.students ?? []))
-            .catch((err) => handleApiError(err)
-                .then((result) => {
-                    notification.error({
-                        message: '错误',
-                        description: <>未能获取学生数据<p>错误信息：{result.message}</p></>
-                    });
-                    if (result.requireLogin) {
-                        setTimeout(() => history.push('/login', history.location), 1500);
-                    }
-                })
-            );
+            .catch(err => handleApiError(err, createNotifyError('错误', '未能获取学生数据', (err) => err.requireLogin && setTimeout(() => history.push('/login', history.location), 1500))))
     }, [auth, history]);
 
     const getCurrentStudent = useCallback(

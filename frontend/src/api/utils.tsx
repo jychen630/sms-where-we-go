@@ -45,7 +45,7 @@ export const handleApiError = async (err: ApiError | string | undefined, cb?: (p
     return error;
 }
 
-export const createNotifyError = (title?: string, errorMsg?: string, cb?: () => void): (props: ProcessedError) => void => {
+export const createNotifyError = (title?: string, errorMsg?: string, cb?: (err: ProcessedError) => void): (props: ProcessedError) => void => {
     /**
      * Create a notify error function that can be used as the callback for handleApiError
      * @param title The title of the notification message
@@ -55,9 +55,9 @@ export const createNotifyError = (title?: string, errorMsg?: string, cb?: () => 
     return (props) => {
         notification.error({
             message: title,
-            description: <><p>{props.message}</p>{errorMsg && <p>错误信息: {errorMsg}</p>}</>
+            description: <>{errorMsg && <p>{errorMsg}</p>}{props.message && <p>{props.message}</p>}</>
         });
-        cb && cb();
+        cb && cb(props);
     };
 }
 

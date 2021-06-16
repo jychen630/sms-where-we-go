@@ -1,9 +1,8 @@
 import { Form, Space, Spin, notification, Input, Button } from 'antd';
-import { useTranslation } from 'react-i18next';
 import { useHistory, useLocation } from 'react-router-dom';
 import { Result, Service } from 'wwg-api';
 import { useAuth } from '../api/auth';
-import { handleApiError } from '../api/utils';
+import { createNotifyError, handleApiError } from '../api/utils';
 
 // constants
 const phonePattern = /^1(?:3\d{3}|5[^4\D]\d{2}|8\d{3}|7(?:[0-35-9]\d{2}|4(?:0\d|1[0-2]|9\d))|9[0-35-9]\d{2}|6[2567]\d{2}|4(?:(?:10|4[01])\d{3}|[68]\d{4}|[579]\d{2}))\d{6}$/;
@@ -17,13 +16,12 @@ const LoginForm = () => {
     const [form] = Form.useForm<Value>();
     const location = useLocation();
     const history = useHistory();
-    const [t] = useTranslation();
     const auth = useAuth();
     const validateLogin = async (
         { password,
             identifier,
             use_uid }: Value
-    ): Promise<void> => {
+    ): Promise<any> => {
         if (!!!password || !!!identifier) {
             return;
         }
@@ -51,13 +49,7 @@ const LoginForm = () => {
                     return Promise.reject(res.message);
                 }
             })
-            .catch((err) => handleApiError(err).then((res) => {
-                notification.error({
-                    message: '登录失败',
-                    description: t(res.message) ?? '登录时发生未知错误'
-                });
-            }
-            ))
+            .catch((err) => handleApiError(err, createNotifyError('登录失败')))
     };
 
     return (

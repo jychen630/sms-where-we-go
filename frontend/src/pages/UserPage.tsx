@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router";
 import { Result, Service } from "wwg-api";
 import { useAuth } from "../api/auth";
-import { handleApiError } from "../api/utils";
+import { createNotifyError, handleApiError } from "../api/utils";
 import InfoUpdateForm from "../components/InfoUpdateForm";
 import PasswordResetForm from "../components/PasswordResetForm";
 import AppPage, { menuOptions } from "./AppPage";
@@ -30,19 +30,9 @@ const UserPage = () => {
             }
         }
         catch (err) {
-            handleApiError(err).then((res) => {
-                notification.error({
-                    message: "错误",
-                    description: t(res.message)
-                })
-                if (res.requireLogin) {
-                    setTimeout(() => {
-                        history.push('/login', history.location);
-                    }, 200);
-                }
-            });
+            handleApiError(err, createNotifyError('错误', undefined, err => err.requireLogin && setTimeout(() => history.push('/login', history.location), 1500)));
         }
-    }, [t, history]);
+    }, [history]);
 
     const deleteAccount = useCallback(async () => {
         if (auth.studentUid === undefined) {
@@ -65,13 +55,7 @@ const UserPage = () => {
                     return Promise.reject(res);
                 }
             }).catch(err => {
-                handleApiError(err)
-                    .then((res) => {
-                        notification.error({
-                            message: '失败',
-                            description: `未能将你的账户移除。错误信息：${res.message}`
-                        })
-                    })
+                handleApiError(err, createNotifyError('失败', '未能将你的账户移除'))
             })
     }, [t, history, auth.studentUid]);
 

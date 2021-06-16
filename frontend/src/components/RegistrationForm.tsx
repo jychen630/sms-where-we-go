@@ -3,7 +3,7 @@ import { FieldTimeOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Result, Service } from 'wwg-api';
-import { handleApiError } from '../api/utils';
+import { createNotifyError, handleApiError } from '../api/utils';
 
 import PrivacyPolicy from './PrivacyPolicy';
 import SchoolSearchTool from './SchoolSearchTool';
@@ -65,13 +65,7 @@ const RegistrationForm = () => {
                     return Promise.reject(res.message);
                 }
             })
-            .catch((err) => handleApiError(err).then((res) => {
-                notification.error({
-                    message: '注册失败',
-                    description: res.message ?? '注册时发生未知错误'
-                });
-            }
-            ));
+            .catch((err) => handleApiError(err, createNotifyError('注册失败')));
     }
 
     return (

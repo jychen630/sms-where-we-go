@@ -1,4 +1,4 @@
-import { handleApiError } from "../api/utils";
+import { createNotifyError, handleApiError } from "../api/utils";
 import { Button, Form, FormInstance, List, notification, Select, Switch } from "antd";
 import { useCallback, useEffect, useState } from 'react';
 import { RegistrationKeyInfo, Result, Service } from "wwg-api";
@@ -44,16 +44,7 @@ const RegistrationKeyForm = (props: { form: FormInstance<{ class: string }>, onS
                 props.form.setFieldsValue({ class: res.classes.length > 0 ? JSON.stringify(res.classes[0]) : '' })
                 setClasses(res.classes);
             })
-            .catch(err => handleApiError(err)
-                .then(err => {
-                    notification.error({
-                        message: '失败',
-                        description: <><p>未能获取可用班级。</p><p>错误信息: {err.message}</p></>
-                    });
-                    if (err.requireLogin) {
-                        setTimeout(() => history.push('/login', history.location), 1500);
-                    }
-                }))
+            .catch(err => handleApiError(err, createNotifyError('失败', '未能获取可用班级', (err) => err.requireLogin && setTimeout(() => history.push('/login', history.location), 1500))))
     }, [props.form, history]);
 
     const handleFinish = useCallback((data: { class: string }) => {
@@ -74,11 +65,7 @@ const RegistrationKeyForm = (props: { form: FormInstance<{ class: string }>, onS
                     return Promise.reject(res.message);
                 }
             })
-            .catch(err => handleApiError(err)
-                .then(err => notification.error({
-                    message: '失败',
-                    description: <><p>未能添加注册码。</p><p>错误信息: {err.message}</p></>
-                })))
+            .catch(err => handleApiError(err, createNotifyError('失败', '未能添加注册码')))
     }, [props]);
 
     return (
@@ -114,13 +101,7 @@ const RegistrationKey = () => {
     const fetchKeys = useCallback(() => {
         Service.getRegistrationKey()
             .then(result => setKeys(result.registration_keys ?? []))
-            .catch(err => handleApiError(err)
-                .then(res => {
-                    notification.error({
-                        message: '错误',
-                        description: <>未能获取注册码<p>错误信息：{res.message}</p></>
-                    });
-                }))
+            .catch(err => handleApiError(err, createNotifyError('失败', '未能获取注册码')))
     }, [])
 
     useEffect(() => {
@@ -149,11 +130,7 @@ const RegistrationKey = () => {
                                             return Promise.reject(result.message);
                                         }
                                     })
-                                    .catch(err => handleApiError(err)
-                                        .then(err => notification.error({
-                                            message: '错误',
-                                            description: err.message
-                                        })));
+                                    .catch(err => handleApiError(err, createNotifyError('错误')));
                             }}
                         ></Switch>]}
                     >
