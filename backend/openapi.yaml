@@ -958,17 +958,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                class_number:
-                  type: number
-                grad_year:
-                  type: number
-                curriculum:
-                  type: string
-                  enum:
-                    - international
-                    - gaokao
+              $ref: "#/components/schemas/Class"
       responses:
         200:
           $ref: "#/components/responses/Success"

@@ -556,11 +556,7 @@ classes: Array<Class>,
      * @throws ApiError
      */
     public static async postClass(
-requestBody: {
-class_number?: number,
-grad_year?: number,
-curriculum?: 'international' | 'gaokao',
-},
+requestBody: Class,
 ): Promise<Result> {
         const result = await __request({
             method: 'POST',
