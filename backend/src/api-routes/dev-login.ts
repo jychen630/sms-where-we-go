@@ -46,6 +46,8 @@ export const post: Operation = async (req, res) => {
     else {
         req.session.identifier = data.uid;
         req.session.student_uid = student.student_uid;
-        sendSuccess(res);
+        sendSuccess(res, {
+            role: student.role
+        });
     }
 }

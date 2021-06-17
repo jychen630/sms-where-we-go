@@ -100,7 +100,7 @@ role: Role,
     /**
      * Only available in development. Login using the student with the specified uid, password is not required
      * @param requestBody 
-     * @returns Result Success
+     * @returns any Return the role of the logged in user
      * @throws ApiError
      */
     public static async postDevLogin(
@@ -110,7 +110,9 @@ requestBody: {
  */
 uid: number,
 },
-): Promise<Result> {
+): Promise<(Result & {
+role?: Role,
+})> {
         const result = await __request({
             method: 'POST',
             path: `/dev-login`,

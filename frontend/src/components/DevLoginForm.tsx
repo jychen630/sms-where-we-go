@@ -3,11 +3,13 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router";
 import { Result, Service } from "wwg-api";
+import { useAuth } from "../api/auth";
 import { createNotifyError, handleApiError, ThenType } from "../api/utils";
 
 type Values = { uid: number };
 const DevLoginForm = () => {
     const [t] = useTranslation();
+    const { devLogin } = useAuth();
     const history = useHistory();
     const [form] = Form.useForm<Values>();
     const [users, setUsers] = useState<NonNullable<ThenType<ReturnType<typeof Service.getDevLogin>>['users']>>([]);
@@ -24,6 +26,16 @@ const DevLoginForm = () => {
     }, [t, setUsers]);
 
     const handleFinish = (data: Values) => {
+        devLogin(data.uid)
+            .then(() => {
+                history.push('/map');
+            })
+            .catch(err =>
+                handleApiError(
+                    err,
+                    createNotifyError(t('Error'), t('Failed to login as dev'))
+                )
+            )
         Service.postDevLogin({ uid: data.uid })
             .then(res => {
                 if (res.result === Result.result.SUCCESS) {

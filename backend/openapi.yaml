@@ -392,7 +392,16 @@ paths:
                   description: The unique identifier of the user
       responses:
         200:
-          $ref: "#/components/responses/Success"
+          description: Return the role of the logged in user
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Result"
+                  - type: object
+                    properties:
+                      role:
+                        $ref: "#/components/schemas/Role"
   /student:
     get:
       operationId: getStudent

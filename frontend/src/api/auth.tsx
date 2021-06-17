@@ -7,7 +7,8 @@ export type LoginHandler = (password: string, identifier?: number | string, useU
 export interface AuthContext {
     role?: Role,
     studentUid?: number,
-    login: LoginHandler
+    login: LoginHandler,
+    devLogin: (uid: number) => Promise<void>
 }
 
 const defaultLoginHandler: LoginHandler = async (password) => ({ result: Result.result.ERROR, message: 'Login not available' })
@@ -74,7 +75,21 @@ export const useAuthProvider = () => {
             });
     }
 
-    return { role, studentUid, login, update };
+    const devLogin = async (uid: number): Promise<void> => {
+        Service.postDevLogin({ uid: uid })
+            .then(res => {
+                if (res.result === Result.result.SUCCESS) {
+                    setRole(res.role);
+                    setStudentUid(uid);
+                    return Promise.resolve();
+                }
+                else {
+                    return Promise.reject(res.message);
+                }
+            });
+    }
+
+    return { role, studentUid, login, update, devLogin };
 }
 
 export const AuthProvider = ({ value, children }: HasChildren<{ value?: AuthContext }>) => {
