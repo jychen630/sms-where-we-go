@@ -1,7 +1,7 @@
 import { createNotifyError, handleApiError } from "../api/utils";
 import { Button, Form, FormInstance, List, notification, Select, Switch } from "antd";
 import { useCallback, useEffect, useState } from 'react';
-import { RegistrationKeyInfo, Result, Service } from "wwg-api";
+import { Class, RegistrationKeyInfo, Result, Service } from "wwg-api";
 import { useTranslation } from "react-i18next";
 import { ClockCircleOutlined, PieChartOutlined, PlusOutlined } from "@ant-design/icons";
 import { useHistory } from "react-router";
@@ -12,35 +12,13 @@ type KeyInfo = RegistrationKeyInfo & {
     activated?: boolean | undefined;
 };
 
-type Class = { classNumber: number, gradYear: number };
-const mockGetClass = async (): Promise<{ classes: Class[] }> => {
-    if (Math.random() < 0.2) {
-        return Promise.reject({
-            result: Result.result.ERROR,
-            message: 'Failed to fetch classes'
-        });
-    }
-    return Promise.resolve({
-        classes: [{
-            classNumber: 2,
-            gradYear: 2020
-        }, {
-            classNumber: 2,
-            gradYear: 2019
-        }, {
-            classNumber: 3,
-            gradYear: 2019
-        }]
-    });
-}
 const RegistrationKeyForm = (props: { form: FormInstance<{ class: string }>, onSuccess?: () => void }) => {
     const history = useHistory();
     const [t] = useTranslation();
     const [classes, setClasses] = useState<Class[]>([]);
 
     useEffect(() => {
-        //Service.getClass()
-        mockGetClass()
+        Service.getClass()
             .then(res => {
                 props.form.setFieldsValue({ class: res.classes.length > 0 ? JSON.stringify(res.classes[0]) : '' })
                 setClasses(res.classes);
@@ -51,8 +29,8 @@ const RegistrationKeyForm = (props: { form: FormInstance<{ class: string }>, onS
     const handleFinish = useCallback((data: { class: string }) => {
         const class_ = JSON.parse(data.class) as Class;
         Service.postRegistrationKey({
-            class_number: class_.classNumber,
-            grad_year: class_.gradYear,
+            class_number: class_.class_number,
+            grad_year: class_.grad_year,
         })
             .then(res => {
                 if (res.result === Result.result.SUCCESS) {
@@ -84,7 +62,7 @@ const RegistrationKeyForm = (props: { form: FormInstance<{ class: string }>, onS
                             key={index}
                             value={JSON.stringify(value)}
                         >
-                            {value.gradYear}届 {value.classNumber}班
+                            {value.grad_year}届 {value.class_number}班
                         </Select.Option>
                     )}
                 </Select>

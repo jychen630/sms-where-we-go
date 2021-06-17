@@ -192,6 +192,25 @@ components:
         country:
           type: string
           example: United States
+    Class:
+      type: object
+      required:
+        - class_number
+        - grad_year
+        - curriculum
+      properties:
+        class_number:
+          type: integer
+          minimum: 1
+          maximum: 100
+          example: 2
+        grad_year:
+          type: integer
+          format: year
+          example: 2021
+        curriculum:
+          type: string
+          example: gaokao
     Visibility:
       type: string
       description: >
@@ -913,7 +932,20 @@ paths:
       description: Get classes that are accessible to the current user.
       responses:
         200:
-          $ref: "#/components/responses/Success"
+          description: Return a list of classes
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Result"
+                  - type: object
+                    required:
+                      - classes
+                    properties:
+                      classes:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/Class"
         401:
           $ref: "#/components/responses/UnAuthorized"
         403:

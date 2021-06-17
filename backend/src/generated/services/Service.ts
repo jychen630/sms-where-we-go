@@ -2,6 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { City } from '../models/City';
+import type { Class } from '../models/Class';
 import type { Limit } from '../models/Limit';
 import type { Offset } from '../models/Offset';
 import type { RegistrationKeyInfo } from '../models/RegistrationKeyInfo';
@@ -531,10 +532,12 @@ activate?: boolean,
 
     /**
      * Get classes that are accessible to the current user.
-     * @returns Result Success
+     * @returns any Return a list of classes
      * @throws ApiError
      */
-    public static async getClass(): Promise<Result> {
+    public static async getClass(): Promise<(Result & {
+classes: Array<Class>,
+})> {
         const result = await __request({
             method: 'GET',
             path: `/class`,
