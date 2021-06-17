@@ -577,7 +577,9 @@ requestBody: Class,
      * @throws ApiError
      */
     public static async deleteClass(
-requestBody?: {
+requestBody: {
+class_number: number,
+grad_year: number,
 /**
  * Delete the class anyway even if there are students associated with it. This will delete those students as well
  */

@@ -970,12 +970,22 @@ paths:
       operationId: deleteClass
       description: Delete an existing class. This is only usable for curriculum admins or higher level admins
       requestBody:
-        required: false
+        required: true
         content:
           application/json:
             schema:
               type: object
+              required:
+                - class_number
+                - grad_year
               properties:
+                class_number:
+                  type: integer
+                  minimum: 1
+                  maximum: 100
+                grad_year:
+                  type: integer
+                  format: year
                 force:
                   type: boolean
                   default: false

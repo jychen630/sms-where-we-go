@@ -269,11 +269,12 @@ export const DELETE: Operation = async (req, res, next) => {
         .delete()
         .where('student_uid', data.student_uid)
         .then((result) => {
-            logger.info(result);
             if (result === 0) {
+                logger.info(`${req.session.student_uid} failed to delete Student ${data.student_uid}`);
                 sendSuccess(res, { message: 'No students affected' });
             }
             else {
+                logger.info(`Student ${data.student_uid} is deleted by ${req.session.student_uid}`);
                 sendSuccess(res, { message: 'Successfully deleted the student' });
             }
         }).catch((err) => {
