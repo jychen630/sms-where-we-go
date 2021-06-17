@@ -21,7 +21,7 @@ app.use(session({
     saveUninitialized: false
 }));
 
-app.use(cors({ credentials: true, origin: ['http://192.168.0.29:3000', 'http://localhost:3000'] }));
+app.use(cors({ credentials: true, origin: ['http://192.168.0.29:3000', 'http://localhost:3000', 'http://localhost:5000', 'http://47.106.186.142:5000'] }));
 
 log4js.configure({
     appenders: {

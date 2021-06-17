@@ -154,8 +154,9 @@ export const put: Operation = async (req, res) => {
 
     const privilege = await RoleService.privilege(RoleService.studentToRoleResource(student), RoleService.registrationKeyToRoleResource(registrationKey))
     if (!privilege.update) {
-        logger.info(`User is not allowed for updating ${registrationKey?.registration_key} (exp: ${registrationKey?.expiration_date.toISOString()}) (uid: ${student.student_uid}, level: ${student.level})`)
+        logger.info(`User is not allowed for updating registrationKey ${registrationKey?.registration_key} (exp: ${registrationKey?.expiration_date.toISOString()}) (uid: ${student.student_uid}, level: ${student.level})`)
         sendError(res, 403, 'You are not allowed to update this registration key');
+        return;
     }
 
     pg('wwg.registration_key')

@@ -89,7 +89,7 @@ export class RoleService {
             return undefined;
         }
         if (typeof student.level !== 'number' || typeof student.class_number !== 'number' || student.grad_year === null || student.curriculum_name === null) {
-            throw new Error('Invalid student');
+            throw new Error(`Invalid student: ${JSON.stringify(student)}`);
         }
 
         return new RoleResource({
@@ -107,6 +107,18 @@ export class RoleService {
     static async privilege(current: RoleResource | undefined, target: RoleResource | undefined): Promise<Privilege>;
     static async privilege(...args: any[]): Promise<Privilege> {
         let current: RoleResource | undefined, target: RoleResource | undefined;
+        let privilege = {
+            read: false,
+            update: false,
+            delete: false,
+            grant: false,
+            level: 0,
+        }
+
+        if (args[0] === undefined || args[1] === undefined) {
+            return privilege
+        }
+
         if (typeof args[0] === 'number' && typeof args[1] === 'number') {
             [current, target] = [this.studentToRoleResource(await StudentService.get(args[0])), (this.studentToRoleResource(await StudentService.get(args[1])))];
         }
@@ -117,18 +129,12 @@ export class RoleService {
             [current, target] = [this.studentToRoleResource(args[0]), this.studentToRoleResource(args[1])];
         }
 
-        let privilege = {
-            read: false,
-            update: false,
-            delete: false,
-            grant: false,
-            level: current?.level as number ?? 0,
-        }
-
         if (!!!current || !!!target) {
             // If either of the resources in action don't exist, we consider target inaccessible at all
             return privilege;
         }
+
+        privilege.level = current.level ?? 0;
 
         const compare = this.compare(current, target);
 

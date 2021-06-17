@@ -55,11 +55,16 @@ export const dbHandleError = (err: any, res: Response, logger: Logger) => {
             break;
         case '23503':
             logger.error(err.detail);
-            if (err.detail.contains('is still reference')) {
-                sendError(res, 200, `${matchGroup[2]} ${matchGroup[1]} cannot be deleted`);
+            if (err.detail !== undefined) {
+                if (err.detail.includes('is still reference')) {
+                    sendError(res, 200, `${matchGroup[2]} (${matchGroup[1]}) cannot be deleted`);
+                }
+                else {
+                    sendError(res, 200, `${matchGroup[2]} does not exist as ${matchGroup[1]}`);
+                }
             }
             else {
-                sendError(res, 200, `${matchGroup[2]} is not a existing ${matchGroup[1]}`);
+                sendError(res, 200, `${matchGroup[2]} is invalid for ${matchGroup[1]}`);
             }
             break;
         default:
