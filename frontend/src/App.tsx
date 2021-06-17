@@ -15,6 +15,7 @@ import 'antd/dist/antd.css';
 import { OpenAPI, Role } from 'wwg-api';
 import { AuthProvider, useAuthProvider } from './api/auth';
 import DevLoginForm from './components/DevLoginForm';
+import ListPage from './pages/ListPage';
 
 OpenAPI.WITH_CREDENTIALS = true;
 OpenAPI.TOKEN = '';
@@ -51,7 +52,7 @@ function App() {
             <MapPage />
           </Route>
           <Route path="/list">
-            List
+            <ListPage />
           </Route>
           {authProvider.role !== Role.STUDENT &&
             <Route path="/admin">

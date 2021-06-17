@@ -1,6 +1,6 @@
 import { BarsOutlined, CompassOutlined, ControlOutlined, SettingOutlined } from '@ant-design/icons';
 import { Layout, Menu, Space } from 'antd';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useHistory } from 'react-router';
 import { Role } from 'wwg-api';
 import { useAuth } from '../api/auth';
