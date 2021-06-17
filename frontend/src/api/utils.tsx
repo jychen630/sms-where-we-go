@@ -31,16 +31,18 @@ export const handleApiError = async (err: ApiError | string | undefined, cb?: (p
             requireLogin: requireLogin
         };
     }
-    else if (err.status === 401) {
-        requireLogin = true;
-    }
+    else {
+        if (err.status === 401) {
+            requireLogin = true;
+        }
 
-    else if (!!err.body) {
-        error = {
-            result: err.body.result ?? Result.result.ERROR,
-            message: err.body.message ?? '发生了未知错误',
-            requireLogin: requireLogin
-        };
+        if (!!err.body) {
+            error = {
+                result: err.body.result ?? Result.result.ERROR,
+                message: err.body.message ?? '发生了未知错误',
+                requireLogin: requireLogin
+            };
+        }
     }
     cb && cb(error);
     return error;
