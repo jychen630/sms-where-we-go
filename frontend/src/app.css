@@ -53,9 +53,26 @@
     var(--layout-padding);
 }
 
+.collapse-panel {
+  overflow-x: hidden;
+}
+
+.collapse-panel .ant-collapse-content-box {
+  max-height: 350px;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  margin-right: -16.5px;
+}
+
 .centered-layout main > div {
   transform: translateX(calc(50vw - 50% - var(--layout-padding)));
   max-width: 480px;
+}
+
+@media (max-width: 576px) {
+  .ant-modal {
+    top: 0 !important;
+  }
 }
 
 @media (max-width: 767px) {

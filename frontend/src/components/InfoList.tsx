@@ -8,8 +8,8 @@ import { useTranslation } from "react-i18next";
 /**
  * A util component that will render nothing if the content is empty
  */
-export const Optional = ({ content, icon }: { content: string | number | undefined | null | object, icon: JSX.Element }) => {
-    if (!!!content && content !== 0) {
+export const Optional = ({ content, dependencies, icon }: { content: string | number | undefined | null | object, dependencies?: any[], icon: JSX.Element }) => {
+    if ((!!!content && content !== 0) || (dependencies && dependencies.some(value => value === undefined || value === ''))) {
         return <></>;
     }
 
@@ -28,7 +28,7 @@ const InfoList = (props: StudentInfo & { hideName?: boolean }) => {
             <Optional content={props.phone_number} icon={<PhoneFilled />} />
             <Optional content={props.email ?? ""} icon={<MailOutlined />} />
             <Optional content={props.wxid} icon={<WechatFilled />} />
-            <Optional content={props.grad_year + "届" + props.class_number + "班"} icon={<HomeFilled />} />
+            <Optional content={(!!props.grad_year && !!props.class_number) ? props.grad_year + "届" + props.class_number + "班" : ''} icon={<HomeFilled />} />
             <Optional content={t(props.curriculum ?? "")} icon={<FontAwesomeIcon icon={faMapSigns} />} />
             <Optional content={props.department ?? ""} icon={<FontAwesomeIcon icon={faBuilding} />} />
             <Optional content={props.major ?? ""} icon={<FontAwesomeIcon icon={faBook} />} />

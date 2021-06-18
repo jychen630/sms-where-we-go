@@ -20,7 +20,7 @@ const DevLoginForm = () => {
             .catch(err =>
                 handleApiError(
                     err,
-                    createNotifyError(t('Error'), t('Failed to fetch available users'))
+                    createNotifyError(t, t('Error'), t('Failed to fetch available users'))
                 )
             )
     }, [t, setUsers]);
@@ -33,7 +33,7 @@ const DevLoginForm = () => {
             .catch(err =>
                 handleApiError(
                     err,
-                    createNotifyError(t('Error'), t('Failed to login as dev'))
+                    createNotifyError(t, t('Error'), t('Failed to login as dev'))
                 )
             )
         Service.postDevLogin({ uid: data.uid })
@@ -48,7 +48,7 @@ const DevLoginForm = () => {
             .catch(err =>
                 handleApiError(
                     err,
-                    createNotifyError(t('Error'), t('Failed to login as dev'))
+                    createNotifyError(t, t('Error'), t('Failed to login as dev'))
                 )
             )
     }

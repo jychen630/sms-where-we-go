@@ -1,19 +1,31 @@
-import { CheckCircleFilled } from '@ant-design/icons';
-import { Button, Divider, Form, Input, Space, Tabs, notification } from 'antd';
+import { CheckCircleFilled, EnvironmentOutlined } from '@ant-design/icons';
+import { faAddressCard, faMap, faMapPin } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Button, Card, Divider, Form, Input, Modal, Space, Tabs, notification } from 'antd';
+import { useEffect } from 'react';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Result, Service } from 'wwg-api';
+import { Coordinate, Result, Service } from 'wwg-api';
 import { createNotifyError, handleApiError } from '../api/utils';
+import InfoCard from './InfoCard';
+import { Optional } from './InfoList';
+import Map, { MapItem } from './Map';
 import SearchTool, { SearchHandlerProps } from './SearchTool';
 
 type Values = Parameters<typeof Service.postSchool>[0];
 
-
+type Location = Coordinate & {
+    name: string;
+    city?: string | undefined;
+    address?: string | undefined;
+}
 const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
     const [t] = useTranslation();
     const [form] = Form.useForm<Values>();
-    const [currentTab, setCurrentTab] = useState('select');
     const [cityUid, setCityUid] = useState(-1);
+    const [visible, setVisible] = useState(false);
+    const [location, setLocation] = useState<Location>();
+    const [currentTab, setCurrentTab] = useState('select');
 
     const fetchCity = useCallback(async (props: SearchHandlerProps) => {
         try {
@@ -53,6 +65,32 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                 });
             }))
     }
+    useEffect(() => {
+        form.setFieldsValue({
+            longitude: location?.longitude,
+            latitude: location?.latitude
+        })
+    }, [form, location])
+
+    const mockStudentData = useCallback(async (): Promise<MapItem[]> => {
+        return [{
+            students: [],
+            longitude: location?.longitude,
+            latitude: location?.latitude,
+            school_name: location?.name ?? '示例学校',
+            city: location?.city ?? '',
+        }];
+    }, [location]);
+
+    const getPreview = useCallback(async (props: SearchHandlerProps): Promise<Location[]> => {
+        return Service.getLocation(props.value, props.offset + 1)
+            .then(res => {
+                return res.locations;
+            })
+            .catch(err => {
+                return [];
+            })
+    }, []);
 
     return (
         <Form
@@ -133,7 +171,7 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
             <Divider>坐标</Divider>
             <Space>
                 <Form.Item
-                    name='longtitude'
+                    name='longitude'
                     label='经度'
                 >
                     <Input placeholder='经度，如 114.1216' />
@@ -145,16 +183,61 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                     <Input placeholder='纬度，如 22.5514' />
                 </Form.Item>
             </Space>
+            <Map getData={mockStudentData} getPopup={(props) => <InfoCard {...props} />} zoom={10.5} startingCoordinate={!!location?.latitude && !!location.longitude ? { longitude: location.longitude, latitude: location.latitude - 0.005 } : undefined} responsive></Map>
+            {!!location && <Card>
+                <Optional content={location.name} icon={<FontAwesomeIcon icon={faAddressCard} />} />
+                <Optional content={<>({location.longitude?.toFixed(5)}, {location.latitude?.toFixed(5)})</>} icon={<FontAwesomeIcon icon={faMapPin} />} dependencies={[location.longitude, location.latitude]} />
+                <Optional content={location.city} icon={<EnvironmentOutlined />} />
+                <Optional content={location.address} icon={<FontAwesomeIcon icon={faMap} />} />
+            </Card>
+            }
+            <SearchTool
+                initialValue={form.getFieldValue('school_name')}
+                placeholder='输入学校名称'
+                searchHandler={getPreview}
+                searchLimit={1}
+                item={(value, index) =>
+                    <Button style={{ textAlign: 'left', width: '100%', overflowX: 'hidden' }} onClick={() => setLocation(value)} type={(value.name === location?.name && value.address === location?.address) ? 'primary' : 'text'} block>
+                        {value.name === location?.name && value.address === location?.address &&
+                            <CheckCircleFilled />
+                        }
+                        {value.name}
+                        <span style={{ fontSize: '0.5rem' }}>{value.city} {value.address} ({value.longitude?.toFixed(5)}, {value.latitude?.toFixed(5)})</span>
+                    </Button>
+                }
+            />
             <Form.Item>
                 <Space>
-                    <Button type='ghost' htmlType='submit'>
-                        预览
-                    </Button>
                     <Button type='primary' htmlType='submit'>
                         添加
                     </Button>
                 </Space>
             </Form.Item>
+            <Modal title='预览' visible={visible} okText={t('Save')} cancelText={t('Cancel')} onCancel={() => setVisible(false)} width={600}>
+                <Map getData={mockStudentData} getPopup={(props) => <InfoCard {...props} />} zoom={10.5} startingCoordinate={!!location?.latitude && !!location.longitude ? { longitude: location.longitude, latitude: location.latitude - 0.005 } : undefined} responsive></Map>
+                {!!location && <Card>
+                    <Optional content={location.name} icon={<FontAwesomeIcon icon={faAddressCard} />} />
+                    <Optional content={<>({location.longitude?.toFixed(5)}, {location.latitude?.toFixed(5)})</>} icon={<FontAwesomeIcon icon={faMapPin} />} dependencies={[location.longitude, location.latitude]} />
+                    <Optional content={location.city} icon={<EnvironmentOutlined />} />
+                    <Optional content={location.address} icon={<FontAwesomeIcon icon={faMap} />} />
+                </Card>
+                }
+                <SearchTool
+                    initialValue={form.getFieldValue('school_name')}
+                    placeholder='输入关键词'
+                    searchHandler={getPreview}
+                    searchLimit={1}
+                    item={(value, index) =>
+                        <Button style={{ textAlign: 'left', width: '100%', overflowX: 'hidden' }} onClick={() => setLocation(value)} type={(value.name === location?.name && value.address === location?.address) ? 'primary' : 'text'} block>
+                            {value.name === location?.name && value.address === location?.address &&
+                                <CheckCircleFilled />
+                            }
+                            {value.name}
+                            <span style={{ fontSize: '0.5rem' }}>{value.city} {value.address} ({value.longitude?.toFixed(5)}, {value.latitude?.toFixed(5)})</span>
+                        </Button>
+                    }
+                />
+            </Modal>
             <a href='https://lbs.amap.com/tools/picker' target='new'>通过高德API搜索坐标</a>
         </Form>
     )

@@ -87,6 +87,7 @@ const SearchTool = <T extends unknown>({ searchHandler, placeholder, item, initi
                             }
                         </Space>
                     }
+                    className='collapse-panel'
                 >
                     {resultList.length === 0 &&
                         <EmptyPlaceholder />
