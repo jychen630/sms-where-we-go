@@ -3,6 +3,7 @@
 /* eslint-disable */
 import type { City } from '../models/City';
 import type { Class } from '../models/Class';
+import type { Coordinate } from '../models/Coordinate';
 import type { Limit } from '../models/Limit';
 import type { Offset } from '../models/Offset';
 import type { RegistrationKeyInfo } from '../models/RegistrationKeyInfo';
@@ -595,6 +596,43 @@ force: boolean,
             errors: {
                 401: `Unauthorized to access the resource`,
                 403: `The user is not allowed to access the resource`,
+            },
+        });
+        return result.body;
+    }
+
+    /**
+     * Query the coordinate of schools
+     * @param keywords 
+     * @param page 
+     * @param city 
+     * @param country 
+     * @param provider 
+     * @returns any Return a list of possible coordinates
+     * @throws ApiError
+     */
+    public static async getLocation(
+keywords: string,
+page: number = 1,
+city?: string,
+country?: string,
+provider: 'amap' | 'google' = 'amap',
+): Promise<(Result & {
+locations: Array<(Coordinate & {
+name: string,
+city?: string,
+address?: string,
+})>,
+})> {
+        const result = await __request({
+            method: 'GET',
+            path: `/location`,
+            query: {
+                'keywords': keywords,
+                'page': page,
+                'city': city,
+                'country': country,
+                'provider': provider,
             },
         });
         return result.body;

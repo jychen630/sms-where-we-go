@@ -40,6 +40,21 @@ components:
           schema:
             $ref:  "#/components/schemas/Result"
   schemas:
+    Coordinate:
+      type: object
+      description: A coordinate in WGS84 format
+      required:
+        - longitude
+        - latitude
+      properties:
+        longitude:
+          type: number
+          minimum: -180
+          maximum: 180
+        latitude:
+          type: number
+          minimum: -90
+          maximum: 90
     Offset:
       type: integer
       default: 0
@@ -247,6 +262,17 @@ components:
     bearerAuth:
       type: http
       scheme: bearer
+  headers:
+    X-RateLimit-Limit:
+      schema:
+        type: integer
+    X-RateLimit-Remaining:
+      schema:
+        type: integer
+    X-RateLimit-Reset:
+      schema:
+        type: string
+        format: date-time
 security:
   - sessionAuth: []
   - bearerAuth: []
@@ -1006,3 +1032,72 @@ paths:
           $ref: "#/components/responses/UnAuthorized"
         403:
           $ref: "#/components/responses/Forbidden"
+  /location:
+    get:
+      description: Query the coordinate of schools
+      operationId: getLocation
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: keywords
+          in: query
+          required: true
+          schema:
+            type: string
+            maxLength: 100
+        - name: city
+          in: query
+          schema:
+            type: string
+            maxLength: 100
+        - name: country
+          in: query
+          schema:
+            type: string
+            maxLength: 100
+        - name: provider
+          in: query
+          schema:
+            type: string
+            enum:
+              - amap
+              - google
+            default:
+              amap
+      responses:
+        200:
+          headers:
+            X-RateLimit-Limit:
+              $ref: "#/components/headers/X-RateLimit-Limit"
+            X-RateLimit-Remaining:
+              $ref: "#/components/headers/X-RateLimit-Remaining"
+            X-RateLimit-Reset:
+              $ref: "#/components/headers/X-RateLimit-Reset"
+          description: Return a list of possible coordinates
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Result"
+                  - type: object
+                    required:
+                      - locations
+                    properties:
+                      locations:
+                        type: array
+                        items:
+                          allOf:
+                            - $ref: "#/components/schemas/Coordinate"
+                            - type: object
+                              required:
+                                - name
+                              properties:
+                                name:
+                                  type: string
+                                city:
+                                  type: string
+                                address:
+                                  type: string
