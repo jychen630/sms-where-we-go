@@ -1,5 +1,3 @@
-/// <reference types="node" />
-
 import { Session } from 'express-session';
 
 declare module 'express-session' {

@@ -6,7 +6,7 @@ import { Service } from '../generated';
 import { dbHandleError, parseBody, parseQuery, removeNull, sendError, sendSuccess } from '../utils';
 import { ClassService, RoleService, StudentService } from '../services';
 import { City, School, StudentClassRole, StudentRole, StudentVisibility } from '../generated/schema';
-import { ArrayType } from '../wwg_typings/custom_types';
+import { ArrayType } from '../wwg_types/custom_types';
 
 export const get: Operation = async (req, res, next) => {
     const data = parseQuery<typeof Service.getStudent>(req) as any;

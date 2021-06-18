@@ -1,4 +1,3 @@
-import knex from 'knex';
 import hash from 'bcrypt';
 import log4js from 'log4js';
 import { Operation } from 'express-openapi';

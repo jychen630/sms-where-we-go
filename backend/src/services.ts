@@ -1,5 +1,8 @@
+import axios from 'axios';
+import { gcj02towgs84 } from 'coordtransform';
 import log4js from 'log4js';
 import { pg } from '.';
+import { request } from './generated/core/request';
 import { Class, RegistrationKey, StudentClassRole, StudentRole, StudentVisibility } from './generated/schema';
 import { Role } from './generated/schema';
 
@@ -188,6 +191,40 @@ export class RoleService {
             default:
                 return privilege;
         }
+    }
+}
+
+export const LocationService = {
+    constructAmapURL: (keywords: string, city: string, page: number) => {
+        return encodeURI(`https://restapi.amap.com/v3/place/text?key=${process.env.AMAP_SECRET}&keywords=${keywords}&types=高等院校&city=${city}&children=1&offset=20&page=${page}&extensions=all`);
+    },
+    amap: async (keywords: string, city: string, page: number = 1) => {
+        const url = LocationService.constructAmapURL(keywords, city, page);
+        console.log(url);
+        return axios.get(url)
+            .then(res => res.data.pois.map((poi: any) => {
+                let [longitude, latitude] = poi.location.split(',');
+                try {
+                    [longitude, latitude] = gcj02towgs84(longitude, latitude);
+                }
+                catch {
+                    return Promise.reject('Failed to convert coordinates');
+                }
+
+                return {
+                    name: poi.name,
+                    city: poi.cityname ?? '',
+                    address: poi.address.length !== 0 ? poi.address : '',
+                    longitude: longitude,
+                    latitude: latitude,
+                }
+            }))
+            .catch(err => {
+                return Promise.reject(err);
+            });
+    },
+    google: async (keywords: string, city: string, country: string) => {
+
     }
 }
 

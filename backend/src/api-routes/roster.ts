@@ -2,7 +2,7 @@ import { Operation } from 'express-openapi';
 import log4js from 'log4js';
 import { pg } from '..';
 import { Student as StudentRes, School as SchoolRes, StudentVerbose } from '../generated';
-import { City, School, Student, StudentVisibility } from '../generated/schema';
+import { City, School, StudentVisibility } from '../generated/schema';
 import { StudentClass } from '../generated/schema';
 import { removeNull, sendError, sendSuccess } from '../utils';
 
