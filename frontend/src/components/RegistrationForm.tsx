@@ -41,8 +41,13 @@ const RegistrationForm = () => {
                     return Promise.resolve();
                 }
                 else {
-                    console.error(res.message);
-                    return Promise.reject('该注册码不可用');
+                    if (res.message === 'The registration key is invalid') {
+                        return Promise.reject('该注册码不可用');
+                    }
+                    else {
+                        console.error(res.message);
+                        return Promise.reject('获取注册码失败');
+                    }
                 }
             })
             .catch(err => handleApiError(err).then(res => Promise.reject('该注册码不可用' ?? '验证失败，请联系管理员')))
@@ -88,15 +93,15 @@ const RegistrationForm = () => {
                             required: true,
                             message: '注册码不能为空'
                         }, {
-                            len: 8,
-                            message: '注册码长度必须为 8'
+                            len: 14,
+                            message: '注册码长度必须为14位'
                         },
                         ({ getFieldError }) => ({ validator(_, value) { return validateKey(value) } })
                     ]}
                     hasFeedback
                     required
                 >
-                    <Input placeholder='8位注册码' onChange={() => { setRegInfo(undefined) }} />
+                    <Input placeholder='14位注册码' onChange={() => { setRegInfo(undefined) }} />
                 </Form.Item>
                 <Collapse defaultActiveKey={'1'} ghost>
                     <Collapse.Panel header={<>注册码信息 <InfoCircleOutlined /></>} key={'1'}>

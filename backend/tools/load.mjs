@@ -196,7 +196,7 @@ async function populateTestData() {
   logger.info("Populating test data for registration key...");
   await pg("wwg.registration_key")
     .insert({
-      registration_key: "wwgasdfg",
+      registration_key: "202106wwgasdfg",
       expiration_date: new Date("2022").toISOString(),
       class_number: 2,
       grad_year: 2019,

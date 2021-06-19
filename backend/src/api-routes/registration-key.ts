@@ -110,11 +110,12 @@ export const post: Operation = async (req, res) => {
     }
 
     let expirationDate = new Date()
+    const prefix = expirationDate.getUTCFullYear().toString() + (expirationDate.getUTCMonth() + 1).toString().padStart(2, '0')
     expirationDate.setDate(expirationDate.getDate() + 7);
 
     pg('wwg.registration_key')
         .insert({
-            registration_key: randomBytes(16).toString('hex').slice(0, 8),
+            registration_key: prefix + randomBytes(16).toString('hex').slice(0, 8),
             expiration_date: expirationDate,
             class_number: classNumber,
             grad_year: gradYear,

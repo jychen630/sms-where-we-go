@@ -31,10 +31,11 @@ WWG_USER=wwgadmin
 DB_NAME=wwg_base
 SEARCH_PATH=wwg,public
 BACKEND_ENV=backend/.env
+AMAP_SECRET=TheAPIKeyOfAmap
 export PGPASSFILE=~/.pgpass
 PASSWORD="ThePasswordHere"
 echo "*:*:$DB_NAME:$WWG_USER:$PASSWORD" > $PGPASSFILE
-echo SECRET=MySecretHere$'\n'PGHOST=localhost$'\n'PGUSER=$WWG_USER$'\n'PGPASSWORD=$PASSWORD$'\n'PGDBNAME=$DB_NAME > $BACKEND_ENV
+echo AMAP_SECRET=$AMAP_SECRET$'\n'SECRET=MySecretHere$'\n'PGHOST=localhost$'\n'PGUSER=$WWG_USER$'\n'PGPASSWORD=$PASSWORD$'\n'PGDBNAME=$DB_NAME > $BACKEND_ENV
 if ! pg_isready -U "$PG_USER" -q
 then
     echo "[error] PostgreSQL is not running!"

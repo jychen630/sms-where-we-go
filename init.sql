@@ -48,7 +48,7 @@ CREATE TABLE wwg.class (
 );
 
 CREATE TABLE wwg.registration_key (
-    registration_key CHAR(8),
+    registration_key VARCHAR(14),
     expiration_date TIMESTAMP,
     class_number SMALLINT NOT NULL,
     grad_year INT NOT NULL,
