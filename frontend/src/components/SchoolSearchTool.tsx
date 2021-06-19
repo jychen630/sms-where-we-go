@@ -70,7 +70,7 @@ const SchoolSearchTool = ({ schoolUid, setSchoolUid, initialValue }: { schoolUid
                 </Col>
             </Row>
             <Modal title='添加学校' visible={showSchoolModal} onCancel={() => setShowSchoolModal(false)} footer={null}>
-                <Space>
+                <Space direction='vertical' style={{ display: 'block' }}>
                     <AddSchoolForm cb={(uid) => setSchoolUid(uid)} />
                 </Space>
             </Modal>

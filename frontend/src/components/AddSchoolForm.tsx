@@ -21,6 +21,7 @@ type Location = Coordinate & {
 }
 const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
     const [t] = useTranslation();
+    const [page, setPage] = useState(0);
     const [form] = Form.useForm<Values>();
     const [cityUid, setCityUid] = useState(-1);
     const [visible, setVisible] = useState(false);
@@ -97,122 +98,137 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
             form={form}
             onFinish={handleFinish}
         >
-            <Form.Item
-                name='school_name'
-                label='学校名'
-                required
-                rules={[
-                    {
-                        required: true,
-                        message: '请填写学校名称'
-                    }
-                ]}
-            >
-                <Input placeholder='学校的正式名称（非缩写，昵称）' />
-            </Form.Item>
-            <Tabs defaultActiveKey='select' onChange={(key) => { setCurrentTab(key) }}>
-                <Tabs.TabPane key='select' tab='选择城市'>
-                    <SearchTool
-                        searchHandler={fetchCity}
-                        item={(value, index) =>
-                            <Button onClick={() => setCityUid(value.city_uid)} type={value.city_uid === cityUid ? 'primary' : 'text'} block>
-                                {value.city}, {value.state_province}, {value.country}
-                                {value.city_uid === cityUid &&
-                                    <CheckCircleFilled />
-                                }
-                            </Button>
-                        }
-                        placeholder='输入城市名'
-                    />
-                </Tabs.TabPane>
-                <Tabs.TabPane key='add' tab='添加城市'>
-                    <Form.Item
-                        name='city'
-                        label='城市'
-                        required
-                        rules={[
-                            {
-                                validator(_, value) {
-                                    if (!!!value && currentTab === 'add') {
-                                        return Promise.reject("学校所在的城市不能为空")
-                                    }
-                                    return Promise.resolve();
-                                }
-                            }
-                        ]}
-                    >
-                        <Input placeholder='学校所在的城市' />
-                    </Form.Item>
-                    <Form.Item
-                        name='school_state_province'
-                        label='省份/州'
-                    >
-                        <Input placeholder='学校所在的省份或州' />
-                    </Form.Item>
-                    <Form.Item
-                        name='school_country'
-                        label='国家'
-                        required
-                        rules={[
-                            {
-                                validator(_, value) {
-                                    if (!!!value && currentTab === 'add') {
-                                        return Promise.reject("学校所在的国家不能为空")
-                                    }
-                                    return Promise.resolve();
-                                }
-                            }
-                        ]}
-                    >
-                        <Input placeholder='学校的所在的国家' />
-                    </Form.Item>
-                </Tabs.TabPane>
-            </Tabs>
-            <Divider>坐标</Divider>
-            <Space>
+            <div style={page !== 0 ? { display: 'none' } : {}}>
                 <Form.Item
-                    name='longitude'
-                    label='经度'
-                >
-                    <Input placeholder='经度，如 114.1216' />
-                </Form.Item>
-                <Form.Item
-                    name='latitude'
-                    label='纬度'
-                >
-                    <Input placeholder='纬度，如 22.5514' />
-                </Form.Item>
-            </Space>
-            <Map getData={mockStudentData} getPopup={(props) => <InfoCard {...props} />} zoom={10.5} startingCoordinate={!!location?.latitude && !!location.longitude ? { longitude: location.longitude, latitude: location.latitude - 0.005 } : undefined} responsive></Map>
-            {!!location && <Card>
-                <Optional content={location.name} icon={<FontAwesomeIcon icon={faAddressCard} />} />
-                <Optional content={<>({location.longitude?.toFixed(5)}, {location.latitude?.toFixed(5)})</>} icon={<FontAwesomeIcon icon={faMapPin} />} dependencies={[location.longitude, location.latitude]} />
-                <Optional content={location.city} icon={<EnvironmentOutlined />} />
-                <Optional content={location.address} icon={<FontAwesomeIcon icon={faMap} />} />
-            </Card>
-            }
-            <SearchTool
-                initialValue={form.getFieldValue('school_name')}
-                placeholder='输入学校名称'
-                searchHandler={getPreview}
-                searchLimit={1}
-                item={(value, index) =>
-                    <Button style={{ textAlign: 'left', width: '100%', overflowX: 'hidden' }} onClick={() => setLocation(value)} type={(value.name === location?.name && value.address === location?.address) ? 'primary' : 'text'} block>
-                        {value.name === location?.name && value.address === location?.address &&
-                            <CheckCircleFilled />
+                    name='school_name'
+                    label='学校名'
+                    required
+                    rules={[
+                        {
+                            required: true,
+                            message: '请填写学校名称'
                         }
-                        {value.name}
-                        <span style={{ fontSize: '0.5rem' }}>{value.city} {value.address} ({value.longitude?.toFixed(5)}, {value.latitude?.toFixed(5)})</span>
-                    </Button>
-                }
-            />
-            <Form.Item>
+                    ]}
+                >
+                    <Input placeholder='学校的正式名称（非缩写，昵称）' />
+                </Form.Item>
+                <Tabs defaultActiveKey='select' onChange={(key) => { setCurrentTab(key) }}>
+                    <Tabs.TabPane key='select' tab='选择城市'>
+                        <SearchTool
+                            searchHandler={fetchCity}
+                            item={(value, index) =>
+                                <Button onClick={() => setCityUid(value.city_uid)} type={value.city_uid === cityUid ? 'primary' : 'text'} block>
+                                    {value.city}, {value.state_province}, {value.country}
+                                    {value.city_uid === cityUid &&
+                                        <CheckCircleFilled />
+                                    }
+                                </Button>
+                            }
+                            placeholder='输入城市名'
+                        />
+                    </Tabs.TabPane>
+                    <Tabs.TabPane key='add' tab='添加城市'>
+                        <Form.Item
+                            name='city'
+                            label='城市'
+                            required
+                            rules={[
+                                {
+                                    validator(_, value) {
+                                        if (!!!value && currentTab === 'add') {
+                                            return Promise.reject("学校所在的城市不能为空")
+                                        }
+                                        return Promise.resolve();
+                                    }
+                                }
+                            ]}
+                        >
+                            <Input placeholder='学校所在的城市' />
+                        </Form.Item>
+                        <Form.Item
+                            name='school_state_province'
+                            label='省份/州'
+                        >
+                            <Input placeholder='学校所在的省份或州' />
+                        </Form.Item>
+                        <Form.Item
+                            name='school_country'
+                            label='国家'
+                            required
+                            rules={[
+                                {
+                                    validator(_, value) {
+                                        if (!!!value && currentTab === 'add') {
+                                            return Promise.reject("学校所在的国家不能为空")
+                                        }
+                                        return Promise.resolve();
+                                    }
+                                }
+                            ]}
+                        >
+                            <Input placeholder='学校的所在的国家' />
+                        </Form.Item>
+                    </Tabs.TabPane>
+                </Tabs>
+                <Form.Item>
+                    <Button type='primary' onClick={() => {
+                        form.validateFields(['school_name', 'city', 'school_country'])
+                            .then(() => {
+                                setPage(1);
+                            })
+                    }}>下一步</Button>
+                </Form.Item>
+            </div>
+            <div style={page !== 1 ? { display: 'none' } : {}}>
+                <Divider>坐标</Divider>
                 <Space>
-                    <Button type='primary' htmlType='submit'>
-                        添加
-                    </Button>
+                    <Form.Item
+                        name='longitude'
+                        label='经度'
+                    >
+                        <Input placeholder='经度，如 114.1216' />
+                    </Form.Item>
+                    <Form.Item
+                        name='latitude'
+                        label='纬度'
+                    >
+                        <Input placeholder='纬度，如 22.5514' />
+                    </Form.Item>
                 </Space>
-            </Form.Item>
+                <Map getData={mockStudentData} getPopup={(props) => <InfoCard {...props} />} zoom={10.5} startingCoordinate={!!location?.latitude && !!location.longitude ? { longitude: location.longitude, latitude: location.latitude - 0.005 } : undefined} responsive></Map>
+                {!!location && <Card>
+                    <Optional content={location.name} icon={<FontAwesomeIcon icon={faAddressCard} />} />
+                    <Optional content={<>({location.longitude?.toFixed(5)}, {location.latitude?.toFixed(5)})</>} icon={<FontAwesomeIcon icon={faMapPin} />} dependencies={[location.longitude, location.latitude]} />
+                    <Optional content={location.city} icon={<EnvironmentOutlined />} />
+                    <Optional content={location.address} icon={<FontAwesomeIcon icon={faMap} />} />
+                </Card>
+                }
+                <SearchTool
+                    initialValue={form.getFieldValue('school_name')}
+                    placeholder='输入学校名称'
+                    searchHandler={getPreview}
+                    searchLimit={1}
+                    item={(value, index) =>
+                        <Button style={{ textAlign: 'left', width: '100%', overflowX: 'hidden' }} onClick={() => setLocation(value)} type={(value.name === location?.name && value.address === location?.address) ? 'primary' : 'text'} block>
+                            {value.name === location?.name && value.address === location?.address &&
+                                <CheckCircleFilled />
+                            }
+                            {value.name}
+                            <span style={{ fontSize: '0.5rem' }}>{value.city} {value.address} ({value.longitude?.toFixed(5)}, {value.latitude?.toFixed(5)})</span>
+                        </Button>
+                    }
+                />
+                <Form.Item>
+                    <Space>
+                        <Button type='ghost' onClick={() => {
+                            setPage(0);
+                        }}>上一步</Button>`
+                        <Button type='primary' htmlType='submit'>
+                            添加
+                        </Button>
+                    </Space>
+                </Form.Item>
+            </div>
             <Modal title='预览' visible={visible} okText={t('Save')} cancelText={t('Cancel')} onCancel={() => setVisible(false)} width={600}>
                 <Map getData={mockStudentData} getPopup={(props) => <InfoCard {...props} />} zoom={10.5} startingCoordinate={!!location?.latitude && !!location.longitude ? { longitude: location.longitude, latitude: location.latitude - 0.005 } : undefined} responsive></Map>
                 {!!location && <Card>
