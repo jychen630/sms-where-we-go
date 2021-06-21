@@ -105,31 +105,13 @@ export class RoleService {
             visibility: student.visibility_type ?? undefined
         })
     }
-    static async privilege(current_uid: number, target_uid: number): Promise<Privilege>;
-    static async privilege(current: StudentClassRole | undefined, target: StudentClassRole | undefined): Promise<Privilege>;
-    static async privilege(current: RoleResource | undefined, target: RoleResource | undefined): Promise<Privilege>;
-    static async privilege(...args: any[]): Promise<Privilege> {
-        let current: RoleResource | undefined, target: RoleResource | undefined;
+    static _privilegeImpl(current: RoleResource | undefined, target: RoleResource | undefined) {
         let privilege = {
             read: false,
             update: false,
             delete: false,
             grant: false,
             level: 0,
-        }
-
-        if (args[0] === undefined || args[1] === undefined) {
-            return privilege
-        }
-
-        if (typeof args[0] === 'number' && typeof args[1] === 'number') {
-            [current, target] = [this.studentToRoleResource(await StudentService.get(args[0])), (this.studentToRoleResource(await StudentService.get(args[1])))];
-        }
-        else if (args[0] instanceof RoleResource && args[1] instanceof RoleResource) {
-            [current, target] = args;
-        }
-        else {
-            [current, target] = [this.studentToRoleResource(args[0]), this.studentToRoleResource(args[1])];
         }
 
         if (!!!current || !!!target) {
@@ -186,11 +168,49 @@ export class RoleService {
                 privilege.read = privilege.update = true;
                 // Prevent system admins from lowering their own privilege level or deleting themselves
                 privilege.grant = privilege.delete = !compare.isSame;
-                console.log(privilege);
                 return privilege;
             default:
                 return privilege;
         }
+    }
+    static privilegeSync(current: StudentClassRole | undefined, target: StudentClassRole | undefined): Privilege;
+    static privilegeSync(current: RoleService | undefined, target: RoleService | undefined): Privilege;
+    static privilegeSync(...args: any[]): Privilege {
+        let current: RoleResource | undefined, target: RoleResource | undefined;
+
+        if (args[0] === undefined || args[1] === undefined) {
+            return this._privilegeImpl(current, target);
+        }
+
+        if (!(args[0] instanceof RoleResource && args[1] instanceof RoleResource)) {
+            [current, target] = [this.studentToRoleResource(args[0]), this.studentToRoleResource(args[1])];
+        }
+        else {
+            [current, target] = [args[0], args[1]];
+        }
+
+        return this._privilegeImpl(current, target);
+    }
+    static async privilege(current_uid: number, target_uid: number): Promise<Privilege>;
+    static async privilege(current: StudentClassRole | undefined, target: StudentClassRole | undefined): Promise<Privilege>;
+    static async privilege(current: RoleResource | undefined, target: RoleResource | undefined): Promise<Privilege>;
+    static async privilege(...args: any[]): Promise<Privilege> {
+        let current: RoleResource | undefined, target: RoleResource | undefined;
+
+        if (args[0] === undefined || args[1] === undefined) {
+            return this._privilegeImpl(current, target);
+        }
+
+        if (typeof args[0] === 'number' && typeof args[1] === 'number') {
+            [current, target] = [this.studentToRoleResource(await StudentService.get(args[0])), (this.studentToRoleResource(await StudentService.get(args[1])))];
+        }
+        else if (args[0] instanceof RoleResource && args[1] instanceof RoleResource) {
+            [current, target] = args;
+        }
+        else {
+            [current, target] = [this.studentToRoleResource(args[0]), this.studentToRoleResource(args[1])];
+        }
+        return this._privilegeImpl(current, target);
     }
 }
 

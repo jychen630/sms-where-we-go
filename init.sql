@@ -106,6 +106,23 @@ CREATE TABLE wwg.student (
     FOREIGN KEY (visibility_type) REFERENCES wwg.visibility(type)
 );
 
+CREATE TYPE STUDENT_FIELD as ENUM ('phone_number', 'email', 'wxid', 'department', 'major', 'school_uid');
+
+ CREATE TABLE wwg.student_field_visibility (
+    student_uid INT NOT NULL,
+    field STUDENT_FIELD NOT NULL,
+    hidden BOOLEAN DEFAULT false,
+    PRIMARY KEY (student_uid, field),
+    FOREIGN KEY (student_uid) REFERENCES wwg.student(student_uid)
+ );
+
+ CREATE TABLE wwg.additional_info (
+    student_uid INT PRIMARY KEY,
+    key_name VARCHAR(30) UNIQUE NOT NULL,
+    value VARCHAR(255) NOT NULL,
+    FOREIGN KEY (student_uid) REFERENCES wwg.student(student_uid)
+ )
+
 CREATE VIEW wwg.student_class AS 
     SELECT * FROM wwg.student
     NATURAL JOIN wwg.class;

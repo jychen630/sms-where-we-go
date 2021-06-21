@@ -616,6 +616,11 @@ paths:
                     type: array
                     items:
                       enum: ["email", "phone_number", "school_uid"]
+                  hidden:
+                    description: The fields that are decided to be hidden
+                    type: array
+                    items:
+                      enum: ["email", "phone_number", "school_uid"]
       responses:
         200:
           $ref: "#/components/responses/Default"

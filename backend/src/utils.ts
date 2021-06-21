@@ -39,6 +39,34 @@ export const removeNull = (obj: any) => {
     return obj;
 }
 
+export const removeKeys = (obj: Record<any, any>, keys: Set<string>, privilege?: { update: boolean }) => {
+    if (privilege?.update) {
+        // If the user is able to update this student, we assume that the hidden fields don't apply
+        return obj;
+    }
+
+    Object.keys(obj).forEach(key => keys.has(key) && delete obj[key]);
+
+    return obj;
+}
+
+export const parseHiddenFields = (original: string | null) => {
+    let hiddenFields: Set<string>;
+    if (typeof original === 'string') {
+        hiddenFields = new Set(original.slice(1, -1).split(','));
+        if (hiddenFields.has('school_uid')) {
+            hiddenFields.add('school_name');
+            hiddenFields.add('school_country');
+            hiddenFields.add('school_state_province');
+            hiddenFields.add('city');
+        }
+    }
+    else {
+        hiddenFields = new Set();
+    }
+    return hiddenFields;
+}
+
 export const dbHandleError = (err: any, res: Response, logger: Logger) => {
     if (!!!err.detail) {
         logger.error(err);

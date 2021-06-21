@@ -239,6 +239,10 @@ curriculum?: any,
  * The fields that need to be cleared
  */
 clear?: Array<'email' | 'phone_number' | 'school_uid'>,
+/**
+ * The fields that are decided to be hidden
+ */
+hidden?: Array<'email' | 'phone_number' | 'school_uid'>,
 }),
 ): Promise<Result> {
         const result = await __request({

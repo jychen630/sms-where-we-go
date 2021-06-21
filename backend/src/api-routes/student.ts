@@ -2,11 +2,25 @@ import { Operation } from 'express-openapi';
 import hash, { hashSync } from 'bcrypt';
 import log4js from 'log4js';
 import { pg } from '..';
+import { Knex } from 'knex';
 import { Service } from '../generated';
-import { dbHandleError, parseBody, parseQuery, removeNull, sendError, sendSuccess } from '../utils';
+import { dbHandleError, parseBody, parseHiddenFields, parseQuery, removeKeys, removeNull, sendError, sendSuccess } from '../utils';
 import { ClassService, RoleService, StudentService } from '../services';
 import { City, School, StudentClassRole, StudentRole, StudentVisibility } from '../generated/schema';
 import { ArrayType } from '../wwg_types/custom_types';
+
+export const studentFieldVisibility = pg(
+    pg('wwg.student_field_visibility')
+        .select()
+        .where('hidden', true)
+        .as('temp')
+)
+    .column(
+        'student_uid',
+        { 'hidden_fields': pg.raw('array_agg(field)') }
+    )
+    .groupBy('student_uid')
+    .as('field_visibility');
 
 export const get: Operation = async (req, res, next) => {
     const data = parseQuery<typeof Service.getStudent>(req) as any;
@@ -25,7 +39,7 @@ export const get: Operation = async (req, res, next) => {
         return;
     }
 
-    const subquery = pg('wwg.student_class_role')
+    const queryStudent = pg('wwg.student_class_role')
         .modify<any, StudentClassRole[]>(
             async (qb) => {
                 if (!(typeof self.level === 'number')) {
@@ -84,48 +98,81 @@ export const get: Operation = async (req, res, next) => {
             }
         )
         .as('t1');
-    const school = pg('wwg.school')
+
+    const querySchool = pg('wwg.school')
         .column({ 'school_name': 'name' }, 'school_uid', 'city_uid')
         .select()
         .as('t2')
-    pg(subquery)
+
+    const addFilters = (hiddenFieldsColumn?: string) => (qb: Knex.QueryBuilder) => {
+        if (!!data['self']) {
+            qb.where('t1.student_uid', self.student_uid);
+            return;
+        }
+        if (!!data['name']) {
+            qb.where('t1.name', 'LIKE', `%${data['name']}%`);
+            !!hiddenFieldsColumn && qb.orWhereRaw(`name = ANY(${hiddenFieldsColumn}})`)
+        }
+        if (!!data['phone_number']) {
+            qb.where('phone_number', 'LIKE', `%${data['phone_number']}%`);
+            !!hiddenFieldsColumn && qb.orWhereRaw(`phone_number = ANY(${hiddenFieldsColumn}})`)
+        }
+        if (!!data['curriculum']) {
+            qb.where('curriculum_name', 'LIKE', `%${data['curriculum']}%`);
+        }
+        if (!!data['city']) {
+            qb.where('city.city', 'LIKE', `%${data['city']}%`);
+            !!hiddenFieldsColumn && qb.orWhereRaw(`name = ANY(${hiddenFieldsColumn}})`)
+        }
+        if (!!data['school_state_province']) {
+            qb.where('city.state_province', 'LIKE', `%${data['school_state_province']}%`);
+            !!hiddenFieldsColumn && qb.orWhereRaw(`school_uid = ANY(${hiddenFieldsColumn}})`)
+        }
+        if (!!data['school_country']) {
+            qb.where('city.country', 'LIKE', `%${data['school_country']}%`);
+            !!hiddenFieldsColumn && qb.orWhereRaw(`school_uid = ANY(${hiddenFieldsColumn}})`)
+        }
+    }
+
+    pg(queryStudent)
+        .distinctOn('student_uid')
+        .column(
+            't1.student_uid',
+            't1.name',
+            't1.class_number',
+            't1.grad_year',
+            't1.curriculum_name',
+            't1.phone_number',
+            't1.email',
+            't1.wxid',
+            't1.department',
+            't1.major',
+            't1.role',
+            't1.visibility_type',
+            't1.level',
+            't2.school_uid',
+            't2.school_name',
+            'city.city',
+            'city.country',
+            'city.state_province',
+            'hidden_fields'
+        )
         .select()
-        .leftOuterJoin(school, 't1.school_uid', 't2.school_uid')
+        .leftOuterJoin(querySchool, 't1.school_uid', 't2.school_uid')
         .leftOuterJoin('city', 'city.city_uid', 't2.city_uid')
-        .modify<any, (StudentClassRole & School & City & { school_name: string })[]>((qb) => {
-            if (!!data['self']) {
-                qb.where('t1.student_uid', self.student_uid);
-                return;
-            }
-            if (!!data['name']) {
-                qb.where('t1.name', 'LIKE', `%${data['name']}%`);
-            }
-            if (!!data['phone_number']) {
-                qb.where('phone_number', 'LIKE', `%${data['phone_number']}%`);
-            }
-            if (!!data['curriculum']) {
-                qb.where('curriculum_name', 'LIKE', `%${data['curriculum']}%`);
-            }
-            if (!!data['city']) {
-                qb.where('t2.city', 'LIKE', `%${data['city']}%`);
-            }
-            if (!!data['school_state_province']) {
-                qb.where('t2.state_province', 'LIKE', `%${data['school_state_province']}%`);
-            }
-            if (!!data['school_country']) {
-                qb.where('t2.country', 'LIKE', `%${data['school_country']}%`);
-            }
-        })
+        .leftOuterJoin(studentFieldVisibility, 'field_visibility.student_uid', 't1.student_uid')
+        .modify<any, (StudentClassRole & School & City & { school_name: string, hidden_fields: string | null })[]>(addFilters())
         .then(async (students) => {
             const privilegeTemp = await Promise.all(students.map(async (student) => {
                 return await RoleService.privilege(self, student);
-            }))
+            }));
             students = students.filter((_, index) => privilegeTemp[index].read && (!!!data['can_update_only'] || privilegeTemp[index].update));
             logger.info(`Retrieved students for ${self.student_uid}`);
             sendSuccess(res, {
                 students: await Promise.all(students.map(async (student, index) => {
                     const privilege = privilegeTemp[index];
-                    return removeNull({
+                    const hiddenFields = parseHiddenFields(student.hidden_fields);
+                    return removeKeys(removeNull({
                         uid: student.student_uid,
                         name: student.name,
                         class_number: student.class_number,
@@ -145,7 +192,7 @@ export const get: Operation = async (req, res, next) => {
                         // Role and visibility are only visible to admins or the users themselves
                         role: privilege.level > 0 || self.student_uid === student.student_uid ? student.role : undefined,
                         visibility: privilege.level > 0 || self.student_uid === student.student_uid ? student.visibility_type : undefined
-                    });
+                    }), hiddenFields, privilege);
                 }))
             });
         })
