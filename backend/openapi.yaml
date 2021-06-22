@@ -151,6 +151,21 @@ components:
           description: The year when the student graduates from high school
           format: year
           example: 2021
+    StudentFieldsVisibility:
+      type:  object
+      properties:
+        school_uid:
+          type: boolean
+        phone_number:
+          type: boolean
+        email:
+          type: boolean
+        wxid:
+          type: boolean
+        department:
+          type: boolean
+        major:
+          type: boolean
     RegistrationKeyInfo:
       type: object
       properties:
@@ -616,11 +631,8 @@ paths:
                     type: array
                     items:
                       enum: ["email", "phone_number", "school_uid"]
-                  hidden:
-                    description: The fields that are decided to be hidden
-                    type: array
-                    items:
-                      enum: ["email", "phone_number", "school_uid"]
+                  field_visibility:
+                    $ref:  "#/components/schemas/StudentFieldsVisibility"
       responses:
         200:
           $ref: "#/components/responses/Default"

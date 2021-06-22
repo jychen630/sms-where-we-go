@@ -269,29 +269,46 @@ export const put: Operation = async (req, res, next) => {
         hashed = hashSync(data.password, 10);
     }
 
-    pg('student')
-        .select()
-        .where('student_uid', target_uid)
-        .update({
-            name: data.name,
-            phone_number: clear.has('phone_number') ? null : data.phone_number,
-            email: clear.has('email') ? null : data.email,
-            password_hash: hashed,
-            wxid: data.wxid,
-            department: data.department,
-            major: data.major,
-            class_number: data.class_number,
-            grad_year: data.grad_year,
-            school_uid: clear.has('school_uid') ? null : data.school_uid,
-            visibility_type: data.visibility,
-            role: data.role
-        })
-        .then(result => {
-            logger.info(`Updated uid ${target_uid}'s information${!!!data.student_uid ? ' (self-update)' : ''}`);
-            logger.info(data);
-            sendSuccess(res);
-        })
-        .catch(err => dbHandleError(err, res, logger));
+    if (!!data.field_visibility) {
+        await pg('student_field_visibility')
+            .select()
+            .insert(Object.entries(data.field_visibility).map(([key, val]) => ({
+                student_uid: target_uid,
+                field: key,
+                hidden: !val // "Field visibility" and "hidden" are semantically opposite
+            })))
+            .onConflict(['student_uid', 'field'])
+            .merge();
+    }
+
+    if (Object.entries(data).some(([key, val]) => key !== 'student_uid' && key !== 'hidden' && (val === undefined || val === null))) {
+        pg('student')
+            .select()
+            .where('student_uid', target_uid)
+            .update({
+                name: data.name,
+                phone_number: clear.has('phone_number') ? null : data.phone_number,
+                email: clear.has('email') ? null : data.email,
+                password_hash: hashed,
+                wxid: data.wxid,
+                department: data.department,
+                major: data.major,
+                class_number: data.class_number,
+                grad_year: data.grad_year,
+                school_uid: clear.has('school_uid') ? null : data.school_uid,
+                visibility_type: data.visibility,
+                role: data.role
+            })
+            .then(async result => {
+                logger.info(`Updated uid ${target_uid}'s information${!!!data.student_uid ? ' (self-update)' : ''}`);
+                logger.info(data);
+                sendSuccess(res);
+            })
+            .catch(err => dbHandleError(err, res, logger));
+    }
+    else {
+        sendSuccess(res);
+    }
 }
 
 //type: ignore

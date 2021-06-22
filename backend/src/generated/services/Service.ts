@@ -11,6 +11,7 @@ import type { Result } from '../models/Result';
 import type { Role } from '../models/Role';
 import type { School } from '../models/School';
 import type { Student } from '../models/Student';
+import type { StudentFieldsVisibility } from '../models/StudentFieldsVisibility';
 import type { StudentVerbose } from '../models/StudentVerbose';
 import type { Visibility } from '../models/Visibility';
 import { request as __request } from '../core/request';
@@ -239,10 +240,7 @@ curriculum?: any,
  * The fields that need to be cleared
  */
 clear?: Array<'email' | 'phone_number' | 'school_uid'>,
-/**
- * The fields that are decided to be hidden
- */
-hidden?: Array<'email' | 'phone_number' | 'school_uid'>,
+field_visibility?: StudentFieldsVisibility,
 }),
 ): Promise<Result> {
         const result = await __request({
