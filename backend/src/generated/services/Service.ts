@@ -4,6 +4,9 @@
 import type { City } from '../models/City';
 import type { Class } from '../models/Class';
 import type { Coordinate } from '../models/Coordinate';
+import type { Feedback } from '../models/Feedback';
+import type { FeedbackComment } from '../models/FeedbackComment';
+import type { FeedbackInfo } from '../models/FeedbackInfo';
 import type { Limit } from '../models/Limit';
 import type { Offset } from '../models/Offset';
 import type { RegistrationKeyInfo } from '../models/RegistrationKeyInfo';
@@ -636,6 +639,157 @@ address?: string,
                 'country': country,
                 'provider': provider,
             },
+        });
+        return result.body;
+    }
+
+    /**
+     * Fetch feedbacks as a normal user
+     * @returns any Return a list of feedbacks along with associated comments
+     * @throws ApiError
+     */
+    public static async viewGetFeedback(): Promise<(Result & {
+feedbacks?: Array<(Feedback & FeedbackInfo & {
+/**
+ * The unique id of a feedback
+ */
+feedback_id?: string,
+/**
+ * The uid of the sender if the feedback was sent by a registered user
+ */
+sender_uid?: number,
+status?: 'resolved' | 'pending' | 'closed',
+comments?: Array<FeedbackComment>,
+})>,
+})> {
+        const result = await __request({
+            method: 'GET',
+            path: `/feedback/view`,
+        });
+        return result.body;
+    }
+
+    /**
+     * Fetch feedbacks as an admin
+     * @returns any Return a list of feedbacks along with associated comments
+     * @throws ApiError
+     */
+    public static async manageGetFeedback(): Promise<(Result & {
+feedbacks?: Array<(Feedback & FeedbackInfo & {
+/**
+ * The unique id of a feedback
+ */
+feedback_id?: string,
+/**
+ * The uid of the sender if the feedback was sent by a registered user
+ */
+sender_uid?: number,
+status?: 'resolved' | 'pending' | 'closed',
+comments?: Array<FeedbackComment>,
+})>,
+})> {
+        const result = await __request({
+            method: 'GET',
+            path: `/feedback/manage`,
+        });
+        return result.body;
+    }
+
+    /**
+     * Manage feedbacks
+     * @param feedbackUid 
+     * @param requestBody 
+     * @returns Result Success
+     * @throws ApiError
+     */
+    public static async updateFeedback(
+feedbackUid: string,
+requestBody: {
+status: 'resolved' | 'pending' | 'closed',
+},
+): Promise<Result> {
+        const result = await __request({
+            method: 'PUT',
+            path: `/feedback/${feedbackUid}/update`,
+            body: requestBody,
+            errors: {
+                401: `Unauthorized to access the resource`,
+                403: `The user is not allowed to access the resource`,
+            },
+        });
+        return result.body;
+    }
+
+    /**
+     * Manage feedbacks
+     * @param feedbackUid 
+     * @param requestBody 
+     * @returns any Mark a feedback's status
+     * @throws ApiError
+     */
+    public static async commentFeedback(
+feedbackUid: string,
+requestBody: {
+/**
+ * Whether to reveal the sender name or not
+ */
+anonymous: boolean,
+content?: string,
+},
+): Promise<{
+/**
+ * Leave a comment on the feedback
+ */
+comment: string,
+}> {
+        const result = await __request({
+            method: 'POST',
+            path: `/feedback/${feedbackUid}/comment`,
+            body: requestBody,
+        });
+        return result.body;
+    }
+
+    /**
+     * Send a new feedback
+     * @param requestBody 
+     * @returns any Successfully sent the feedback and return its unique id
+     * @throws ApiError
+     */
+    public static async publicReportFeedback(
+requestBody: (Feedback & FeedbackInfo),
+): Promise<{
+/**
+ * The unique id of the feedback just created
+ */
+feedback_uid?: string,
+}> {
+        const result = await __request({
+            method: 'POST',
+            path: `/feedback/report/public`,
+            body: requestBody,
+        });
+        return result.body;
+    }
+
+    /**
+     * Send a new feedback as a logged in user
+     * @param requestBody 
+     * @returns any Successfully sent the feedback and return its unique id
+     * @throws ApiError
+     */
+    public static async userReportFeedback(
+requestBody: Feedback,
+): Promise<{
+/**
+ * The unique id of the feedback just created
+ */
+feedback_uid?: string,
+}> {
+        const result = await __request({
+            method: 'POST',
+            path: `/feedback/report/user`,
+            body: requestBody,
         });
         return result.body;
     }

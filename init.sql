@@ -106,22 +106,48 @@ CREATE TABLE wwg.student (
     FOREIGN KEY (visibility_type) REFERENCES wwg.visibility(type)
 );
 
+CREATE TYPE FEEDBACK_STATUS as ENUM ('resolved', 'pending', 'closed');
+
+CREATE TABLE wwg.feedback (
+    feedback_uid CHAR(22) NOT NULL PRIMARY KEY,
+    status FEEDBACK_STATUS NOT NULL DEFAULT 'pending',
+    title VARCHAR(120),
+    content TEXT,
+    reason VARCHAR(120),
+    phone_number VARCHAR(120),
+    email VARCHAR(120),
+    sender_uid INT,
+    name VARCHAR(120),
+    class_number INT,
+    grad_year INT,
+    posted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE wwg.comment (
+    comment_uid SERIAL PRIMARY KEY,
+    feedback_uid CHAR(22) NOT NULL,
+    sender_name VARCHAR(120),
+    content TEXT,
+    posted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (feedback_uid) REFERENCES wwg.feedback(feedback_uid)
+);
+
 CREATE TYPE STUDENT_FIELD as ENUM ('phone_number', 'email', 'wxid', 'department', 'major', 'school_uid');
 
- CREATE TABLE wwg.student_field_visibility (
+CREATE TABLE wwg.student_field_visibility (
     student_uid INT NOT NULL,
     field STUDENT_FIELD NOT NULL,
     hidden BOOLEAN DEFAULT false,
     PRIMARY KEY (student_uid, field),
     FOREIGN KEY (student_uid) REFERENCES wwg.student(student_uid)
- );
+);
 
- CREATE TABLE wwg.additional_info (
+CREATE TABLE wwg.additional_info (
     student_uid INT PRIMARY KEY,
     key_name VARCHAR(30) UNIQUE NOT NULL,
     value VARCHAR(255) NOT NULL,
     FOREIGN KEY (student_uid) REFERENCES wwg.student(student_uid)
- )
+)
 
 CREATE VIEW wwg.student_class AS 
     SELECT * FROM wwg.student

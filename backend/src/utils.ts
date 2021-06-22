@@ -1,6 +1,8 @@
 import { Response, Request } from "express";
-import { Logger } from "log4js";
+import { getLogger, Logger } from "log4js";
+import { Result } from "./generated";
 import { StudentClassRole } from "./generated/schema";
+import { StudentService } from "./services";
 
 export const sendSuccess = (res: Response, result?: object) => {
     res.status(200).json({
@@ -110,5 +112,87 @@ export const compareStudents = (current: StudentClassRole, target: StudentClassR
         isSameClass: isSameYear && current.class_number === target.class_number,
         // Only students in the same year with higher privilege level are adminable over another student
         isAdminable: isSameYear && ((current.level as number) > (target.level as number)),
+    }
+}
+
+export const validateLogin = (req: Request, res: Response, logger: ServerLogger, message?: string): boolean => {
+    if (!!!req.session.identifier || req.session.student_uid === undefined) {
+        logger.logComposed('Visitor', Actions.access, 'this operation', false, 'the user did not log in', true);
+        sendError(res, 401, message ?? 'Please login to access this operation');
+        return false;
+    }
+    else {
+        return true;
+    }
+}
+
+export const validateAdmin = async (res: Response, self: StudentClassRole, logger: ServerLogger, minLevel: number = 1): Promise<boolean> => {
+    if (typeof self.level !== 'number' || self.level < minLevel) {
+        logger.logComposed(self, Actions.access, 'this operation', true, 'the user does not have enough privilege', true);
+        sendError(res, 403, 'You are not allowed for this operation');
+        return false;
+    }
+    else {
+        return true;
+    }
+}
+
+export const getSelf = async (req: Request, res: Response, logger: ServerLogger): Promise<StudentClassRole> => {
+    const student = await StudentService.get(req.session.student_uid);
+
+    if (student === undefined) {
+        logger.logComposed(req.session.student_uid, Actions.read, 'self', false, 'the student uid was invalid');
+        sendError(res, 403, 'Invalid user for this operation');
+        return Promise.reject();
+    }
+    else {
+        return Promise.resolve(student);
+    }
+}
+
+export class Actions {
+    static create = (p: boolean) => p ? 'create' : 'created'
+    static access = (p: boolean) => p ? 'access' : 'accessed'
+    static update = (p: boolean) => p ? 'update' : 'updated'
+    static delete = (p: boolean) => p ? 'delete' : 'deleted'
+    static read = (p: boolean) => p ? 'read' : 'read'
+}
+export class ServerLogger {
+    logger: Logger;
+    constructor(logger: Logger) {
+        this.logger = logger;
+    }
+    static getLogger(name: string) {
+        return new ServerLogger(getLogger(name));
+    }
+    /**
+     * Efficiently generate concise, standardlized log messages
+     * 
+     * @param who The information associated with requester
+     * @param action The action that was taken
+     * @param target The target of the action
+     * @param showPrivilege Whether to show the privilege information of the requester and the target (if there is any)
+     * @param exception Details about how the action has failed
+     * @param error Whether display the log message as an error or not
+     * @param additional Additional information as an object that will be converted to JSON to be displayed
+     */
+    logComposed(who: StudentClassRole | number | string, action: (p: boolean) => string, target: string | StudentClassRole, showPrivilege: boolean = false, exception?: string, error: boolean = false, additional?: object): void {
+        const formatPrivilege = (student: StudentClassRole) => showPrivilege ? `, role: ${student.role}, level: ${student.role}` : '';
+        const hasException = exception !== undefined;
+        const student = typeof who === 'number' ? `uid ${who}` : typeof who === 'string' ? who : `${who.name} (uid: ${who.student_uid}${formatPrivilege(who)})`
+        let message = `${student}${hasException ? ' attemped to ' : ' '}${action(hasException)} ${typeof target === 'string' ? target : formatPrivilege(target)}`;
+        if (hasException) {
+            message = message.concat(` but ${exception}`);
+        }
+        if (!!additional) {
+            message = message.concat(`\naddtional info:\n${JSON.stringify(additional)}\n==== end ====`);
+        }
+
+        if (error) {
+            this.logger.error(message);
+        }
+        else {
+            this.logger.info(message);
+        }
     }
 }

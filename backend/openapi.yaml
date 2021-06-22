@@ -40,6 +40,37 @@ components:
         application/json:
           schema:
             $ref:  "#/components/schemas/Result"
+    Feedback:
+      description: Return a list of feedbacks along with associated comments
+      content:
+        application/json:
+          schema:
+            type: object
+            allOf:
+              - $ref: "#/components/schemas/Result"
+              - type: object
+                properties:
+                  feedbacks:
+                    type: array
+                    items:
+                      allOf:
+                        - $ref: "#/components/schemas/Feedback"
+                        - $ref: "#/components/schemas/FeedbackInfo"
+                        - type: object
+                          properties:
+                            feedback_id:
+                              type: string
+                              description: The unique id of a feedback
+                            sender_uid:
+                              type: integer
+                              description: The uid of the sender if the feedback was sent by a registered user
+                            status:
+                              type: string
+                              enum: ["resolved", "pending", "closed"]
+                            comments:
+                              type: array
+                              items:
+                                $ref: "#/components/schemas/FeedbackComment"
   schemas:
     Coordinate:
       type: object
@@ -166,6 +197,54 @@ components:
           type: boolean
         major:
           type: boolean
+    Feedback:
+      type: object
+      required:
+        - title
+        - content
+        - reason
+      properties:
+        title:
+          default: ""
+          description: The title of the feedback message
+          type: string
+        content:
+          default: ""
+          description: The written body of the feedback message
+          type: string
+        reason:
+          description: The reason for sending the feedback
+          type: string
+          enum:
+            ["general", "registration", "reset password", "update info", "improvement"]
+    FeedbackInfo:
+      type: object
+      properties:
+        name:
+          description: The name of the user
+          type: string
+        email:
+          description: Email for contact
+          type: string
+        phone_number:
+          description: Phone number for contact
+          type: string
+        class_number:
+          description: The class number reported by the student
+          type: integer
+        grad_year:
+          description: The year of graduation reported by the student
+          type: integer
+    FeedbackComment:
+      type: object
+      properties:
+        content:
+          type: string
+        sender_name:
+          type: string
+        posted_at:
+          type: string
+          format: datetime
     RegistrationKeyInfo:
       type: object
       properties:
@@ -1119,3 +1198,128 @@ paths:
                                   type: string
                                 address:
                                   type: string
+  /feedback/view:
+    get:
+      operationId: viewGetFeedback
+      description: Fetch feedbacks as a normal user
+      responses:
+        200:
+          $ref: "#/components/responses/Feedback"
+  /feedback/manage:
+    get:
+      operationId: manageGetFeedback
+      description: Fetch feedbacks as an admin
+      responses:
+        200:
+          $ref: "#/components/responses/Feedback"
+  /feedback/{feedback_uid}/update:
+    put:
+      parameters:
+        - in: path
+          name: feedback_uid
+          required: true
+          schema:
+            type: string
+      operationId: updateFeedback
+      description: Manage feedbacks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+              properties:
+                status:
+                  type: string
+                  enum: ["resolved", "pending", "closed"]
+      responses:
+        200:
+          $ref: "#/components/responses/Success"
+        401:
+          $ref: "#/components/responses/UnAuthorized"
+        403:
+          $ref: "#/components/responses/Forbidden"
+  /feedback/{feedback_uid}/comment:
+    post:
+      parameters:
+        - in: path
+          name: feedback_uid
+          required: true
+          schema:
+            type: string
+      operationId: commentFeedback
+      description: Manage feedbacks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                anonymous:
+                  type: boolean
+                  default: false
+                  description: Whether to reveal the sender name or not
+                content:
+                  type: string
+                  maxLength: 255
+      responses:
+        200:
+          description: Mark a feedback's status
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - comment
+                properties:
+                  comment:
+                    type: string
+                    description: Leave a comment on the feedback
+  /feedback/report/public:
+    post:
+      operationId: publicReportFeedback
+      description: Send a new feedback
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/Feedback"
+                - $ref: "#/components/schemas/FeedbackInfo"
+      responses:
+        200:
+          description: Successfully sent the feedback and return its unique id
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  feedback_uid:
+                    type: string
+                    description: The unique id of the feedback just created
+  /feedback/report/user:
+    post:
+      operationId: userReportFeedback
+      description: Send a new feedback as a logged in user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+                $ref: "#/components/schemas/Feedback"
+      responses:
+        200:
+          description: Successfully sent the feedback and return its unique id
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  feedback_uid:
+                    type: string
+                    description: The unique id of the feedback just created
