@@ -82,7 +82,7 @@ export const get: Operation = async (req, res, next) => {
                             city: school.city,
                             students: tempStudents.filter((student) => student.school_uid === school.school_uid)
                         } as SchoolRes);
-                    })
+                    }).filter(school => school.students !== undefined && school.students.length > 0)
                 });
             }).catch((err) => {
                 logger.error(err);
