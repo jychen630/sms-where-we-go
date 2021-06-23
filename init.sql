@@ -147,7 +147,7 @@ CREATE TABLE wwg.additional_info (
     key_name VARCHAR(30) UNIQUE NOT NULL,
     value VARCHAR(255) NOT NULL,
     FOREIGN KEY (student_uid) REFERENCES wwg.student(student_uid)
-)
+);
 
 CREATE VIEW wwg.student_class AS 
     SELECT * FROM wwg.student
