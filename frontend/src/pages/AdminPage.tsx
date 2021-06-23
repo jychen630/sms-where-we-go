@@ -96,7 +96,7 @@ const AdminPage = () => {
                                 <RegistrationKey />
                             </Tabs.TabPane>
                             <Tabs.TabPane tab={t('Feedbacks')} key={AdminTab.Feedbacks}>
-                                <Feedbacks />
+                                <Feedbacks adminView />
                             </Tabs.TabPane>
                         </Tabs>
                     </Card>

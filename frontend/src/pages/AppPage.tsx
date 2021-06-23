@@ -1,4 +1,4 @@
-import { BarsOutlined, CompassOutlined, ControlOutlined, SettingOutlined } from '@ant-design/icons';
+import { BarsOutlined, CompassOutlined, ControlOutlined, RadarChartOutlined, SettingOutlined } from '@ant-design/icons';
 import { Layout, Menu, Space } from 'antd';
 import React from 'react';
 import { useHistory } from 'react-router';
@@ -8,7 +8,7 @@ import '../app.css';
 
 const { Header, Content } = Layout;
 export enum menuOptions {
-    MAP = 'map', LIST = 'list', SETTINGS = 'settings', ADMIN = 'admin'
+    MAP = 'map', LIST = 'list', SETTINGS = 'settings', ADMIN = 'admin', FEEDBACK = 'feedback'
 }
 
 const AppPage = ({ activeKey, children }: { activeKey: menuOptions, children: React.ReactNode }) => {
@@ -35,6 +35,11 @@ const AppPage = ({ activeKey, children }: { activeKey: menuOptions, children: Re
                     <Menu.Item key='settings' onClick={() => history.push('/user')}>
                         <Space>
                             <SettingOutlined /> 设置
+                        </Space>
+                    </Menu.Item>
+                    <Menu.Item key='feedback' onClick={() => history.push('/feedback')}>
+                        <Space>
+                            <RadarChartOutlined /> 反馈
                         </Space>
                     </Menu.Item>
                     {!!role && role !== Role.STUDENT &&

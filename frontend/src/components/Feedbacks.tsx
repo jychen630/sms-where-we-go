@@ -7,18 +7,18 @@ import { Service } from "wwg-api";
 import { createNotifyError, handleApiError } from "../api/utils";
 import FeedbackCard, { FeedbackVerbose } from "./FeedbackCard";
 
-const Feedbacks = () => {
+const Feedbacks = ({ adminView, count }: { adminView: boolean, count?: number }) => {
     const [t] = useTranslation();
     const [pendingOnly, setPendingOnly] = useState(true);
     const [feedbacks, setFeedbacks] = useState<FeedbackVerbose[]>([]);
 
     const fetchFeedbacks = useCallback(() => {
-        Service.manageGetFeedback()
+        (adminView ? Service.manageGetFeedback : Service.viewGetFeedback)()
             .then(res => {
                 setFeedbacks(res.feedbacks ?? []);
             })
             .catch(err => handleApiError(err, createNotifyError(t, t('Error'), '未能获取反馈列表')))
-    }, [t, setFeedbacks]);
+    }, [t, adminView, setFeedbacks]);
 
     const updateFeedback = useCallback((uid: string, status: string) => {
         setFeedbacks(feedbacks.map(
@@ -30,7 +30,7 @@ const Feedbacks = () => {
 
     useEffect(() => {
         fetchFeedbacks();
-    }, [fetchFeedbacks]);
+    }, [count, fetchFeedbacks]);
 
     return (
         <>
@@ -42,6 +42,7 @@ const Feedbacks = () => {
                     onUpdateStatus={(status) => {
                         updateFeedback(val.feedback_uid, status);
                     }}
+                    adminView={adminView}
                     {...val}
                 />)}
             </Space>

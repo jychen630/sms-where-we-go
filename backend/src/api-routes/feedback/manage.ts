@@ -30,6 +30,7 @@ export const get: Operation = async (req, res) => {
                     });
 
                     const privilege = RoleService.privilegeSync(RoleService.studentToRoleResource(self), feedbackRole);
+                    logger.logComposed(self, Actions.access, 'feedbacks', true, undefined, false, { privilege: privilege, feedback: feedback });
                     return privilege.update;
                 })
 

@@ -16,6 +16,8 @@ import { OpenAPI, Role } from 'wwg-api';
 import { AuthProvider, useAuthProvider } from './api/auth';
 import DevLoginForm from './components/DevLoginForm';
 import ListPage from './pages/ListPage';
+import FeedbackPage from './pages/FeedbackPage';
+import FeedbackForm from './components/FeedbackForm';
 
 OpenAPI.WITH_CREDENTIALS = true;
 OpenAPI.TOKEN = '';
@@ -43,6 +45,14 @@ function App() {
           <Route path="/register">
             <CardPage title='Where We Go 注册'>
               <RegistrationForm />
+            </CardPage>
+          </Route>
+          <Route path="/feedback">
+            <FeedbackPage />
+          </Route>
+          <Route path="/public-feedback">
+            <CardPage title='提交反馈'>
+              <FeedbackForm isPublic />
             </CardPage>
           </Route>
           <Route path="/user">

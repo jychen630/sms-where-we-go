@@ -17,7 +17,7 @@ export type FeedbackVerbose = Feedback & FeedbackInfo & {
     onUpdateStatus?: (status: "resolved" | "pending" | "closed") => void,
 }
 
-const FeedbackCard = (props: FeedbackVerbose) => {
+const FeedbackCard = (props: FeedbackVerbose & { adminView: boolean }) => {
     const [t] = useTranslation();
     const { feedback_uid, onSent, onUpdateStatus } = props;
 
@@ -96,7 +96,9 @@ const FeedbackCard = (props: FeedbackVerbose) => {
                     <ComposeBox sendBtnLabel='添加评论' onSent={handleSendComment} />
                 </Collapse.Panel>
             </Collapse>
-            <ManageButton />
+            {props.adminView &&
+                <ManageButton />
+            }
         </Card>
     );
 }
