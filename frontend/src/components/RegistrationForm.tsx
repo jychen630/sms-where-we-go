@@ -1,5 +1,5 @@
 import { Button, Collapse, Checkbox, Form, Input, Modal, Space, Spin, Tooltip, Typography, notification } from 'antd';
-import { FieldTimeOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { FieldTimeOutlined, InfoCircleOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Result, Service } from 'wwg-api';
@@ -200,7 +200,7 @@ const RegistrationForm = () => {
                 </Form.Item>
                 <Form.Item
                     name='school_uid'
-                    label='去向院校'
+                    label={<>去向院校 (找不到的院校可在右侧 <PlusCircleOutlined style={{ paddingLeft: 2, paddingRight: 2 }} /> 添加)</>}
                     tooltip='没有找到你的学校？点击右方 + 来添加一个学校。若目前未定去向，此项可不填。海外院校请输入英文名'
                 >
                     <SchoolSearchTool schoolUid={schoolUid} setSchoolUid={setSchoolUid} />
