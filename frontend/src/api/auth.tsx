@@ -8,7 +8,9 @@ export interface AuthContext {
     role?: Role,
     studentUid?: number,
     login: LoginHandler,
-    devLogin: (uid: number) => Promise<void>
+    devLogin: (uid: number) => Promise<void>,
+    gradYear?: number,
+    classNumber?: number,
 }
 
 const defaultLoginHandler: LoginHandler = async (password) => ({ result: Result.result.ERROR, message: 'Login not available' })
@@ -24,6 +26,8 @@ export const useAuth = () => {
 export const useAuthProvider = () => {
     const [role, setRole] = useState<Role>();
     const [studentUid, setStudentUid] = useState<number>();
+    const [gradYear, setGradYear] = useState<number>();
+    const [classNumber, setClassNumber] = useState<number>();
 
     const login = async (password: string, identifier?: number | string, useUid: boolean = false) => {
         try {
@@ -39,6 +43,8 @@ export const useAuthProvider = () => {
                         if (!!res.students && res.students.length > 0) {
                             setRole(res.students[0].role);
                             setStudentUid(res.students[0].uid);
+                            setGradYear(res.students[0].grad_year);
+                            setClassNumber(res.students[0].class_number);
                         }
                     })
                     .catch(err => {
@@ -64,6 +70,8 @@ export const useAuthProvider = () => {
                 if (!!res.students) {
                     setRole(res.students[0].role);
                     setStudentUid(res.students[0].uid);
+                    setGradYear(res.students[0].grad_year);
+                    setClassNumber(res.students[0].class_number);
                 }
                 else {
                     return Promise.reject();
@@ -72,6 +80,8 @@ export const useAuthProvider = () => {
             .catch(err => {
                 setRole(undefined);
                 setStudentUid(undefined);
+                setGradYear(undefined);
+                setClassNumber(undefined);
             });
     }
 
@@ -89,7 +99,7 @@ export const useAuthProvider = () => {
             });
     }
 
-    return { role, studentUid, login, update, devLogin };
+    return { role, studentUid, login, update, devLogin, classNumber, gradYear };
 }
 
 export const AuthProvider = ({ value, children }: HasChildren<{ value?: AuthContext }>) => {

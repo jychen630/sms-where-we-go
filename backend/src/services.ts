@@ -222,23 +222,28 @@ export const LocationService = {
         const url = LocationService.constructAmapURL(keywords, city, page);
         console.log(url);
         return axios.get(url)
-            .then(res => res.data.pois.map((poi: any) => {
-                let [longitude, latitude] = poi.location.split(',');
-                try {
-                    [longitude, latitude] = gcj02towgs84(longitude, latitude);
+            .then(res => {
+                if (res.data.pois === undefined) {
+                    return []
                 }
-                catch {
-                    return Promise.reject('Failed to convert coordinates');
-                }
+                return res.data.pois.map((poi: any) => {
+                    let [longitude, latitude] = poi.location.split(',');
+                    try {
+                        [longitude, latitude] = gcj02towgs84(longitude, latitude);
+                    }
+                    catch {
+                        return Promise.reject('Failed to convert coordinates');
+                    }
 
-                return {
-                    name: poi.name,
-                    city: poi.cityname ?? '',
-                    address: poi.address.length !== 0 ? poi.address : '',
-                    longitude: longitude,
-                    latitude: latitude,
-                }
-            }))
+                    return {
+                        name: poi.name,
+                        city: poi.cityname ?? '',
+                        address: poi.address.length !== 0 ? poi.address : '',
+                        longitude: longitude,
+                        latitude: latitude,
+                    }
+                })
+            })
             .catch(err => {
                 return Promise.reject(err);
             });
