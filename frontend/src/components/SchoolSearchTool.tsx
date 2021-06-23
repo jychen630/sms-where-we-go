@@ -1,5 +1,6 @@
 import { CheckCircleFilled, PlusOutlined } from "@ant-design/icons";
 import { Button, Col, Empty, Row, Space, Tooltip } from "antd";
+import { SearchProps } from "antd/lib/input";
 import Modal from "antd/lib/modal/Modal";
 import { useState } from "react";
 import { Result, Service } from "wwg-api";
@@ -28,7 +29,7 @@ export const fetchSchool = async ({ offset, limit, value }: SearchHandlerProps) 
     }
 }
 
-const SchoolSearchTool = ({ schoolUid, setSchoolUid, initialValue }: { schoolUid: number, setSchoolUid: React.Dispatch<React.SetStateAction<number>>, initialValue?: string }) => {
+const SchoolSearchTool = ({ schoolUid, setSchoolUid, initialValue, searchProps }: { schoolUid: number, setSchoolUid: React.Dispatch<React.SetStateAction<number>>, initialValue?: string, searchProps?: SearchProps }) => {
     const [showSchoolModal, setShowSchoolModal] = useState(false);
 
     return (
@@ -62,6 +63,7 @@ const SchoolSearchTool = ({ schoolUid, setSchoolUid, initialValue }: { schoolUid
                         }}
                         initialValue={schoolUid !== -1 ? initialValue : ''}
                         placeholder='输入学校名称'
+                        searchProps={searchProps}
                     />
                 </Col>
                 <Col span={1} />

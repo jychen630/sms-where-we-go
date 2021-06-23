@@ -1,8 +1,9 @@
-import { Button, Form, Input, notification, Select, Space, Tooltip } from "antd"
+import { Button, Form, Input, notification, Select, Space, Switch, Tooltip } from "antd"
 import throttle from "lodash/throttle";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Result, Role, School, Service, Student, StudentVerbose, Visibility } from "wwg-api";
+import { Result, Role, School, Service, Student, StudentFieldsVisibility, StudentVerbose, Visibility } from "wwg-api";
+import { useDict } from "../api/useDict";
 import { handleApiError, ThenType } from "../api/utils";
 import { emailPattern, phonePattern } from "./RegistrationForm";
 import SchoolSearchTool from "./SchoolSearchTool";
@@ -10,14 +11,16 @@ import SchoolSearchTool from "./SchoolSearchTool";
 type Values = Parameters<typeof Service.updateStudent>[0];
 const { Item } = Form;
 
-const InfoUpdateForm = ({ getStudent, showRoleOptions = false }: { showRoleOptions?: boolean, getStudent: () => Promise<Partial<Student & StudentVerbose & School & { role?: Role, visibility?: Visibility }> | undefined> }) => {
+const InfoUpdateForm = ({ getStudent, showRoleOptions = false }: { showRoleOptions?: boolean, getStudent: () => Promise<Partial<Student & StudentVerbose & School & { role?: Role, visibility?: Visibility, field_visibility?: StudentFieldsVisibility }> | undefined> }) => {
     const [t] = useTranslation();
     const [form] = Form.useForm<Values>();
+    const [role, setRole] = useState<Role | undefined>(undefined);
     const [schoolUid, setSchoolUid] = useState(-1);
     const [studentUid, setStudentUid] = useState(-1);
     const [initialSchool, setInitialSchool] = useState('');
     const [, setFields] = useState<ThenType<ReturnType<typeof getStudent>>>(undefined);
     const [saving, setSaving] = useState(false);
+    const [fieldVisibility, updateFieldVisibility, setFieldVisibility] = useDict<boolean, StudentFieldsVisibility>({});
     const getVisibilityDescription = useCallback((visibility: Visibility) => {
         switch (visibility) {
             case Visibility.PRIVATE:
@@ -68,11 +71,31 @@ const InfoUpdateForm = ({ getStudent, showRoleOptions = false }: { showRoleOptio
                 school_uid: res?.school_uid ?? -1,
                 school_name: res?.school_name
             };
+            setRole(res?.role);
             setStudentUid(res?.uid ?? -1);
+            setFieldVisibility(res?.field_visibility);
             setFields(data);
             return data
         });
-    }, [setFields, getStudent]);
+    }, [setFields, getStudent, setFieldVisibility]);
+
+    const createToggleSuffix = useCallback((name: keyof StudentFieldsVisibility) => {
+        if (!!!fieldVisibility) {
+            return {};
+        }
+        const checked = fieldVisibility[name] !== undefined ? !fieldVisibility[name] : false;
+        return {
+            suffix: <Switch
+                checked={checked}
+                onChange={val => { updateFieldVisibility(name, !val) }}
+                checkedChildren='已隐藏'
+                unCheckedChildren='他人可见'
+            />
+        };
+    }, [fieldVisibility, updateFieldVisibility]);
+    useEffect(() => {
+        console.log('fv')
+    }, [fieldVisibility])
 
     const initialize = useCallback(() => {
         getFields()
@@ -98,17 +121,23 @@ const InfoUpdateForm = ({ getStudent, showRoleOptions = false }: { showRoleOptio
             delete data.email;
             toClear.push('email');
         }
+        if (data.role === role) {
+            // Avoid updating role if the user doesn't change it at all
+            delete data.role;
+        }
         Service.updateStudent({
             ...data,
             school_uid: schoolUid,
             clear: toClear,
             student_uid: studentUid !== -1 ? studentUid : undefined,
+            field_visibility: fieldVisibility
         })
             .then((res) => {
                 if (res.result === Result.result.SUCCESS) {
                     notification.success({
                         message: '成功',
                         description: '数据已保存',
+                        duration: 0.5
                     });
                     setFields(undefined);
                 }
@@ -128,14 +157,10 @@ const InfoUpdateForm = ({ getStudent, showRoleOptions = false }: { showRoleOptio
             .finally(() => {
                 setSaving(false);
             });
-    }, 1500), [schoolUid, studentUid, setFields, setSaving]);
+    }, 1500), [schoolUid, studentUid, setFields, setSaving, fieldVisibility]);
 
     const handleFinished = useCallback((data: Values) => {
         if (!saving) {
-            notification.info({
-                message: '信息',
-                description: '正在保存',
-            });
             setSaving(true);
         }
         doUpdate(data);
@@ -151,6 +176,7 @@ const InfoUpdateForm = ({ getStudent, showRoleOptions = false }: { showRoleOptio
         <Form
             form={form}
             onFinish={handleFinished}
+            layout='vertical'
         >
             <Item
                 name="name"
@@ -185,7 +211,7 @@ const InfoUpdateForm = ({ getStudent, showRoleOptions = false }: { showRoleOptio
                 ]}
                 tooltip='电话号码和邮箱请至少填写一项，两者都将能够作为登录的凭证'
             >
-                <Input placeholder='请输入电话号码' />
+                <Input placeholder='请输入电话号码' {...createToggleSuffix('phone_number')} />
             </Form.Item>
             <Form.Item
                 name='email'
@@ -207,33 +233,33 @@ const InfoUpdateForm = ({ getStudent, showRoleOptions = false }: { showRoleOptio
                     })
                 ]}
             >
-                <Input placeholder='请输入邮箱' />
+                <Input placeholder='请输入邮箱'  {...createToggleSuffix('email')} />
             </Form.Item>
             <Form.Item
                 name='wxid'
                 label='微信ID'
                 tooltip='若已填写微信所绑定的电话号码，或无微信ID，此项可不填'
             >
-                <Input placeholder='微信唯一ID (如 asdasdkl202122skwmrt)' />
+                <Input placeholder='微信唯一ID (如 asdasdkl202122skwmrt)'  {...createToggleSuffix('wxid')} />
             </Form.Item>
             <Form.Item
                 name='school_uid'
                 label='去向院校'
                 tooltip='没有找到你的学校？点击右方 + 来添加一个学校。若目前未定去向，此项可不填。海外院校请输入英文名'
             >
-                <SchoolSearchTool schoolUid={schoolUid} setSchoolUid={setSchoolUid} initialValue={initialSchool} />
+                <SchoolSearchTool schoolUid={schoolUid} setSchoolUid={setSchoolUid} initialValue={initialSchool} searchProps={{ ...createToggleSuffix('school_uid') }} />
             </Form.Item>
             <Form.Item
                 name='department'
                 label='学院'
             >
-                <Input placeholder='请输入你的学院名称' />
+                <Input placeholder='请输入你的学院名称'  {...createToggleSuffix('department')} />
             </Form.Item>
             <Form.Item
                 name='major'
                 label='专业'
             >
-                <Input placeholder='请输入你的专业名称' />
+                <Input placeholder='请输入你的专业名称'  {...createToggleSuffix('major')} />
             </Form.Item>
             <Form.Item
                 name='visibility'
@@ -251,7 +277,7 @@ const InfoUpdateForm = ({ getStudent, showRoleOptions = false }: { showRoleOptio
                     }
                 </Select>
             </Form.Item>
-            {showRoleOptions &&
+            {showRoleOptions && role !== undefined &&
                 < Form.Item
                     name='role'
                     label='权限设置'

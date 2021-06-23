@@ -1,5 +1,6 @@
 import { LoadingOutlined } from "@ant-design/icons";
 import { Button, Collapse, Empty, Input, Row, Space, Spin } from "antd";
+import { SearchProps } from "antd/lib/input";
 import throttle from "lodash/throttle";
 import React, { useCallback, useEffect, useState } from "react";
 
@@ -11,6 +12,7 @@ export type SearchToolProps<T> = {
     initialValue?: string,
     searchLimit?: number,
     inputRef?: React.Ref<Input>,
+    searchProps?: SearchProps
 }
 
 export type SearchHandlerProps = {
@@ -20,7 +22,7 @@ export type SearchHandlerProps = {
 }
 
 // See also for why we don't use forwardRef: https://github.com/microsoft/TypeScript/pull/30215
-const SearchTool = <T extends unknown>({ searchHandler, placeholder, item, initialValue, inputRef, searchLimit = 5, EmptyPlaceholder = () => <Empty /> }: SearchToolProps<T>) => {
+const SearchTool = <T extends unknown>({ searchHandler, placeholder, item, initialValue, inputRef, searchLimit = 5, EmptyPlaceholder = () => <Empty />, searchProps }: SearchToolProps<T>) => {
     const [value, setValue] = useState('');
     const [offset, setOffset] = useState(0);
     const [loading, setLoading] = useState(false);
@@ -75,6 +77,7 @@ const SearchTool = <T extends unknown>({ searchHandler, placeholder, item, initi
                     setValue(e.target.value);
                     handleSearch({ value: e.target.value });
                 }}
+                {...searchProps}
             />
             <Collapse defaultActiveKey={0} ghost>
                 <Collapse.Panel
