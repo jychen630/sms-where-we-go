@@ -40,7 +40,11 @@ export const get: Operation = async (req, res) => {
         })
         .then((result) => {
             sendSuccess(res, {
-                classes: result
+                classes: result.map(val => ({
+                    class_number: val.class_number,
+                    curriculum: val.curriculum_name,
+                    grad_year: val.grad_year
+                }))
             });
         })
 }

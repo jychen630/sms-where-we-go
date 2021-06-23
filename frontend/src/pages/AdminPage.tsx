@@ -10,6 +10,7 @@ import { useHistory, useRouteMatch } from "react-router";
 import PasswordResetForm from "../components/PasswordResetForm";
 import RegistrationKey from "../components/Registrationkey";
 import Feedbacks from "../components/Feedbacks";
+import Classes from "../components/Classes";
 
 enum AdminTab {
     Users = "users",
@@ -89,7 +90,7 @@ const AdminPage = () => {
                                 </List>
                             </Tabs.TabPane>
                             <Tabs.TabPane tab={t('Class List')} key={AdminTab.Classes}>
-
+                                <Classes />
                             </Tabs.TabPane>
                             <Tabs.TabPane tab={t('Registration Keys')} key={AdminTab.Keys}>
                                 <RegistrationKey />
