@@ -9,6 +9,9 @@ import { ClassService, RoleService, StudentService } from '../services';
 import { City, School, StudentClassRole, StudentRole, StudentVisibility } from '../generated/schema';
 import { ArrayType } from '../wwg_types/custom_types';
 
+// These are the fields that will not be stored in the database
+export const pseudoFields = ['school_name', 'school_state_province', 'school_country', 'city'];
+
 export const studentFieldVisibility = pg(
     pg('wwg.student_field_visibility')
         .select()
@@ -276,7 +279,7 @@ export const put: Operation = async (req, res, next) => {
             student_uid: target_uid,
             field: key,
             hidden: !val // "Field visibility" and "hidden" are semantically opposite
-        }))
+        })).filter(val => !pseudoFields.includes(val.field))
         if (prepared.length > 0) {
             try {
                 await pg('student_field_visibility')
