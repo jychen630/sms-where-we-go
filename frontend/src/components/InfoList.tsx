@@ -8,13 +8,13 @@ import { useTranslation } from "react-i18next";
 /**
  * A util component that will render nothing if the content is empty
  */
-export const Optional = ({ content, dependencies, icon }: { content: string | number | undefined | null | object, dependencies?: any[], icon: JSX.Element }) => {
-    if ((!!!content && content !== 0) || (dependencies && dependencies.some(value => value === undefined || value === ''))) {
-        return <></>;
+export const Optional = ({ content, label, dependencies, icon, nullAlt }: { content: string | number | undefined | null | object, label?: string, dependencies?: any[], icon?: JSX.Element, nullAlt?: JSX.Element }) => {
+    if ((!!!content && content !== 0) || (dependencies && dependencies.some(value => value === undefined || value === null || value === ''))) {
+        return nullAlt ?? <></>;
     }
 
     return (
-        <div><Space>{icon}{content}</Space></div>
+        <div><Space>{icon}{label !== undefined && `${label}: `}{content}</Space></div>
     )
 }
 

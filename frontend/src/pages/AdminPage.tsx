@@ -9,11 +9,13 @@ import { useTranslation } from "react-i18next";
 import { useHistory, useRouteMatch } from "react-router";
 import PasswordResetForm from "../components/PasswordResetForm";
 import RegistrationKey from "../components/Registrationkey";
+import Feedbacks from "../components/Feedbacks";
 
 enum AdminTab {
     Users = "users",
     Classes = "classes",
-    Keys = "keys"
+    Keys = "keys",
+    Feedbacks = "feedbacks",
 }
 
 const AdminPage = () => {
@@ -91,6 +93,9 @@ const AdminPage = () => {
                             </Tabs.TabPane>
                             <Tabs.TabPane tab={t('Registration Keys')} key={AdminTab.Keys}>
                                 <RegistrationKey />
+                            </Tabs.TabPane>
+                            <Tabs.TabPane tab={t('Feedbacks')} key={AdminTab.Feedbacks}>
+                                <Feedbacks />
                             </Tabs.TabPane>
                         </Tabs>
                     </Card>
