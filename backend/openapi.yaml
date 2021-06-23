@@ -57,8 +57,13 @@ components:
                         - $ref: "#/components/schemas/Feedback"
                         - $ref: "#/components/schemas/FeedbackInfo"
                         - type: object
+                          required:
+                            - feedback_uid
+                            - status
+                            - comments
+                            - posted_at
                           properties:
-                            feedback_id:
+                            feedback_uid:
                               type: string
                               description: The unique id of a feedback
                             sender_uid:
@@ -71,6 +76,9 @@ components:
                               type: array
                               items:
                                 $ref: "#/components/schemas/FeedbackComment"
+                            posted_at:
+                              type: string
+                              format: date
   schemas:
     Coordinate:
       type: object
@@ -237,6 +245,10 @@ components:
           type: integer
     FeedbackComment:
       type: object
+      required:
+        - content
+        - sender_name
+        - posted_at
       properties:
         content:
           type: string
@@ -598,6 +610,8 @@ paths:
                                   $ref: "#/components/schemas/Role"
                                 visibility:
                                   $ref: "#/components/schemas/Visibility"
+                                field_visibility:
+                                  $ref: "#/components/schemas/StudentFieldsVisibility"
                                 self:
                                   type: boolean
                                   description: Indicating whether the current student is the caller
@@ -1267,17 +1281,7 @@ paths:
                   maxLength: 255
       responses:
         200:
-          description: Mark a feedback's status
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                  - comment
-                properties:
-                  comment:
-                    type: string
-                    description: Leave a comment on the feedback
+          $ref: "#/components/responses/Success"
   /feedback/report/public:
     post:
       operationId: publicReportFeedback
@@ -1298,6 +1302,8 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - feedback_uid
                 properties:
                   feedback_uid:
                     type: string

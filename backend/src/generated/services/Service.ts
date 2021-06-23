@@ -153,6 +153,7 @@ schoolCountry?: string,
 students?: Array<(Student & StudentVerbose & School & {
 role?: Role,
 visibility?: Visibility,
+field_visibility?: StudentFieldsVisibility,
 /**
  * Indicating whether the current student is the caller
  */
@@ -653,13 +654,14 @@ feedbacks?: Array<(Feedback & FeedbackInfo & {
 /**
  * The unique id of a feedback
  */
-feedback_id?: string,
+feedback_uid: string,
 /**
  * The uid of the sender if the feedback was sent by a registered user
  */
 sender_uid?: number,
-status?: 'resolved' | 'pending' | 'closed',
-comments?: Array<FeedbackComment>,
+status: 'resolved' | 'pending' | 'closed',
+comments: Array<FeedbackComment>,
+posted_at: string,
 })>,
 })> {
         const result = await __request({
@@ -679,13 +681,14 @@ feedbacks?: Array<(Feedback & FeedbackInfo & {
 /**
  * The unique id of a feedback
  */
-feedback_id?: string,
+feedback_uid: string,
 /**
  * The uid of the sender if the feedback was sent by a registered user
  */
 sender_uid?: number,
-status?: 'resolved' | 'pending' | 'closed',
-comments?: Array<FeedbackComment>,
+status: 'resolved' | 'pending' | 'closed',
+comments: Array<FeedbackComment>,
+posted_at: string,
 })>,
 })> {
         const result = await __request({
@@ -724,7 +727,7 @@ status: 'resolved' | 'pending' | 'closed',
      * Manage feedbacks
      * @param feedbackUid 
      * @param requestBody 
-     * @returns any Mark a feedback's status
+     * @returns Result Success
      * @throws ApiError
      */
     public static async commentFeedback(
@@ -736,12 +739,7 @@ requestBody: {
 anonymous: boolean,
 content?: string,
 },
-): Promise<{
-/**
- * Leave a comment on the feedback
- */
-comment: string,
-}> {
+): Promise<Result> {
         const result = await __request({
             method: 'POST',
             path: `/feedback/${feedbackUid}/comment`,
@@ -762,7 +760,7 @@ requestBody: (Feedback & FeedbackInfo),
 /**
  * The unique id of the feedback just created
  */
-feedback_uid?: string,
+feedback_uid: string,
 }> {
         const result = await __request({
             method: 'POST',

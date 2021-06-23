@@ -3,7 +3,7 @@
 /* eslint-disable */
 
 export type FeedbackComment = {
-    content?: string;
-    sender_name?: string;
-    posted_at?: string;
+    content: string;
+    sender_name: string;
+    posted_at: string;
 }
