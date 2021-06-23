@@ -189,6 +189,8 @@ export const get: Operation = async (req, res, next) => {
                         school_state_province: student.state_province,
                         city: student.city,
                         self: self.student_uid === student.student_uid ? true : undefined,
+                        // Field visibility are only visible to the users themselves
+                        field_visibility: self.student_uid === student.student_uid ? ((obj: any) => { hiddenFields.forEach((val) => obj[val] = false); return obj; })({}) : undefined,
                         // Role and visibility are only visible to admins or the users themselves
                         role: privilege.level > 0 || self.student_uid === student.student_uid ? student.role : undefined,
                         visibility: privilege.level > 0 || self.student_uid === student.student_uid ? student.visibility_type : undefined
@@ -270,18 +272,28 @@ export const put: Operation = async (req, res, next) => {
     }
 
     if (!!data.field_visibility) {
-        await pg('student_field_visibility')
-            .select()
-            .insert(Object.entries(data.field_visibility).map(([key, val]) => ({
-                student_uid: target_uid,
-                field: key,
-                hidden: !val // "Field visibility" and "hidden" are semantically opposite
-            })))
-            .onConflict(['student_uid', 'field'])
-            .merge();
+        const prepared = Object.entries(data.field_visibility).map(([key, val]) => ({
+            student_uid: target_uid,
+            field: key,
+            hidden: !val // "Field visibility" and "hidden" are semantically opposite
+        }))
+        if (prepared.length > 0) {
+            try {
+                await pg('student_field_visibility')
+                    .select()
+                    .insert(prepared)
+                    .onConflict(['student_uid', 'field'])
+                    .merge()
+
+            }
+            catch (err) {
+                dbHandleError(err, res, logger);
+                return;
+            }
+        }
     }
 
-    if (Object.entries(data).some(([key, val]) => key !== 'student_uid' && key !== 'hidden' && (val === undefined || val === null))) {
+    if (Object.entries(data).some(([key, val]) => key !== 'student_uid' && key !== 'hidden' && !(val === undefined || val === null))) {
         pg('student')
             .select()
             .where('student_uid', target_uid)
