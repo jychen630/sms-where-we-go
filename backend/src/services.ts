@@ -69,7 +69,7 @@ export class RoleService {
         return {
             isSame: self.uid === target.uid,
             isSameYear: isSameYear,
-            isSameCurriculum: isSameYear && self.curriculum === target.curriculum || target.curriculum === 'any',
+            isSameCurriculum: isSameYear && (self.curriculum === target.curriculum || target.curriculum === 'any'),
             isSameClass: isSameYear && self.classNumber === target.classNumber,
             // Only students in the same year with higher privilege level are adminable over another student
             isAdminable: isSameYear && (self.level !== undefined && target.level !== undefined) && (self.level > target.level),
@@ -174,7 +174,7 @@ export class RoleService {
         }
     }
     static privilegeSync(current: StudentClassRole | undefined, target: StudentClassRole | undefined): Privilege;
-    static privilegeSync(current: RoleService | undefined, target: RoleService | undefined): Privilege;
+    static privilegeSync(current: RoleResource | undefined, target: RoleResource | undefined): Privilege;
     static privilegeSync(...args: any[]): Privilege {
         let current: RoleResource | undefined, target: RoleResource | undefined;
 
