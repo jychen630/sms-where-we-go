@@ -1,4 +1,5 @@
-import { Button, Form, Input, notification, Select, Space, Switch, Tooltip } from "antd"
+import { WarningOutlined } from "@ant-design/icons";
+import { Alert, Button, Divider, Form, Input, notification, Select, Space, Switch, Tooltip } from "antd"
 import throttle from "lodash/throttle";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -178,6 +179,8 @@ const InfoUpdateForm = ({ getStudent, showRoleOptions = false }: { showRoleOptio
             onFinish={handleFinished}
             layout='vertical'
         >
+            <Divider>更新个人信息</Divider>
+            <Alert message={<Space><WarningOutlined />注意：你的任何改动在<b>保存后</b>才会生效</Space>} />
             <Item
                 name="name"
                 label={t("name")}
