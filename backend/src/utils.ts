@@ -177,7 +177,7 @@ export class ServerLogger {
      * @param additional Additional information as an object that will be converted to JSON to be displayed
      */
     logComposed(who: StudentClassRole | number | string, action: (p: boolean) => string, target: string | StudentClassRole, showPrivilege: boolean = false, exception?: string, error: boolean = false, additional?: object): void {
-        const formatPrivilege = (student: StudentClassRole) => showPrivilege ? `, role: ${student.role}, level: ${student.role}` : '';
+        const formatPrivilege = (student: StudentClassRole) => showPrivilege ? `, role: ${student.role}, level: ${student.level}` : '';
         const hasException = exception !== undefined;
         const student = typeof who === 'number' ? `uid ${who}` : typeof who === 'string' ? who : `${who.name} (uid: ${who.student_uid}${formatPrivilege(who)})`
         let message = `${student}${hasException ? ' attemped to ' : ' '}${action(hasException)} ${typeof target === 'string' ? target : formatPrivilege(target)}`;
