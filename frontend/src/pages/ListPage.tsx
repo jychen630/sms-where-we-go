@@ -1,4 +1,4 @@
-import { Button, Modal, Space, Layout, Popover } from "antd";
+import { Button, Card, Modal, Space, Layout, Popover, Table, Radio } from "antd";
 import { useCallback } from "react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -9,9 +9,15 @@ import InfoList, { StudentInfo } from "../components/InfoList";
 import AppPage, { menuOptions } from "./AppPage";
 import "./ListPage.css"
 
+enum VIEW_MODE {
+    TABLE = 'table',
+    BUTTONS = 'buttons'
+}
+
 const ListPage = () => {
     const [t] = useTranslation();
     const history = useHistory();
+    const [viewMode, setViewMode] = useState<VIEW_MODE>(VIEW_MODE.TABLE);
     const [visible, setVisible] = useState(false);
     const [students, setStudents] = useState<StudentInfo[]>([]);
     const [currentStudent, setCurrentStudent] = useState<StudentInfo>()
@@ -46,15 +52,84 @@ const ListPage = () => {
 
     return (
         <AppPage activeKey={menuOptions.LIST}>
-            <Layout className='centered-layout'>
+            <Layout>
                 <Layout.Content>
-                    <Space className='list-page-flex-box'>
-                        {students.map((value) =>
-                            <Popover title={value.name} content={Info({ student: value })}>
-                                <Button onClick={() => { setCurrentStudent(value); setVisible(true); }}>{value.name}</Button>
-                            </Popover>
-                        )}
-                    </Space>
+                    <Card>
+                        <div>
+                            <Radio.Group value={viewMode} onChange={(e) => { setViewMode(e.target.value) }}>
+                                <Radio.Button value={VIEW_MODE.TABLE}>列表</Radio.Button>
+                                <Radio.Button value={VIEW_MODE.BUTTONS}>名片</Radio.Button>
+                            </Radio.Group>
+                        </div>
+                        {viewMode === VIEW_MODE.BUTTONS &&
+                            <Space className='list-page-flex-box'>
+                                {students.map((value, index) =>
+                                    <Popover title={value.name} content={Info({ student: value })} key={index}>
+                                        <Button onClick={() => { setCurrentStudent(value); setVisible(true); }}>{value.name}</Button>
+                                    </Popover>
+                                )}
+                            </Space>
+                        }
+                        {viewMode === VIEW_MODE.TABLE &&
+                            <Table
+                                scroll={{ x: 1200 }}
+                                columns={[{
+                                    title: '姓名',
+                                    key: 'name',
+                                    dataIndex: 'name',
+                                },
+                                {
+                                    title: '学校',
+                                    key: 'school_name',
+                                    dataIndex: 'school_name',
+                                },
+                                {
+                                    title: '班级',
+                                    key: 'class',
+                                    dataIndex: 'class_'
+                                },
+                                {
+                                    title: '体系',
+                                    key: 'curriculum',
+                                    dataIndex: 'curriculumLocale'
+                                },
+                                {
+                                    title: '城市',
+                                    key: 'city',
+                                    dataIndex: 'city'
+                                },
+                                {
+                                    title: '省/州/郡',
+                                    key: 'state_province',
+                                    dataIndex: 'school_state_province'
+                                },
+                                {
+                                    title: '国家',
+                                    key: 'country',
+                                    dataIndex: 'school_country'
+                                },
+                                {
+                                    title: '学院',
+                                    key: 'deparment',
+                                    dataIndex: 'department',
+                                },
+                                {
+                                    title: '专业',
+                                    key: 'major',
+                                    dataIndex: 'major',
+                                },
+                                {
+                                    title: t('Details'),
+                                    key: 'operation',
+                                    fixed: 'right',
+                                    width: 100,
+                                    render: (a, b) => <Button type='primary' onClick={() => { setCurrentStudent(b); setVisible(true); }}>{t('Details')}</Button>,
+                                },
+                                ]}
+                                dataSource={students.map((val, index) => ({ key: index, class_: `${val.grad_year}届 ${val.class_number}班`, curriculumLocale: t(val.curriculum ?? ''), ...val }))}
+                            />
+                        }
+                    </Card>
                 </Layout.Content>
             </Layout>
             <Modal
@@ -62,7 +137,8 @@ const ListPage = () => {
                 visible={visible}
                 onOk={() => setVisible(false)}
                 onCancel={() => setVisible(false)}
-                cancelText=''
+                okText={t('Confirm')}
+                cancelText={<></>}
             >
                 <Info student={currentStudent} />
             </Modal>
