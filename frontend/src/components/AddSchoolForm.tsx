@@ -44,6 +44,14 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
     }, [t]);
 
     const handleFinish = (data: Values) => {
+        if (data.longitude === undefined || data.latitude === undefined) {
+            notification.error({
+                message: '错误',
+                description: '坐标不能为空',
+                duration: 1.5
+            });
+            return;
+        }
         Service.postSchool(currentTab === 'select' ? {
             ...data,
             city_uid: cityUid
@@ -172,6 +180,14 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                 </Tabs>
                 <Form.Item>
                     <Button type='primary' onClick={() => {
+                        if (currentTab === 'select' && cityUid === -1) {
+                            notification.error({
+                                message: '错误',
+                                description: '城市不能为空',
+                                duration: 1.5
+                            })
+                            return;
+                        }
                         form.validateFields(['school_name', 'city', 'school_country'])
                             .then(() => {
                                 setPage(1);
