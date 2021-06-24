@@ -2,6 +2,7 @@ import fs from "fs";
 import log4js from "log4js";
 import { assert } from "console";
 import { pg } from "./load.mjs";
+import axios from "axios";
 
 const logger = log4js.getLogger("LoadSchool");
 
@@ -37,51 +38,68 @@ const UNIQUE_CONSTRAINT_CODE = "23505";
  */
 export default async function initSchools(paths) {
   let cities = {};
-  for (let m = 0; m < paths.length; m++) {
-    logger.info(`Reading from ${paths[m]}`);
-    let parsed = JSON.parse(fs.readFileSync(paths[m]));
-    const country = parsed.country;
+  try {
+    for (let m = 0; m < paths.length; m++) {
+      logger.info(`Reading from ${paths[m]}`);
+      let parsed = JSON.parse(fs.readFileSync(paths[m]));
+      const country = parsed.country;
 
-    for (let i = 0, len = parsed.data.length; i < len; i++) {
-      // Iterate through the list of schools within the state or province
-      const stateProvince = parsed.data[i].state_province;
+      for (let i = 0, len = parsed.data.length; i < len; i++) {
+        // Iterate through the list of schools within the state or province
+        const stateProvince = parsed.data[i].state_province;
 
-      for (let n = 0, len = parsed.data[i].schools.length; n < len; n++) {
-        const school = parsed.data[i].schools[n];
-        const key = `${school.city.toLowerCase()} ${stateProvince.toLowerCase()} ${country.toLowerCase()}`;
+        for (let n = 0, len = parsed.data[i].schools.length; n < len; n++) {
+          const school = parsed.data[i].schools[n];
+          const key = `${school.city.toLowerCase()} ${stateProvince.toLowerCase()} ${country.toLowerCase()}`;
 
-        // Presumably, the combination of city and state_pronvince is unique in the database
-        // We use it as an unique identifier for any city that has been added
-        if (cities[key] === undefined) {
-          cities[key] = await addOrRetrieveCity(
-            school.city,
-            stateProvince,
-            country
+          // Presumably, the combination of city and state_pronvince is unique in the database
+          // We use it as an unique identifier for any city that has been added
+          if (cities[key] === undefined) {
+            cities[key] = await addOrRetrieveCity(
+              school.city,
+              stateProvince,
+              country
+            );
+          }
+
+          assert(cities[key] !== undefined);
+
+          let [lat, lng] = [school.latitude, school.longitude];
+          if (!!!school.latitude || !!!school.longitude) {
+            try {
+              [lng, lat] = await getSchoolLngLat(
+                school.name,
+                school.city,
+                country
+              );
+              logger.info(`Retreived ${lng} ${lat}`);
+            } catch (err) {
+              logger.error("Cannot retrieve the location of");
+              logger.error(school);
+              logger.error(`Error message: ${err.message}`);
+              continue;
+            }
+          }
+
+          // Having either inserted or retrieved the city, we can use the cities[key] to add the school
+          const schoolUid = await addOrRetrieveSchool(
+            school.name,
+            cities[key],
+            lat,
+            lng,
+            !!school.aliases,
+            true
           );
-        }
 
-        assert(cities[key] !== undefined);
-
-        let [lat, lng] = [school.latitude, school.longitude];
-        if (!!!school.latitude || !!!school.longitude) {
-          [lat, lng] = await getSchoolLngLat(school.name, school.city, country);
-        }
-
-        // Having either inserted or retrieved the city, we can use the cities[key] to add the school
-        const schoolUid = await addOrRetrieveSchool(
-          school.name,
-          cities[key],
-          lat,
-          lng,
-          !!school.aliases,
-          true
-        );
-
-        if (!!school.aliases) {
-          await addSchoolAliases(schoolUid, school.aliases);
+          if (!!school.aliases) {
+            await addSchoolAliases(schoolUid, school.aliases);
+          }
         }
       }
     }
+  } catch (err) {
+    logger.error(err);
+    process.exit(1);
   }
 }
 
@@ -220,7 +238,14 @@ async function addSchoolAliases(schoolUid, aliases) {
     }
   }
 }
-
 async function getSchoolLngLat(name, city, country) {
-  return [Math.random() * 180 - 90, Math.random() * 360 - 180];
+  const result = await axios.get(
+    `http://localhost:8080/v1/location?keywords=${encodeURIComponent(
+      name
+    )}&page=1&provider=amap`
+  );
+  return [
+    result.data.locations[0].longitude,
+    result.data.locations[0].latitude,
+  ];
 }
