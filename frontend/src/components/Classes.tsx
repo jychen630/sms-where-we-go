@@ -8,14 +8,14 @@ import { useAuth } from '../api/auth';
 import { createNotifyError, handleApiError } from '../api/utils';
 import InfoList from './InfoList';
 
-type Values = { class_number: number, curriculum: string, grad_year: number };
+type Values = { class_number: string, curriculum: string, grad_year: string };
 const Classes = () => {
     const auth = useAuth();
     const [t] = useTranslation();
     const [form] = Form.useForm<Values>();
     const [classes, setClasses] = useState<Class[]>();
 
-    useEffect(() => {
+    const fetchClasses = useCallback(() => {
         Service.getClass()
             .then((res) => {
                 if (res.result === Result.result.SUCCESS) {
@@ -28,8 +28,16 @@ const Classes = () => {
             .catch(err => handleApiError(err, createNotifyError(t, t('Error'), '未能获取可用班级')));
     }, [t, setClasses]);
 
+    useEffect(() => {
+        fetchClasses();
+    }, [fetchClasses]);
+
     const handleFinish = useCallback((data: Values) => {
-        Service.postClass(data)
+        Service.postClass({
+            class_number: Number.parseInt(data.class_number),
+            grad_year: Number.parseInt(data.grad_year),
+            curriculum: data.curriculum
+        })
             .then(res => {
                 if (res.result === Result.result.SUCCESS) {
                     notification.success({
@@ -37,13 +45,14 @@ const Classes = () => {
                         description: `已添加${data.grad_year}届 ${data.class_number}班 ${t(data.curriculum)}`,
                         duration: 1
                     });
+                    fetchClasses();
                 }
                 else {
                     return Promise.reject(res.message);
                 }
             })
             .catch(err => handleApiError(err, createNotifyError(t, '错误', '未能添加新班级')));
-    }, [t]);
+    }, [t, fetchClasses]);
 
     return (
         <>
@@ -76,20 +85,39 @@ const Classes = () => {
                 <Form.Item name='class_number' label='班级号码' required rules={[
                     {
                         required: true,
-                        message: '班级号码为必填项'
+                        message: '班级为必填项'
                     },
                     {
                         min: 1,
                         max: 2,
-                        message: '班级号码必须在 1~99 的区间内'
+                        message: '班级必须为 1~99 的区间内的数字'
                     }
                 ]}>
                     {auth.role === Role.CURRICULUM || auth.role === Role.YEAR || auth.role === Role.SYSTEM ?
-                        <Input type='number' placeholder='请输入班级号码'></Input>
+                        <Input type='number' placeholder='请输入班级'></Input>
                         :
                         <Select disabled defaultActiveFirstOption>
                             {auth.classNumber &&
                                 <Select.Option value={auth.classNumber}>{auth.classNumber}</Select.Option>
+                            }
+                        </Select>
+                    }
+                </Form.Item>
+                <Form.Item name='curriculum' label='体系' required rules={[
+                    {
+                        required: true,
+                        message: '体系为必填项'
+                    }
+                ]}>
+                    {auth.role === Role.YEAR || auth.role === Role.SYSTEM ?
+                        <Select defaultActiveFirstOption>
+                            <Select.Option value='gaokao'>{t('gaokao')}</Select.Option>
+                            <Select.Option value='international'>{t('international')}</Select.Option>
+                        </Select>
+                        :
+                        <Select disabled defaultActiveFirstOption>
+                            {auth.curriculum &&
+                                <Select.Option value={auth.curriculum}>{auth.curriculum}</Select.Option>
                             }
                         </Select>
                     }
