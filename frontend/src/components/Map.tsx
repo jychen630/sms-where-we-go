@@ -26,6 +26,8 @@ export default function Map({ getData, getPopup, zoom = 5, startingCoordinate = 
             container: mapContainer.current as any,
             style: 'mapbox://styles/mapbox/streets-v10',
         }).addControl(lang);
+        map.dragRotate.disable();
+        map.touchZoomRotate.disableRotation();
         setMap(map);
     }, [mapContainer])
 
