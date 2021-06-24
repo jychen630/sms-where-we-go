@@ -78,7 +78,7 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
         form.setFieldsValue({
             longitude: location?.longitude,
             latitude: location?.latitude
-        })
+        });
     }, [form, location])
 
     const mockStudentData = useCallback(async (): Promise<MapItem[]> => {
@@ -105,6 +105,7 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
         <Form
             form={form}
             onFinish={handleFinish}
+            scrollToFirstError
         >
             <div style={page !== 0 ? { display: 'none' } : {}}>
                 <Form.Item
@@ -197,20 +198,46 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
             </div>
             <div style={page !== 1 ? { display: 'none' } : {}}>
                 <Divider>坐标</Divider>
+                <p>为了使得你添加的学校能够在地图上显示，我们需要录入学校的坐标</p>
+                <p>你可以使用搜索功能自动填入学校的坐标，也可以在其他网站上查询后手动输入</p>
                 <Space>
                     <Form.Item
                         name='longitude'
                         label='经度'
+                        validateFirst
+                        rules={[
+                            { type: 'number', message: '经度必须为数字', transform: (val) => Number.parseFloat(val) },
+                            { required: true, message: '经度不能为空' },
+                            {
+                                validator(_, val) {
+                                    if (val > 180 || val < -180) {
+                                        return Promise.reject("经度必须在-180和180之间");
+                                    }
+                                }
+                            }]}
                     >
-                        <Input placeholder='经度，如 114.1216' />
+                        <Input type='number' placeholder='经度，如 114.1216' />
                     </Form.Item>
                     <Form.Item
                         name='latitude'
                         label='纬度'
+                        validateFirst
+                        rules={[
+                            { type: 'number', message: '纬度必须为数字', transform: (val) => Number.parseFloat(val) },
+                            { required: true, message: '纬度不能为空' },
+                            {
+                                validator(_, val) {
+                                    if (val > 90 || val < -90) {
+                                        return Promise.reject("纬度必须在-90和90之间");
+                                    }
+                                }
+                            }
+                        ]}
                     >
-                        <Input placeholder='纬度，如 22.5514' />
+                        <Input type='number' placeholder='纬度，如 22.5514' />
                     </Form.Item>
                 </Space>
+                <h3>搜索 & 预览</h3>
                 <Map getData={mockStudentData} getPopup={(props) => <InfoCard {...props} />} zoom={10.5} startingCoordinate={!!location?.latitude && !!location.longitude ? { longitude: location.longitude, latitude: location.latitude - 0.005 } : undefined} responsive></Map>
                 {!!location && <Card>
                     <Optional content={location.name} icon={<FontAwesomeIcon icon={faAddressCard} />} />
@@ -234,6 +261,9 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                         </Button>
                     }
                 />
+                <p>或者手动搜索坐标：</p>
+                <p><a href='https://lbs.amap.com/tools/picker' target='new'>使用高德地图</a></p>
+                <p><a href='https://www.google.com/maps' target='new'>使用 Google Maps (需要科学上网)</a></p>
                 <Form.Item>
                     <Space>
                         <Button type='ghost' onClick={() => {
@@ -270,7 +300,6 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                     }
                 />
             </Modal>
-            <a href='https://lbs.amap.com/tools/picker' target='new'>通过高德API搜索坐标</a>
         </Form>
     )
 }
