@@ -1,13 +1,14 @@
 import { Button, Collapse, Checkbox, Form, Input, Modal, Space, Spin, Tooltip, Typography, notification } from 'antd';
 import { FieldTimeOutlined, InfoCircleOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import { Result, Service } from 'wwg-api';
 import { createNotifyError, handleApiError } from '../api/utils';
 
 import PrivacyPolicy from './PrivacyPolicy';
 import SchoolSearchTool from './SchoolSearchTool';
 import { useTranslation } from 'react-i18next';
+import { useEffect } from 'react';
 
 type Values = Parameters<typeof Service.postStudent>[0];
 export const phonePattern = /^1(?:3\d{3}|5[^4\D]\d{2}|8\d{3}|7(?:[0-35-9]\d{2}|4(?:0\d|1[0-2]|9\d))|9[0-35-9]\d{2}|6[2567]\d{2}|4(?:(?:10|4[01])\d{3}|[68]\d{4}|[579]\d{2}))\d{6}$/;
@@ -19,9 +20,19 @@ const RegistrationForm = () => {
     const [t] = useTranslation();
     const [form] = Form.useForm<Values>();
     const history = useHistory();
+    const location = useLocation();
+    console.log(new URLSearchParams(location.search).get('key'))
     const [schoolUid, setSchoolUid] = useState(0);
     const [showPrivacyModal, setShowPrivacyModal] = useState(false);
     const [regInfo, setRegInfo] = useState<{ curriculum: string, classNumber: number, gradYear: number, expDate: Date }>();
+
+    useEffect(() => {
+        const regkey = (new URLSearchParams(location.search).get('key'));
+        if (regkey) {
+            form.setFieldsValue({ 'registration_key': regkey });
+            form.validateFields(['registration_key']);
+        }
+    }, [form, location]);
 
     const validateKey = async (value: any): Promise<void> => {
         if (!!!value) {
@@ -105,10 +116,10 @@ const RegistrationForm = () => {
                 </Form.Item>
                 <Collapse defaultActiveKey={'1'} ghost>
                     <Collapse.Panel header={<>注册码信息 <InfoCircleOutlined /></>} key={'1'}>
-                        <p>毕业年份: <Text type='success' strong>{regInfo?.gradYear ?? '暂无'}</Text></p>
-                        <p>班级: <Text type='success' strong>{regInfo?.classNumber ?? '暂无'}</Text></p>
-                        <p>方向: <Text type='success' strong>{regInfo?.curriculum ?? '暂无'}</Text></p>
-                        <p><Tooltip placement='bottom' title='为了安全性，注册码将会在创建后一段时间过期'><span className='underdotted'>过期时间</span></Tooltip>: <Text type='success' strong>{(regInfo?.expDate) ? <Space>{regInfo?.expDate.toLocaleString()}<FieldTimeOutlined /></Space> : '暂无'}</Text></p>
+                        <div>毕业年份: <Text type='success' strong>{regInfo?.gradYear ?? '暂无'}</Text></div>
+                        <div>班级: <Text type='success' strong>{regInfo?.classNumber ?? '暂无'}</Text></div>
+                        <div>方向: <Text type='success' strong>{regInfo?.curriculum ?? '暂无'}</Text></div>
+                        <div><Tooltip placement='bottom' title='为了安全性，注册码将会在创建后一段时间过期'><span className='underdotted'>过期时间</span></Tooltip>: <Text type='success' strong>{(regInfo?.expDate) ? <Space>{regInfo?.expDate.toLocaleString()}<FieldTimeOutlined /></Space> : '暂无'}</Text></div>
                     </Collapse.Panel>
                 </Collapse>
                 <Form.Item name='name' label='姓名' required rules={[
