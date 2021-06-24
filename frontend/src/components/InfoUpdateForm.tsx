@@ -94,9 +94,6 @@ const InfoUpdateForm = ({ getStudent, showRoleOptions = false }: { showRoleOptio
             />
         };
     }, [fieldVisibility, updateFieldVisibility]);
-    useEffect(() => {
-        console.log('fv')
-    }, [fieldVisibility])
 
     const initialize = useCallback(() => {
         getFields()

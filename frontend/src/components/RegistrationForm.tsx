@@ -21,7 +21,6 @@ const RegistrationForm = () => {
     const [form] = Form.useForm<Values>();
     const history = useHistory();
     const location = useLocation();
-    console.log(new URLSearchParams(location.search).get('key'))
     const [schoolUid, setSchoolUid] = useState(0);
     const [showPrivacyModal, setShowPrivacyModal] = useState(false);
     const [regInfo, setRegInfo] = useState<{ curriculum: string, classNumber: number, gradYear: number, expDate: Date }>();
@@ -136,7 +135,7 @@ const RegistrationForm = () => {
                         message: '密码不能为空'
                     }
                 ]}>
-                    <Input.Password placeholder='请输入密码' />
+                    <Input.Password placeholder='请输入密码' autoComplete='new-password' />
                 </Form.Item>
                 <Form.Item name='confirm' label='确认密码' dependencies={['password']} rules={[
                     {
@@ -155,7 +154,7 @@ const RegistrationForm = () => {
                         }
                     })
                 ]} required>
-                    <Input.Password placeholder='请再次输入密码' />
+                    <Input.Password placeholder='请再次输入密码' autoComplete='new-password' />
                 </Form.Item>
                 <Form.Item
                     name='phone_number'

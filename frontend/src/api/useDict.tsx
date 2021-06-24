@@ -12,9 +12,5 @@ export const useDict = <V extends any, R extends Record<Key, V>>(obj?: R): [R | 
         setDict(Object.assign({}, Object.assign(dict, temp)))
     }, [dict, setDict]);
 
-    useEffect(() => {
-        console.log('inner');
-    }, [dict])
-
     return [dict, update, setDict];
 }
