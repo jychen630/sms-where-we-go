@@ -80,9 +80,12 @@ const FeedbackForm = ({ isPublic, cb }: { isPublic: boolean, cb?: () => void }) 
             <Modal title='提交成功!' visible={visible} onOk={() => setVisible(false)} onCancel={() => setVisible(false)} okText={t('Confirm')} cancelText={<></>}>
                 你的反馈码
                 <p style={{ textAlign: 'center', backgroundColor: 'antiquewhite', fontSize: '1.5rem' }}>{feedbackUid}</p>
-                <p>请复制保留以备日后查询</p>
+                <p>请复制保留以备参考</p>
                 {!isPublic && <p>你也可以在 反馈-查看 一栏查看你过往的反馈信息及处理结果</p>}
-                {(form.getFieldValue('email') !== undefined || form.getFieldValue('phone_number') !== undefined) && <p>我们也会用你留下的电话号码或电子邮箱进行联系</p>}
+                {(form.getFieldValue('email') !== undefined || form.getFieldValue('phone_number') !== undefined) ?
+                    <p>我们会通过你留下的电话号码或电子邮箱，尽快联系告知处理结果</p>
+                    :
+                    <p>由于你未填写电话号码或电子邮箱，我们将不会主动联系</p>}
             </Modal>
         </>
     )

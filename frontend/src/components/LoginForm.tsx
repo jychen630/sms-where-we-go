@@ -99,7 +99,8 @@ const LoginForm = () => {
                 <Form.Item>
                     <Space>
                         <Button type='primary' htmlType='submit'>登录</Button>
-                        <Button type='link' onClick={() => history.push('/register')}>切换到注册</Button>
+                        <Button onClick={() => history.push('/register')}>切换到注册</Button>
+                        <Button type='link' onClick={() => history.push('/public-feedback')}>无法登录？点此反馈</Button>
                     </Space>
                 </Form.Item>
             </Form>
