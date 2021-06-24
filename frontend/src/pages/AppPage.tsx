@@ -21,6 +21,7 @@ const AppPage = ({ activeKey, children }: { activeKey: menuOptions, children: Re
                 <Menu
                     mode='horizontal'
                     activeKey={activeKey}
+                    style={{ overflow: 'scroll hidden' }}
                 >
                     <Menu.Item key='map' onClick={() => history.push('/map')}>
                         <Space>
