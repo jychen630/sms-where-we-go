@@ -792,4 +792,17 @@ feedback_uid?: string,
         return result.body;
     }
 
+    /**
+     * Logout the current user
+     * @returns Result Successfully logged out and removed the current session
+     * @throws ApiError
+     */
+    public static async logout(): Promise<Result> {
+        const result = await __request({
+            method: 'GET',
+            path: `/logout`,
+        });
+        return result.body;
+    }
+
 }

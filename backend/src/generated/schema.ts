@@ -71,7 +71,7 @@ export type Class = {
 
 export type Comment = {
   comment_uid: number;
-  feedback_uid: string | null;
+  feedback_uid: string;
   sender_name: string | null;
   content: string | null;
   posted_at: Date | null;
@@ -89,11 +89,11 @@ export type Feedback = {
   reason: string | null;
   phone_number: string | null;
   email: string | null;
+  sender_uid: number | null;
   name: string | null;
   class_number: number | null;
   grad_year: number | null;
   posted_at: Date | null;
-  sender_uid: number | null;
 };
 
 export type RegistrationKey = {

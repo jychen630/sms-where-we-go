@@ -1329,3 +1329,14 @@ paths:
                   feedback_uid:
                     type: string
                     description: The unique id of the feedback just created
+  /logout:
+    get:
+      operationId: logout
+      description: Logout the current user
+      responses:
+        200:
+          description: Successfully logged out and removed the current session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Result"
