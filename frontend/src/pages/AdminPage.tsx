@@ -43,7 +43,7 @@ const AdminPage = () => {
         Service.getStudent(false, true)
             .then((result) => setStudents(result.students ?? []))
             .catch(err => handleApiError(err, createNotifyError(t, '错误', '未能获取学生数据', (err) => err.requireLogin && setTimeout(() => history.push('/login', history.location), 1500))))
-    }, [t, auth, history]);
+    }, [t, history]);
 
     const getCurrentStudent = useCallback(
         async () => index === -1 ? undefined : students[index],

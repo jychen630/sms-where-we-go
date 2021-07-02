@@ -2,6 +2,19 @@
   --header-height: 64px;
 }
 
+@media (max-width: 576px) {
+  body {
+    position: fixed;
+  }
+
+  #root {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden auto;
+  }
+}
+
 .app-header {
   color: black;
   background-color: white;
@@ -48,7 +61,7 @@
 }
 
 .centered-layout main {
-  overflow-y: scroll;
+  overflow-y: auto;
   padding: var(--layout-padding) var(--layout-padding) var(--layout-padding)
     var(--layout-padding);
 }
@@ -61,7 +74,7 @@
   max-height: 350px;
   overflow-x: hidden;
   overflow-y: scroll;
-  margin-right: -16.5px;
+  margin-right: -16px;
 }
 
 .centered-layout main > div {

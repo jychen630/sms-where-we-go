@@ -249,7 +249,7 @@ const RegistrationForm = () => {
                     </Checkbox>
                 </Form.Item>
                 <Form.Item>
-                    <Space>
+                    <Space wrap>
                         <Button type='primary' htmlType='submit'>注册</Button>
                         <Button onClick={() => history.push('/login')}>切换到登录</Button>
                         <Button type='link' onClick={() => history.push('/public-feedback')}>无法注册？点此反馈</Button>

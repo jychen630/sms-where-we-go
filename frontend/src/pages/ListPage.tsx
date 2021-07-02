@@ -52,9 +52,9 @@ const ListPage = () => {
 
     return (
         <AppPage activeKey={menuOptions.LIST}>
-            <Layout>
+            <Layout className='centered-layout'>
                 <Layout.Content>
-                    <Card>
+                    <Card style={{ maxWidth: '100%' }}>
                         <div>
                             <Radio.Group value={viewMode} onChange={(e) => { setViewMode(e.target.value) }}>
                                 <Radio.Button value={VIEW_MODE.TABLE}>列表</Radio.Button>

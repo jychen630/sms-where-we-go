@@ -25,7 +25,7 @@ function App() {
   const authProvider = useAuthProvider();
   useEffect(() => {
     authProvider.update();
-  });
+  }, []); //eslint-disable-line
   return (
     <AuthProvider value={authProvider}>
       <Router>
