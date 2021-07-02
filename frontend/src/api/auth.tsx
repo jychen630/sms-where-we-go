@@ -9,6 +9,7 @@ export interface AuthContext {
     studentUid?: number,
     login: LoginHandler,
     devLogin: (uid: number) => Promise<void>,
+    logout: () => Promise<void>,
     gradYear?: number,
     classNumber?: number,
     curriculum?: string,
@@ -67,6 +68,14 @@ export const useAuthProvider = () => {
         }
     }
 
+    const clear = async () => {
+        setRole(undefined);
+        setStudentUid(undefined);
+        setGradYear(undefined);
+        setCurriculum(undefined);
+        setClassNumber(undefined);
+    }
+
     const update = async () => {
         Service.getStudent(true)
             .then(res => {
@@ -82,11 +91,7 @@ export const useAuthProvider = () => {
                 }
             })
             .catch(err => {
-                setRole(undefined);
-                setStudentUid(undefined);
-                setGradYear(undefined);
-                setCurriculum(undefined);
-                setClassNumber(undefined);
+                clear();
             });
     }
 
@@ -104,7 +109,20 @@ export const useAuthProvider = () => {
             });
     }
 
-    return { role, studentUid, login, update, devLogin, classNumber, gradYear, curriculum };
+    const logout = async (): Promise<void> => {
+        Service.logout()
+            .then(() => {
+                clear();
+            })
+            .catch(async (err) => {
+                return handleApiError(err)
+                    .then((res) => {
+                        return Promise.reject(res.message);
+                    });
+            })
+    }
+
+    return { role, studentUid, login, update, devLogin, classNumber, gradYear, curriculum, logout };
 }
 
 export const AuthProvider = ({ value, children }: HasChildren<{ value?: AuthContext }>) => {

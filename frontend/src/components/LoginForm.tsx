@@ -38,7 +38,7 @@ const LoginForm = () => {
                         description: <Space>加载中 <Spin /></Space>,
                         duration: 1
                     });
-                    const dest = (typeof location.state === 'object' && location.state !== null && 'pathname' in (location.state)) ? (location.state as any).pathname : '/map';
+                    const dest = (typeof location.state === 'object' && location.state !== null && 'pathname' in (location.state) && (location.state as any).pathname !== 'login') ? (location.state as any).pathname : '/map';
                     setTimeout(() => history.push(dest), 1500);
                     return Promise.resolve();
                 }

@@ -1,4 +1,4 @@
-import { BarsOutlined, CompassOutlined, ControlOutlined, RadarChartOutlined, SettingOutlined } from '@ant-design/icons';
+import { BarsOutlined, CompassOutlined, ControlOutlined, LogoutOutlined, RadarChartOutlined, SettingOutlined } from '@ant-design/icons';
 import { Layout, Menu, Space } from 'antd';
 import React from 'react';
 import { useHistory } from 'react-router';
@@ -12,7 +12,7 @@ export enum menuOptions {
 }
 
 const AppPage = ({ activeKey, children }: { activeKey: menuOptions, children: React.ReactNode }) => {
-    const { role } = useAuth();
+    const { role, logout } = useAuth();
     const history = useHistory();
 
     return (
@@ -50,6 +50,14 @@ const AppPage = ({ activeKey, children }: { activeKey: menuOptions, children: Re
                             </Space>
                         </Menu.Item>
                     }
+                    <Menu.Item key='logout' onClick={() => {
+                        history.push('/login');
+                        logout();
+                    }}>
+                        <Space>
+                            <LogoutOutlined /> 登出
+                        </Space>
+                    </Menu.Item>
                 </Menu>
             </Header>
             <Content className='app-content'>
