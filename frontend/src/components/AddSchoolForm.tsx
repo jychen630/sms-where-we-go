@@ -115,14 +115,14 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                     rules={[
                         {
                             required: true,
-                            message: '请填写学校名称'
+                            message: '请填写学校名称 (海外大学请填写英文名)'
                         }
                     ]}
                 >
                     <Input placeholder='学校的正式名称（非缩写，昵称）' />
                 </Form.Item>
                 <Tabs defaultActiveKey='select' onChange={(key) => { setCurrentTab(key) }}>
-                    <Tabs.TabPane key='select' tab='选择城市'>
+                    <Tabs.TabPane key='select' tab='选择城市 (国内)'>
                         <SearchTool
                             searchHandler={fetchCity}
                             item={(value, index) =>
@@ -133,10 +133,10 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                                     }
                                 </Button>
                             }
-                            placeholder='输入城市名'
+                            placeholder='输入城市名 (国内大部分及国外少部分城市已收录。若搜索不到，请添加城市)'
                         />
                     </Tabs.TabPane>
-                    <Tabs.TabPane key='add' tab='添加城市'>
+                    <Tabs.TabPane key='add' tab='添加城市 (国外/国内未收录地区)'>
                         <Form.Item
                             name='city'
                             label='城市'
@@ -152,13 +152,13 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                                 }
                             ]}
                         >
-                            <Input placeholder='学校所在的城市' />
+                            <Input placeholder='学校所在的城市 (海外地区请填写英文)' />
                         </Form.Item>
                         <Form.Item
                             name='school_state_province'
-                            label='省份/州'
+                            label='省份/州/郡'
                         >
-                            <Input placeholder='学校所在的省份或州' />
+                            <Input placeholder='学校所在的省份，州或郡 (海外地区请填写英文)' />
                         </Form.Item>
                         <Form.Item
                             name='school_country'
@@ -175,7 +175,7 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                                 }
                             ]}
                         >
-                            <Input placeholder='学校的所在的国家' />
+                            <Input placeholder='学校的所在的国家 (海外地区请填写英文)' />
                         </Form.Item>
                     </Tabs.TabPane>
                 </Tabs>
