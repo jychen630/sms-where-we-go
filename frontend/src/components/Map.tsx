@@ -93,7 +93,7 @@ export default function Map({ getData, getPopup, zoom = 5, startingCoordinate = 
                     },
                     'paint': {
                         'circle-radius': 10,
-                        'circle-color': "rgba(24, 144, 255, 0.23)"
+                        'circle-color': "rgba(24, 144, 255, 0.8)"
                     }
                 });
             }
@@ -122,7 +122,7 @@ export default function Map({ getData, getPopup, zoom = 5, startingCoordinate = 
                     },
                     'paint': {
                         'circle-radius': 10,
-                        'circle-color': "rgba(24, 144, 255, 0.23)"
+                        'circle-color': "rgba(24, 144, 255, 0.8)"
                     }
                 });
                 mapRef.current = map as any;
