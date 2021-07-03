@@ -213,6 +213,9 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                                     if (val > 180 || val < -180) {
                                         return Promise.reject("经度必须在-180和180之间");
                                     }
+                                    else {
+                                        return Promise.resolve();
+                                    }
                                 }
                             }]}
                     >
@@ -229,6 +232,9 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                                 validator(_, val) {
                                     if (val > 90 || val < -90) {
                                         return Promise.reject("纬度必须在-90和90之间");
+                                    }
+                                    else {
+                                        return Promise.resolve();
                                     }
                                 }
                             }
