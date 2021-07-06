@@ -17,6 +17,7 @@ enum VIEW_MODE {
 const ListPage = () => {
     const [t] = useTranslation();
     const history = useHistory();
+    const { innerWidth } = window;
     const [viewMode, setViewMode] = useState<VIEW_MODE>(VIEW_MODE.TABLE);
     const [visible, setVisible] = useState(false);
     const [students, setStudents] = useState<StudentInfo[]>([]);
@@ -64,8 +65,8 @@ const ListPage = () => {
                         {viewMode === VIEW_MODE.BUTTONS &&
                             <Space className='list-page-flex-box'>
                                 {students.map((value, index) =>
-                                    <Popover title={value.name} content={Info({ student: value })} key={index}>
-                                        <Button onClick={() => { setCurrentStudent(value); setVisible(true); }}>{value.name}</Button>
+                                    <Popover title={value.name} content={Info({ student: value })} key={index} visible={innerWidth > 576 && !visible && currentStudent === value}>
+                                        <Button onClick={() => { setCurrentStudent(value); setVisible(true); }} onMouseOver={() => setCurrentStudent(value)}>{value.name}</Button>
                                     </Popover>
                                 )}
                             </Space>
@@ -142,7 +143,7 @@ const ListPage = () => {
             >
                 <Info student={currentStudent} />
             </Modal>
-        </AppPage>
+        </AppPage >
     );
 }
 
