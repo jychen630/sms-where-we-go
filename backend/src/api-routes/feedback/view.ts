@@ -32,9 +32,17 @@ export const get: Operation = async (req, res) => {
     getSelf(req, res, logger).then(self => {
         pg('feedback')
             .select<Feedback[]>()
-            .where('phone_number', self.phone_number)
-            .orWhere('email', self.email)
-            .orWhere('sender_uid', self.student_uid)
+            .modify<any, Feedback[]>((qb) => {
+                if (!!self.phone_number) {
+                    qb.orWhere('phone_number', self.phone_number);
+                }
+                if (!!self.email) {
+                    qb.orWhere('email', self.email);
+                }
+                if (self.student_uid !== undefined) {
+                    qb.orWhere('sender_uid', self.student_uid);
+                }
+            })
             .then(async result => {
                 const comments = await pg('comment')
                     .select<Comment[]>()
