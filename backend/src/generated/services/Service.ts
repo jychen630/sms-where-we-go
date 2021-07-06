@@ -622,7 +622,7 @@ keywords: string,
 page: number = 1,
 city?: string,
 country?: string,
-provider: 'amap' | 'google' = 'amap',
+provider: 'amap' | 'mapbox' = 'amap',
 ): Promise<(Result & {
 locations: Array<(Coordinate & {
 name: string,

@@ -46,7 +46,7 @@ const SearchTool = <T extends unknown>({ searchHandler, placeholder, item, initi
         else {
             setResultList(result ?? []);
         }
-    }, 1000), []);
+    }, 1000), [searchHandler]);
 
     const handleSearch = useCallback(({ offset, limit, value, append = false }: Partial<SearchHandlerProps> & { value: string, append?: boolean }) => {
         setLoading(true);

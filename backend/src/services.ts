@@ -218,6 +218,9 @@ export const LocationService = {
     constructAmapURL: (keywords: string, city: string, page: number) => {
         return encodeURI(`https://restapi.amap.com/v3/place/text?key=${process.env.AMAP_SECRET}&keywords=${keywords}&types=高等院校&city=${city}&children=1&offset=20&page=${page}&extensions=all`);
     },
+    consturctMapBoxURL: (keywords: string) => {
+        return encodeURI(`https://api.mapbox.com/geocoding/v5/mapbox.places/${keywords}.json?access_token=${process.env.MAPBOX_TOKEN}&types=poi&limit=10`)
+    },
     amap: async (keywords: string, city: string, page: number = 1) => {
         const url = LocationService.constructAmapURL(keywords, city, page);
         console.log(url);
@@ -242,14 +245,39 @@ export const LocationService = {
                         longitude: longitude,
                         latitude: latitude,
                     }
-                })
+                });
             })
             .catch(err => {
                 return Promise.reject(err);
             });
     },
-    google: async (keywords: string, city: string, country: string) => {
+    mapbox: async (keywords: string, page: number = 1) => {
+        if (page > 1) {
+            // As Mapbox doesn't support pagination, we will return an empty array when page > 1
+            return Promise.resolve([]);
+        }
+        const url = LocationService.consturctMapBoxURL(keywords);
+        console.log(url);
+        return axios.get(url)
+            .then(res => {
+                if (res.data.features === undefined || res.data.features.length === 0) {
+                    return [];
+                }
+                return res.data.features.map((feature: any) => {
+                    let [longitude, latitude] = feature.center;
 
+                    return {
+                        name: feature.text,
+                        city: '',
+                        address: feature.place_name,
+                        longitude: longitude,
+                        latitude: latitude,
+                    }
+                });
+            })
+            .catch(err => {
+                return Promise.reject(err);
+            });
     }
 }
 

@@ -1,7 +1,7 @@
 import { CheckCircleFilled, EnvironmentOutlined } from '@ant-design/icons';
 import { faAddressCard, faMap, faMapPin } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Button, Card, Divider, Form, Input, Modal, Space, Tabs, notification } from 'antd';
+import { Button, Card, Divider, Form, Input, Modal, Space, Tabs, notification, Switch } from 'antd';
 import { useEffect } from 'react';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -19,6 +19,12 @@ type Location = Coordinate & {
     city?: string | undefined;
     address?: string | undefined;
 }
+
+enum Provider {
+    AMAP = 'amap',
+    MAPBOX = 'mapbox'
+};
+
 const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
     const [t] = useTranslation();
     const [page, setPage] = useState(0);
@@ -27,6 +33,7 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
     const [visible, setVisible] = useState(false);
     const [location, setLocation] = useState<Location>();
     const [currentTab, setCurrentTab] = useState('select');
+    const [provider, setProvider] = useState<Provider>(Provider.AMAP);
 
     const fetchCity = useCallback(async (props: SearchHandlerProps) => {
         try {
@@ -92,14 +99,14 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
     }, [location]);
 
     const getPreview = useCallback(async (props: SearchHandlerProps): Promise<Location[]> => {
-        return Service.getLocation(props.value, props.offset + 1)
+        return Service.getLocation(props.value, props.offset + 1, "", "", provider)
             .then(res => {
                 return res.locations;
             })
             .catch(err => {
                 return [];
-            })
-    }, []);
+            });
+    }, [provider]);
 
     return (
         <Form
@@ -122,7 +129,7 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                     <Input placeholder='学校的正式名称（非缩写，昵称）' />
                 </Form.Item>
                 <Tabs defaultActiveKey='select' onChange={(key) => { setCurrentTab(key) }}>
-                    <Tabs.TabPane key='select' tab='选择城市 (国内)'>
+                    <Tabs.TabPane key='select' tab='选择城市'>
                         <SearchTool
                             searchHandler={fetchCity}
                             item={(value, index) =>
@@ -133,7 +140,7 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                                     }
                                 </Button>
                             }
-                            placeholder='输入城市名 (国内大部分及国外少部分城市已收录。若搜索不到，请添加城市)'
+                            placeholder='输入城市名 (已收录国内大部分城市)'
                         />
                     </Tabs.TabPane>
                     <Tabs.TabPane key='add' tab='添加城市 (国外/国内未收录地区)'>
@@ -244,7 +251,7 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                     </Form.Item>
                 </Space>
                 <h3>搜索 & 预览</h3>
-                <Map getData={mockStudentData} getPopup={(props) => <InfoCard {...props} />} zoom={10.5} startingCoordinate={!!location?.latitude && !!location.longitude ? { longitude: location.longitude, latitude: location.latitude - 0.005 } : undefined} responsive></Map>
+                <Map getData={mockStudentData} getPopup={(props) => <InfoCard {...props} />} zoom={8} startingCoordinate={!!location?.latitude && !!location.longitude ? { longitude: location.longitude, latitude: location.latitude - 0.005 } : undefined} responsive></Map>
                 {!!location && <Card>
                     <Optional content={location.name} icon={<FontAwesomeIcon icon={faAddressCard} />} />
                     <Optional content={<>({location.longitude?.toFixed(5)}, {location.latitude?.toFixed(5)})</>} icon={<FontAwesomeIcon icon={faMapPin} />} dependencies={[location.longitude, location.latitude]} />
@@ -252,6 +259,13 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                     <Optional content={location.address} icon={<FontAwesomeIcon icon={faMap} />} />
                 </Card>
                 }
+                <Form.Item label="搜索范围">
+                    <Switch
+                        checkedChildren="国际"
+                        unCheckedChildren="仅国内"
+                        onChange={(checked) => { console.log(checked ? Provider.MAPBOX : Provider.AMAP); setProvider(checked ? Provider.MAPBOX : Provider.AMAP) }}
+                    />
+                </Form.Item>
                 <SearchTool
                     initialValue={form.getFieldValue('school_name')}
                     placeholder='输入学校名称'
