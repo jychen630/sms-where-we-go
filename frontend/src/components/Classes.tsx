@@ -126,7 +126,7 @@ const Classes = () => {
             </Form>
             <Divider>查看班级</Divider>
             {!!classes && classes.map((class_) =>
-                <Card>
+                <Card key={`${class_.grad_year} ${class_.class_number}`}>
                     <InfoList {...class_} key={`${class_.grad_year} ${class_.class_number}`} />
                 </Card>
             )}
