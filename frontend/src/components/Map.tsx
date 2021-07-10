@@ -4,10 +4,16 @@ import geojson from 'geojson';
 import mapboxgl, { Map as MapType } from 'mapbox-gl';
 import MapboxLanguage from '@mapbox/mapbox-gl-language';
 import './Map.css';
+import { Modal } from 'antd';
 import { Coordinate, School, Student, StudentVerbose } from 'wwg-api';
 import LeftCircleOutlined from '@ant-design/icons/LeftCircleOutlined';
+import GroupOutlined from '@ant-design/icons/GroupOutlined';
+import UpSquareOutlined from '@ant-design/icons/UpSquareOutlined';
+import FullscreenExitOutlined from '@ant-design/icons/FullscreenExitOutlined';
+import SolutionOutlined from '@ant-design/icons/SolutionOutlined';
 import { useCallback } from 'react';
 import StudentSearchTool from './StudentSearchTool';
+import MapControl from './MapControl';
 
 mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_TOKEN as string;
 
@@ -25,12 +31,16 @@ const convertCoordinates = (e: any): [number, number] => {
 
 export default function Map({ getData, getPopup, zoom = 5, startingCoordinate = DEFAULT_CENTER, responsive = false }: { getData: () => Promise<MapItem[]>, getPopup: (props: MapItem) => JSX.Element, zoom?: number, startingCoordinate?: Coordinate, responsive?: boolean }) {
     const mapRef = useRef(null);
-    const isMobile = window.innerWidth <= 576;
-    const [focus, setFocus] = useState<[number, number] | undefined>();
-    const [infoBarHidden, setInfoBarHidden] = useState(true);
     const mapContainer = useRef(null);
-    const [data, setData] = useState<MapItem[]>([]);
     const [map, setMap] = useState<MapType>();
+    const isMobile = window.innerWidth <= 576;
+    const [data, setData] = useState<MapItem[]>([]);
+    const [autoFlyTo, setAutoFlyTo] = useState(true);
+    const [showPopup, setShowPopup] = useState(true);
+    const [modalMode, setModalMode] = useState(false);
+    const [showModal, setShowModal] = useState(false);
+    const [infoBarHidden, setInfoBarHidden] = useState(true);
+    const [focus, setFocus] = useState<[number, number] | undefined>();
     const [currentItem, setCurrentItem] = useState<MapItem>();
 
     useEffect(() => {
@@ -55,7 +65,7 @@ export default function Map({ getData, getPopup, zoom = 5, startingCoordinate = 
     }, [map, zoom, startingCoordinate]);
 
     useEffect(() => {
-        if (!!focus) {
+        if (!!focus && autoFlyTo) {
             flyTo(focus[0], focus[1]);
         }
     }, [focus]);
@@ -71,13 +81,14 @@ export default function Map({ getData, getPopup, zoom = 5, startingCoordinate = 
 
         function handleMouseEnter(e: any) {
             // We disable the popup on mobile devices due to its bad performance
-            if (!!!map || isMobile) return;
-            const coordinates = convertCoordinates(e);
+            if (!!!map) return;
             map.getCanvas().style.cursor = "pointer";
+            if (isMobile || !showPopup) return;
+            const coordinates = convertCoordinates(e);
             const container = document.createElement('div');
             let data = e.features[0].properties;
             data.students = !!data.students ? JSON.parse(data.students) : [];
-            ReactDOM.render(getPopup(data), container);
+            ReactDOM.render(<div style={{ maxHeight: "40vh" }}>{getPopup(data)}</div>, container);
             tempPopup.setLngLat(coordinates).setDOMContent(container).addTo(map);
         }
 
@@ -87,6 +98,7 @@ export default function Map({ getData, getPopup, zoom = 5, startingCoordinate = 
             data.students = JSON.parse(data.students);
             setCurrentItem(data);
             setInfoBarHidden(false);
+            setShowModal(true);
             setFocus(e.features[0].geometry.coordinates);
         }
 
@@ -105,7 +117,7 @@ export default function Map({ getData, getPopup, zoom = 5, startingCoordinate = 
             map.off('mouseup', 'schools', handleMouseUp)
             map.off('mouseleave', 'schools', handleMouseLeave);
         }
-    }, [map, isMobile, flyTo, getPopup]);
+    }, [map, isMobile, flyTo, getPopup, showPopup]);
 
     useEffect(() => {
         // Handle data update after the map has been loaded
@@ -173,7 +185,41 @@ export default function Map({ getData, getPopup, zoom = 5, startingCoordinate = 
     return (
         <>
             <div className={responsive ? 'map-container-responsive' : 'map-container'} ref={mapContainer}></div>
-            {!responsive &&
+            <div className="floating-control-container">
+                <div>
+                    <MapControl
+                        onToggle={(toggle) => {
+                            setModalMode(toggle);
+                            setShowModal(false);
+                            setInfoBarHidden(true);
+                        }}
+                        Content={() => <GroupOutlined />}
+                        AltContent={() => isMobile ? <UpSquareOutlined /> : <LeftCircleOutlined style={{ transform: "rotate(180deg)" }} />}
+                    />
+                    <MapControl
+                        onToggle={(toggle) => {
+                            setAutoFlyTo(toggle);
+                        }}
+                        defaultToggled={true}
+                        altType='ghost'
+                        Content={() => <FullscreenExitOutlined />}
+                    />
+                    {!isMobile &&
+                        <MapControl
+                            onToggle={(toggle) => {
+                                setShowPopup(toggle);
+                            }}
+                            defaultToggled={true}
+                            altType='ghost'
+                            Content={() => <SolutionOutlined />}
+                        />
+                    }
+                </div>
+            </div>
+            <Modal title={currentItem?.school_name} visible={modalMode && showModal} onCancel={() => setShowModal(false)} footer={null} bodyStyle={{ padding: '0 0 0 0' }}>
+                {currentItem !== undefined && getPopup(currentItem)}
+            </Modal>
+            {!modalMode && !responsive &&
                 <div className={`info-bar-container${infoBarHidden ? " info-bar-hidden" : ""}`}>
                     <div className="info-bar">
                         <LeftCircleOutlined className="info-bar-switch" onClick={() => setInfoBarHidden(!infoBarHidden)} />

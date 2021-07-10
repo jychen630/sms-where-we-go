@@ -24,7 +24,7 @@ const MapPage = () => {
 
     return (
         <AppPage activeKey={menuOptions.MAP}>
-            <Map getData={getRoster} getPopup={(props) => (<InfoCard {...props} />)} />
+            <Map getData={getRoster} getPopup={(props) => <InfoCard {...props} />} />
         </AppPage>
     )
 }

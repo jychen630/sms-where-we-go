@@ -66,7 +66,8 @@ const StudentSearchTool = ({ data, onSelect }: { data: readonly MapItem[], onSel
                                 )
                         );
                     })
-                    .filter(data => data.similarity > 0.5) ?? [];
+                    .filter(data => data.similarity > 0.5)
+                    .sort((a, b) => b.similarity - a.similarity) ?? [];
                 setCached(result);
                 setCachedKeyword(props.value);
                 return Promise.resolve(result.slice(props.offset, props.offset + props.limit));
