@@ -2,8 +2,7 @@ import { Button, ButtonProps } from 'antd';
 import { ButtonType } from 'antd/lib/button';
 import { useState } from 'react';
 
-const MapControl = (props: { onToggle: (toggle: boolean) => void, defaultToggled?: boolean, type?: ButtonType, altType?: ButtonType, Content: () => JSX.Element, AltContent?: () => JSX.Element } & ButtonProps) => {
-    const { onToggle, type, altType, defaultToggled, Content, AltContent } = props;
+const MapControl = ({ onToggle, btnProps, type, altType, defaultToggled, Content, AltContent }: { onToggle: (toggle: boolean) => void, defaultToggled?: boolean, type?: ButtonType, altType?: ButtonType, Content: () => JSX.Element, AltContent?: () => JSX.Element, btnProps?: ButtonProps }) => {
     const [toggle, setToggle] = useState(defaultToggled ?? false);
 
     return (
@@ -16,7 +15,7 @@ const MapControl = (props: { onToggle: (toggle: boolean) => void, defaultToggled
                 setToggle(toggle => !toggle);
                 onToggle(!toggle)
             }}
-            {...props}
+            {...btnProps}
         >
             {
                 toggle ?
