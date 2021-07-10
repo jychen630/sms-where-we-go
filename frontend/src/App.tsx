@@ -24,6 +24,7 @@ OpenAPI.TOKEN = '';
 function App() {
   const authProvider = useAuthProvider();
   useEffect(() => {
+    document.title = 'SMS Where We Go'
     authProvider.update();
   }, []); //eslint-disable-line
   return (
