@@ -1,4 +1,4 @@
-import { Button, Card, Col, Row } from "antd";
+import { Button, Card, CardProps, Col, Row } from "antd";
 import { useState } from "react";
 import { MapItem } from "./Map";
 import { useTranslation } from "react-i18next";
@@ -8,7 +8,7 @@ import { Student, StudentVerbose } from "wwg-api";
 import InfoList from "./InfoList";
 
 
-const InfoCard = (props: MapItem) => {
+const InfoCard = (props: MapItem & CardProps) => {
     const [t] = useTranslation();
     const [index, setIndex] = useState(0);
 
@@ -45,6 +45,7 @@ const InfoCard = (props: MapItem) => {
                     </>
                 </Row>
             }
+            {...props}
         >
             <InfoList
                 hideName={false}

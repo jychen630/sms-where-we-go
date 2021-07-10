@@ -5,18 +5,32 @@ import mapboxgl, { Map as MapType } from 'mapbox-gl';
 import MapboxLanguage from '@mapbox/mapbox-gl-language';
 import './Map.css';
 import { Coordinate, School, Student, StudentVerbose } from 'wwg-api';
-import { Modal } from 'antd';
+import LeftCircleOutlined from '@ant-design/icons/LeftCircleOutlined';
 import { useCallback } from 'react';
+import StudentSearchTool from './StudentSearchTool';
 
 mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_TOKEN as string;
 
 export type MapItem = School & { students?: (Student & StudentVerbose)[] };
 
-export default function Map({ getData, getPopup, zoom = 5, startingCoordinate = { longitude: 114.121677, latitude: 22.551557 }, responsive = false }: { getData: () => Promise<MapItem[]>, getPopup: (props: MapItem) => JSX.Element, zoom?: number, startingCoordinate?: Coordinate, responsive?: boolean }) {
+const DEFAULT_CENTER = { longitude: 114.121677, latitude: 22.551557 };
+
+const convertCoordinates = (e: any): [number, number] => {
+    let coordinates = e.features[0].geometry.coordinates.slice();
+    while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+        coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+    }
+    return coordinates
+}
+
+export default function Map({ getData, getPopup, zoom = 5, startingCoordinate = DEFAULT_CENTER, responsive = false }: { getData: () => Promise<MapItem[]>, getPopup: (props: MapItem) => JSX.Element, zoom?: number, startingCoordinate?: Coordinate, responsive?: boolean }) {
     const mapRef = useRef(null);
+    const isMobile = window.innerWidth <= 576;
+    const [focus, setFocus] = useState<[number, number] | undefined>();
+    const [infoBarHidden, setInfoBarHidden] = useState(true);
     const mapContainer = useRef(null);
+    const [data, setData] = useState<MapItem[]>([]);
     const [map, setMap] = useState<MapType>();
-    const [showModal, setShowModal] = useState(false);
     const [currentItem, setCurrentItem] = useState<MapItem>();
 
     useEffect(() => {
@@ -29,90 +43,116 @@ export default function Map({ getData, getPopup, zoom = 5, startingCoordinate = 
         map.dragRotate.disable();
         map.touchZoomRotate.disableRotation();
         setMap(map);
-    }, [mapContainer])
+    }, [mapContainer]);
 
-    const displayModalData = (e: any) => {
-        let data = e.features[0].properties;
-        data.students = JSON.parse(data.students);
-        setCurrentItem(data)
-        setShowModal(true);
-    }
-
-    const flyTo = useCallback(() => {
-        if (!!map)
-            map?.flyTo({
-                center: [startingCoordinate.longitude, startingCoordinate.latitude],
+    const flyTo = useCallback((lng = startingCoordinate.longitude, lat = startingCoordinate.latitude) => {
+        if (!!map) {
+            map.flyTo({
+                center: [lng, lat],
                 zoom: zoom
             })
+        }
     }, [map, zoom, startingCoordinate]);
+
+    useEffect(() => {
+        if (!!focus) {
+            flyTo(focus[0], focus[1]);
+        }
+    }, [focus]);
+
+    useEffect(() => {
+        setFocus([startingCoordinate.longitude, startingCoordinate.latitude]);
+    }, [startingCoordinate])
 
     useEffect(() => {
         if (!!!map) return;
 
-        let popup = new mapboxgl.Popup({ closeOnMove: true, closeOnClick: true });
+        let tempPopup = new mapboxgl.Popup({ closeOnMove: true, closeOnClick: true });
 
-        map.on('mouseenter', 'schools', (e: any) => {
-            let coordinates = e.features[0].geometry.coordinates.slice();
-            while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-                coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-            }
+        function handleMouseEnter(e: any) {
+            // We disable the popup on mobile devices due to its bad performance
+            if (!!!map || isMobile) return;
+            const coordinates = convertCoordinates(e);
             map.getCanvas().style.cursor = "pointer";
             const container = document.createElement('div');
             let data = e.features[0].properties;
             data.students = !!data.students ? JSON.parse(data.students) : [];
             ReactDOM.render(getPopup(data), container);
-            popup.setLngLat(coordinates).setDOMContent(container).addTo(map);
-        });
+            tempPopup.setLngLat(coordinates).setDOMContent(container).addTo(map);
+        }
 
-        map.on('mouseup', 'schools', displayModalData)
+        function handleMouseUp(e: any) {
+            if (!!!map) return;
+            let data = e.features[0].properties;
+            data.students = JSON.parse(data.students);
+            setCurrentItem(data);
+            setInfoBarHidden(false);
+            setFocus(e.features[0].geometry.coordinates);
+        }
 
-        map.on('mouseleave', 'schools', (e: any) => {
+        function handleMouseLeave(e: any) {
+            if (!!!map) return;
             map.getCanvas().style.cursor = "";
-        });
-    }, [map, getData, getPopup]);
+        }
+
+        map.on('mouseenter', 'schools', handleMouseEnter);
+        map.on('mouseup', 'schools', handleMouseUp)
+        map.on('mouseleave', 'schools', handleMouseLeave);
+
+        return () => {
+            // Do a cleanup to deduplicate event handlers 
+            map.off('mouseenter', 'schools', handleMouseEnter);
+            map.off('mouseup', 'schools', handleMouseUp)
+            map.off('mouseleave', 'schools', handleMouseLeave);
+        }
+    }, [map, isMobile, flyTo, getPopup]);
 
     useEffect(() => {
-        flyTo()
-    }, [flyTo]);
-
-    useEffect(() => {
+        // Handle data update after the map has been loaded
         if (!!!map || !!!mapRef.current) return;
+
         getData().then((result) => {
+            setData(result);
             const data = geojson.parse(result ?? [], { Point: ['latitude', 'longitude'] });
             try {
                 if (map.getLayer('schools') !== undefined) {
-                    map.removeLayer('schools')
-                        .removeSource('schools')
+                    (map.getSource('schools') as any).setData(data);
                 }
-                map.addLayer({
-                    'id': 'schools',
-                    'type': 'circle',
-                    'source': {
-                        'type': 'geojson',
-                        'data': data
-                    },
-                    'paint': {
-                        'circle-radius': 10,
-                        'circle-color': "rgba(24, 144, 255, 0.8)"
-                    }
-                });
+                else {
+                    map.addLayer({
+                        'id': 'schools',
+                        'type': 'circle',
+                        'source': {
+                            'type': 'geojson',
+                            'data': data
+                        },
+                        'paint': {
+                            'circle-radius': 10,
+                            'circle-color': "rgba(24, 144, 255, 0.8)"
+                        }
+                    });
+                }
             }
             catch (err) {
                 console.error(err);
             }
         });
-    }, [map, getData, startingCoordinate])
+    }, [map, getData])
 
     useEffect(() => {
+        // Handle data fetching when the map is first loaded
         if (!!!map) return;
 
         getData().then((result) => {
-            const data = geojson.parse(result ?? [], { Point: ['latitude', 'longitude'] });
+            if (result.length === 0) {
+                return;
+            }
+            setData(result);
+            const data = geojson.parse(result, { Point: ['latitude', 'longitude'] });
             map.on('load', () => {
-                flyTo();
-
                 if (map.getLayer('schools') !== undefined) return
 
+                setFocus([startingCoordinate.longitude, startingCoordinate.latitude]);
                 map.addLayer({
                     'id': 'schools',
                     'type': 'circle',
@@ -127,15 +167,31 @@ export default function Map({ getData, getPopup, zoom = 5, startingCoordinate = 
                 });
                 mapRef.current = map as any;
             })
-        })
-    }, [map, flyTo, getData]);
+        });
+    }, [map, setFocus, getData, startingCoordinate]);
 
     return (
         <>
             <div className={responsive ? 'map-container-responsive' : 'map-container'} ref={mapContainer}></div>
-            <Modal title={currentItem?.school_name} visible={showModal} onCancel={() => setShowModal(false)} footer={null} bodyStyle={{ padding: '0 0 0 0' }}>
-                {currentItem !== undefined && getPopup(currentItem)}
-            </Modal>
+            {!responsive &&
+                <div className={`info-bar-container${infoBarHidden ? " info-bar-hidden" : ""}`}>
+                    <div className="info-bar">
+                        <LeftCircleOutlined className="info-bar-switch" onClick={() => setInfoBarHidden(!infoBarHidden)} />
+                        <div className="info-bar-content">
+                            <div style={{ padding: "1 1 1 1" }}>
+                                <StudentSearchTool
+                                    data={data}
+                                    onSelect={(val) => {
+                                        setFocus([val.coordinates[0], val.coordinates[1]]);
+                                        setCurrentItem(val.original);
+                                    }}
+                                />
+                                {!!currentItem ? getPopup(currentItem) : <></>}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
         </>
     )
 }
