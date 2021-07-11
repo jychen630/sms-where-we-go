@@ -1,14 +1,13 @@
 import { Operation } from "express-openapi";
 import { pg } from "..";
-import log4js from "log4js";
-import { dbHandleError, parseBody, sendError, sendSuccess } from "../utils";
+import { Actions, dbHandleError, parseBody, sendError, sendSuccess, ServerLogger } from "../utils";
 import { StudentClass } from "../generated/schema";
 import { StudentService } from "../services";
 import { Service } from "../generated";
 
 export const get: Operation = (req, res) => {
-    const logger = log4js.getLogger('getDevLogin');
-    console.log(process.env.NODE_ENV);
+    const logger = ServerLogger.getLogger('getDevLogin');
+
     if (process.env.NODE_ENV !== 'development') {
         res.status(404).send();
         return;
@@ -27,12 +26,18 @@ export const get: Operation = (req, res) => {
                     role: value.role
                 }))
             });
+            logger.logComposed(
+                req.session.student_uid ?? "Developer",
+                Actions.access,
+                "available users"
+            );
         })
-        .catch(err => dbHandleError(err, res, logger));
+        .catch(err => dbHandleError(err, res, logger.logger));
 }
 
 export const post: Operation = async (req, res) => {
     const data = parseBody<typeof Service.postDevLogin>(req);
+    const logger = ServerLogger.getLogger('postDevLogin');
 
     if (process.env.NODE_ENV !== 'development') {
         res.status(404).send();
@@ -41,9 +46,22 @@ export const post: Operation = async (req, res) => {
 
     const student = await StudentService.get(data.uid);
     if (student === undefined || student.student_uid === null) {
+        logger.logComposed(
+            req.session.student_uid ?? 'Developer',
+            Actions.access,
+            `dev-login ${data.uid}`,
+            false,
+            "the student doesn't exist",
+            true,
+        )
         sendError(res, 200, "The student doesn't exists");
     }
     else {
+        logger.logComposed(
+            req.session.student_uid ?? 'Developer',
+            Actions.access,
+            `dev-login ${data.uid}`,
+        )
         req.session.identifier = data.uid;
         req.session.student_uid = student.student_uid;
         sendSuccess(res, {

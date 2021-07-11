@@ -1,18 +1,23 @@
 import { Operation } from 'express-openapi';
 import { RoleService } from '../services';
-import { sendError, sendSuccess } from '../utils';
+import { Actions, dbHandleError, sendError, sendSuccess, ServerLogger, validateLogin } from '../utils';
 
 export const get: Operation = (req, res) => {
-    if (!!!req.session.student_uid) {
-        sendError(res, 401, 'Please login to get the role');
-        return;
-    }
+    const logger = ServerLogger.getLogger('role.get');
+
+    if (!validateLogin(req, res, logger)) return;
 
     RoleService.get(req.session.student_uid)
         .then((result) => {
+            logger.logComposed(
+                req.session.student_uid,
+                Actions.access,
+                "role"
+            )
             sendSuccess(res, {
                 role: result.role,
                 description: result.description
             });
-        });
+        })
+        .catch(err => dbHandleError(err, res, logger.logger));
 }

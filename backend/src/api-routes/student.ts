@@ -4,7 +4,7 @@ import log4js from 'log4js';
 import { pg } from '..';
 import { Knex } from 'knex';
 import { Service } from '../generated';
-import { dbHandleError, parseBody, parseHiddenFields, parseQuery, removeKeys, removeNull, sendError, sendSuccess } from '../utils';
+import { Actions, dbHandleError, getSelf, parseBody, parseHiddenFields, parseQuery, removeKeys, removeNull, sendError, sendSuccess, ServerLogger, validateAdmin, validateLogin } from '../utils';
 import { ClassService, RoleService, StudentService } from '../services';
 import { City, School, StudentClassRole, StudentRole, StudentVisibility } from '../generated/schema';
 import { ArrayType } from '../wwg_types/custom_types';
@@ -27,186 +27,185 @@ export const studentFieldVisibility = pg(
 
 export const get: Operation = async (req, res, next) => {
     const data = parseQuery<typeof Service.getStudent>(req) as any;
-    const logger = log4js.getLogger('student.get');
+    const logger = ServerLogger.getLogger('student.get');
 
-    if (!!!req.session.student_uid) {
-        logger.error(`Attempt to get ${req.session.student_uid} without authentication`);
-        sendError(res, 401, 'Login to get student')
-        return;
-    }
+    if (!validateLogin(req, res, logger)) return;
 
-    const self = await StudentService.get(req.session.student_uid);
-    if (self === undefined) {
-        logger.error(`Invalid user`);
-        sendError(res, 403, 'Invalid user for this operation');
-        return;
-    }
+    getSelf(req, res, logger).then(self => {
+        const queryStudent = pg('wwg.student_class_role')
+            .modify<any, StudentClassRole[]>(
+                async (qb) => {
+                    if (!(typeof self.level === 'number')) {
+                        return;
+                    }
+                    if (!!data.self) {
+                        qb.select().where('student_uid', self.student_uid);
+                        return;
+                    }
+                    if (self.level >= 16) {
+                        // System admin can access all students
+                        qb.select();
+                        return;
+                    }
+                    let union = [];
+                    if (self.level < 16) {
+                        qb.select().where('student_uid', self.student_uid);
+                        union.push(
+                            pg('wwg.student_class_role').select()
+                                .where('visibility_type', StudentVisibility.Year)
+                                .andWhere('grad_year', self.grad_year),
+                            pg('wwg.student_class_role').select()
+                                .where('visibility_type', StudentVisibility.Students)
+                        )
+                    }
+                    if (self.level < 8) {
+                        union.push(
+                            pg('wwg.student_class_role').select()
+                                .where('visibility_type', StudentVisibility.Curriculum)
+                                .andWhere('curriculum_name', self.curriculum_name)
+                                .andWhere('grad_year', self.grad_year)
+                        )
+                    }
+                    if (self.level < 4) {
+                        union.push(
+                            pg('wwg.student_class_role').select()
+                                .where('visibility_type', StudentVisibility.Class)
+                                .andWhere('class_number', self.class_number as number)
+                                .andWhere('grad_year', self.grad_year)
+                        )
+                    }
+                    if (self.level < 2) {
+                        union.push(
+                            pg('wwg.student_class_role').select()
+                                .where('visibility_type', StudentVisibility.Private)
+                                .andWhere('student_uid', self.student_uid)
+                        )
+                    }
+                    else {
+                        union.push(
+                            pg('wwg.student_class_role').select()
+                                .where('visibility_type', StudentVisibility.Private)
+                        )
+                    }
+                    qb.union(union);
+                }
+            )
+            .as('t1');
 
-    const queryStudent = pg('wwg.student_class_role')
-        .modify<any, StudentClassRole[]>(
-            async (qb) => {
-                if (!(typeof self.level === 'number')) {
-                    return;
-                }
-                if (!!data.self) {
-                    qb.select().where('student_uid', self.student_uid);
-                    return;
-                }
-                if (self.level >= 16) {
-                    // System admin can access all students
-                    qb.select();
-                    return;
-                }
-                let union = [];
-                if (self.level < 16) {
-                    qb.select().where('student_uid', self.student_uid);
-                    union.push(
-                        pg('wwg.student_class_role').select()
-                            .where('visibility_type', StudentVisibility.Year)
-                            .andWhere('grad_year', self.grad_year),
-                        pg('wwg.student_class_role').select()
-                            .where('visibility_type', StudentVisibility.Students)
-                    )
-                }
-                if (self.level < 8) {
-                    union.push(
-                        pg('wwg.student_class_role').select()
-                            .where('visibility_type', StudentVisibility.Curriculum)
-                            .andWhere('curriculum_name', self.curriculum_name)
-                            .andWhere('grad_year', self.grad_year)
-                    )
-                }
-                if (self.level < 4) {
-                    union.push(
-                        pg('wwg.student_class_role').select()
-                            .where('visibility_type', StudentVisibility.Class)
-                            .andWhere('class_number', self.class_number as number)
-                            .andWhere('grad_year', self.grad_year)
-                    )
-                }
-                if (self.level < 2) {
-                    union.push(
-                        pg('wwg.student_class_role').select()
-                            .where('visibility_type', StudentVisibility.Private)
-                            .andWhere('student_uid', self.student_uid)
-                    )
-                }
-                else {
-                    union.push(
-                        pg('wwg.student_class_role').select()
-                            .where('visibility_type', StudentVisibility.Private)
-                    )
-                }
-                qb.union(union);
+        const querySchool = pg('wwg.school')
+            .column({ 'school_name': 'name' }, 'school_uid', 'city_uid')
+            .select()
+            .as('t2')
+
+        const addFilters = (hiddenFieldsColumn?: string) => (qb: Knex.QueryBuilder) => {
+            if (!!data['self']) {
+                qb.where('t1.student_uid', self.student_uid);
+                return;
             }
-        )
-        .as('t1');
+            if (!!data['name']) {
+                qb.where('t1.name', 'LIKE', `%${data['name']}%`);
+                !!hiddenFieldsColumn && qb.orWhereRaw(`name = ANY(${hiddenFieldsColumn}})`)
+            }
+            if (!!data['phone_number']) {
+                qb.where('phone_number', 'LIKE', `%${data['phone_number']}%`);
+                !!hiddenFieldsColumn && qb.orWhereRaw(`phone_number = ANY(${hiddenFieldsColumn}})`)
+            }
+            if (!!data['curriculum']) {
+                qb.where('curriculum_name', 'LIKE', `%${data['curriculum']}%`);
+            }
+            if (!!data['city']) {
+                qb.where('city.city', 'LIKE', `%${data['city']}%`);
+                !!hiddenFieldsColumn && qb.orWhereRaw(`name = ANY(${hiddenFieldsColumn}})`)
+            }
+            if (!!data['school_state_province']) {
+                qb.where('city.state_province', 'LIKE', `%${data['school_state_province']}%`);
+                !!hiddenFieldsColumn && qb.orWhereRaw(`school_uid = ANY(${hiddenFieldsColumn}})`)
+            }
+            if (!!data['school_country']) {
+                qb.where('city.country', 'LIKE', `%${data['school_country']}%`);
+                !!hiddenFieldsColumn && qb.orWhereRaw(`school_uid = ANY(${hiddenFieldsColumn}})`)
+            }
+        }
 
-    const querySchool = pg('wwg.school')
-        .column({ 'school_name': 'name' }, 'school_uid', 'city_uid')
-        .select()
-        .as('t2')
-
-    const addFilters = (hiddenFieldsColumn?: string) => (qb: Knex.QueryBuilder) => {
-        if (!!data['self']) {
-            qb.where('t1.student_uid', self.student_uid);
-            return;
-        }
-        if (!!data['name']) {
-            qb.where('t1.name', 'LIKE', `%${data['name']}%`);
-            !!hiddenFieldsColumn && qb.orWhereRaw(`name = ANY(${hiddenFieldsColumn}})`)
-        }
-        if (!!data['phone_number']) {
-            qb.where('phone_number', 'LIKE', `%${data['phone_number']}%`);
-            !!hiddenFieldsColumn && qb.orWhereRaw(`phone_number = ANY(${hiddenFieldsColumn}})`)
-        }
-        if (!!data['curriculum']) {
-            qb.where('curriculum_name', 'LIKE', `%${data['curriculum']}%`);
-        }
-        if (!!data['city']) {
-            qb.where('city.city', 'LIKE', `%${data['city']}%`);
-            !!hiddenFieldsColumn && qb.orWhereRaw(`name = ANY(${hiddenFieldsColumn}})`)
-        }
-        if (!!data['school_state_province']) {
-            qb.where('city.state_province', 'LIKE', `%${data['school_state_province']}%`);
-            !!hiddenFieldsColumn && qb.orWhereRaw(`school_uid = ANY(${hiddenFieldsColumn}})`)
-        }
-        if (!!data['school_country']) {
-            qb.where('city.country', 'LIKE', `%${data['school_country']}%`);
-            !!hiddenFieldsColumn && qb.orWhereRaw(`school_uid = ANY(${hiddenFieldsColumn}})`)
-        }
-    }
-
-    pg(queryStudent)
-        .distinctOn('student_uid')
-        .column(
-            't1.student_uid',
-            't1.name',
-            't1.class_number',
-            't1.grad_year',
-            't1.curriculum_name',
-            't1.phone_number',
-            't1.email',
-            't1.wxid',
-            't1.department',
-            't1.major',
-            't1.role',
-            't1.visibility_type',
-            't1.level',
-            't2.school_uid',
-            't2.school_name',
-            'city.city',
-            'city.country',
-            'city.state_province',
-            'hidden_fields'
-        )
-        .select()
-        .leftOuterJoin(querySchool, 't1.school_uid', 't2.school_uid')
-        .leftOuterJoin('city', 'city.city_uid', 't2.city_uid')
-        .leftOuterJoin(studentFieldVisibility, 'field_visibility.student_uid', 't1.student_uid')
-        .modify<any, (StudentClassRole & School & City & { school_name: string, hidden_fields: string | null })[]>(addFilters())
-        .then(async (students) => {
-            const privilegeTemp = await Promise.all(students.map(async (student) => {
-                return await RoleService.privilege(self, student);
-            }));
-            students = students.filter((_, index) => privilegeTemp[index].read && (!!!data['can_update_only'] || privilegeTemp[index].update));
-            logger.info(`Retrieved students for ${self.student_uid}`);
-            sendSuccess(res, {
-                students: await Promise.all(students.map(async (student, index) => {
-                    const privilege = privilegeTemp[index];
-                    const hiddenFields = parseHiddenFields(student.hidden_fields);
-                    return removeKeys(removeNull({
-                        uid: student.student_uid,
-                        name: student.name,
-                        class_number: student.class_number,
-                        grad_year: student.grad_year,
-                        curriculum: student.curriculum_name,
-                        phone_number: student.phone_number,
-                        email: student.email,
-                        wxid: student.wxid,
-                        department: student.department,
-                        major: student.major,
-                        school_uid: student.school_uid,
-                        school_name: student.school_name,
-                        school_country: student.country,
-                        school_state_province: student.state_province,
-                        city: student.city,
-                        self: self.student_uid === student.student_uid ? true : undefined,
-                        // Field visibility are only visible to the users themselves
-                        field_visibility: self.student_uid === student.student_uid ? ((obj: any) => { hiddenFields.forEach((val) => obj[val] = false); return obj; })({}) : undefined,
-                        // Role and visibility are only visible to admins or the users themselves
-                        role: privilege.level > 0 || self.student_uid === student.student_uid ? student.role : undefined,
-                        visibility: privilege.level > 0 || self.student_uid === student.student_uid ? student.visibility_type : undefined
-                    }), hiddenFields, privilege);
-                }))
-            });
-        })
-        .catch((err) => dbHandleError(err, res, logger));
+        pg(queryStudent)
+            .distinctOn('student_uid')
+            .column(
+                't1.student_uid',
+                't1.name',
+                't1.class_number',
+                't1.grad_year',
+                't1.curriculum_name',
+                't1.phone_number',
+                't1.email',
+                't1.wxid',
+                't1.department',
+                't1.major',
+                't1.role',
+                't1.visibility_type',
+                't1.level',
+                't2.school_uid',
+                't2.school_name',
+                'city.city',
+                'city.country',
+                'city.state_province',
+                'hidden_fields'
+            )
+            .select()
+            .leftOuterJoin(querySchool, 't1.school_uid', 't2.school_uid')
+            .leftOuterJoin('city', 'city.city_uid', 't2.city_uid')
+            .leftOuterJoin(studentFieldVisibility, 'field_visibility.student_uid', 't1.student_uid')
+            .modify<any, (StudentClassRole & School & City & { school_name: string, hidden_fields: string | null })[]>(addFilters())
+            .then(async (students) => {
+                const privilegeTemp = await Promise.all(students.map(async (student) => {
+                    return await RoleService.privilege(self, student);
+                }));
+                students = students.filter((_, index) => privilegeTemp[index].read && (!!!data['can_update_only'] || privilegeTemp[index].update));
+                logger.logComposed(
+                    self,
+                    Actions.access,
+                    'students',
+                    false,
+                    undefined,
+                    false,
+                    data,
+                );
+                sendSuccess(res, {
+                    students: await Promise.all(students.map(async (student, index) => {
+                        const privilege = privilegeTemp[index];
+                        const hiddenFields = parseHiddenFields(student.hidden_fields);
+                        return removeKeys(removeNull({
+                            uid: student.student_uid,
+                            name: student.name,
+                            class_number: student.class_number,
+                            grad_year: student.grad_year,
+                            curriculum: student.curriculum_name,
+                            phone_number: student.phone_number,
+                            email: student.email,
+                            wxid: student.wxid,
+                            department: student.department,
+                            major: student.major,
+                            school_uid: student.school_uid,
+                            school_name: student.school_name,
+                            school_country: student.country,
+                            school_state_province: student.state_province,
+                            city: student.city,
+                            self: self.student_uid === student.student_uid ? true : undefined,
+                            // Field visibility are only visible to the users themselves
+                            field_visibility: self.student_uid === student.student_uid ? ((obj: any) => { hiddenFields.forEach((val) => obj[val] = false); return obj; })({}) : undefined,
+                            // Role and visibility are only visible to admins or the users themselves
+                            role: privilege.level > 0 || self.student_uid === student.student_uid ? student.role : undefined,
+                            visibility: privilege.level > 0 || self.student_uid === student.student_uid ? student.visibility_type : undefined
+                        }), hiddenFields, privilege);
+                    }))
+                });
+            })
+            .catch((err) => dbHandleError(err, res, logger.logger));
+    })
 }
 
 export const put: Operation = async (req, res, next) => {
     const data = parseBody<typeof Service.updateStudent>(req);
-    const logger = log4js.getLogger('student.update');
+    const logger = ServerLogger.getLogger('student.update');
     // TODO: A student can clear their email first and then clear the phone number later in separate requests
     // to bypass the restriction that either email or phone number should be set. This needs to be solved in
     // the future by adding SQL constraints or manual checks through fetching students beforehand.
@@ -215,14 +214,19 @@ export const put: Operation = async (req, res, next) => {
         return accu;
     }, new Set()) ?? new Set();
 
-    if (!!!req.session.student_uid) {
-        logger.error(`Attempt to update ${data.student_uid ?? '[uid not specified]'} without authentication`);
-        sendError(res, 401, 'Login to update student information');
-        return;
-    }
+    if (!validateLogin(req, res, logger)) return;
 
     if (clear.has('email') && clear.has('phone_number')) {
-        logger.error(`Attempt to clear ${data.student_uid ?? req.session.student_uid}'s phone_number and email at the same time`)
+        data.password = undefined;
+        logger.logComposed(
+            req.session.student_uid,
+            Actions.update,
+            `${data.student_uid ?? req.session.student_uid}'s phone_number and email`,
+            false,
+            'phone_number and email cannot be cleared at the same time',
+            true,
+            data,
+        )
         sendError(res, 400, 'You cannot clear email and phone number at the same time');
         return;
     }
@@ -232,21 +236,47 @@ export const put: Operation = async (req, res, next) => {
     const privileges = await RoleService.privilege(req.session.student_uid, target_uid);
 
     if (!privileges.update) {
-        logger.error(`User update denied for ${data.student_uid} from ${req.session.student_uid} with privileges ${JSON.stringify(privileges)}`);
-        logger.error(data);
+        data.password = undefined;
+        logger.logComposed(
+            req.session.student_uid,
+            Actions.update,
+            `${target_uid.toString()}`,
+            false,
+            "the user didn't have enough privilege",
+            true,
+            { data: data, privileges: privileges },
+        )
         sendError(res, 403, 'You are not allowed to update this student\'s information');
         return;
     }
 
     if (privileges.level < 16 && !!data.grad_year) {
         sendError(res, 403, `You are not allowed to update the graduation year`);
-        logger.error(`${req.session.identifier} attempts to update grad_year`);
+        data.password = undefined;
+        logger.logComposed(
+            req.session.student_uid,
+            Actions.update,
+            `${target_uid.toString()}'s grad_year`,
+            false,
+            "the user didn't have enough privilege",
+            true,
+            { data: data, privileges: privileges },
+        )
         return;
     }
 
     if (privileges.level < 4 && !!data.class_number) {
         sendError(res, 403, `You are not allowed to update the class number`);
-        logger.error(`${req.session.identifier} attempts to update class_number`);
+        data.password = undefined;
+        logger.logComposed(
+            req.session.student_uid,
+            Actions.update,
+            `${target_uid.toString()}'s class_number`,
+            false,
+            "the user didn't have enough privilege",
+            true,
+            { data: data, privileges: privileges },
+        )
         return;
     }
 
@@ -255,8 +285,16 @@ export const put: Operation = async (req, res, next) => {
         (data.role === StudentRole.Curriculum.valueOf() && privileges.level < 8) ||
         (data.role === StudentRole.Year.valueOf() && privileges.level < 16) ||
         (data.role === StudentRole.System.valueOf() && privileges.level < 16))) {
-        logger.error(`${req.session.identifier} (level: ${privileges.level}) is denied for updating ${target_uid} ${privileges.grant ? 'for lower privilege level' : 'for role not allowed'}`);
-        logger.error(data);
+        data.password = undefined;
+        logger.logComposed(
+            req.session.student_uid,
+            Actions.update,
+            target_uid.toString(),
+            false,
+            `${privileges.grant ? 'the privilege level was too low' : 'the role was not allow for this operation'}`,
+            true,
+            { data: data, privileges: privileges }
+        );
         sendError(res, 403, `You are not allowed to alter this student\'s role${privileges.grant ? ` to '${data.role}' as your privilege level is ${privileges.level}` : ''}`);
         return;
     }
@@ -287,10 +325,9 @@ export const put: Operation = async (req, res, next) => {
                     .insert(prepared)
                     .onConflict(['student_uid', 'field'])
                     .merge()
-
             }
             catch (err) {
-                dbHandleError(err, res, logger);
+                dbHandleError(err, res, logger.logger);
                 return;
             }
         }
@@ -315,11 +352,19 @@ export const put: Operation = async (req, res, next) => {
                 role: data.role
             })
             .then(async result => {
-                logger.info(`Updated uid ${target_uid}'s information${!!!data.student_uid ? ' (self-update)' : ''}`);
-                logger.info(data);
+                data.password = undefined;
+                logger.logComposed(
+                    req.session.student_uid,
+                    Actions.update,
+                    `${target_uid}'s information${!!!data.student_uid ? ' (self-update)' : ''}`,
+                    false,
+                    undefined,
+                    false,
+                    data
+                )
                 sendSuccess(res);
             })
-            .catch(err => dbHandleError(err, res, logger));
+            .catch(err => dbHandleError(err, res, logger.logger));
     }
     else {
         sendSuccess(res);
@@ -329,17 +374,22 @@ export const put: Operation = async (req, res, next) => {
 //type: ignore
 export const DELETE: Operation = async (req, res, next) => {
     const data = parseBody<typeof Service.deleteStudent>(req);
-    const logger = log4js.getLogger('student.delete');
+    const logger = ServerLogger.getLogger('student.delete');
 
-    if (!!!req.session.student_uid) {
-        sendError(res, 401, 'Login to delete student');
-        return;
-    }
+    if (!validateLogin(req, res, logger)) return;
 
     const privilege = await RoleService.privilege(req.session.student_uid, data.student_uid);
 
     if (!privilege.delete) {
-        logger.error(`${req.session.student_uid} is denied from deleting ${data.student_uid}`);
+        logger.logComposed(
+            req.session.student_uid,
+            Actions.delete,
+            `student ${data.student_uid}`,
+            false,
+            "the user didn't have enough privilege",
+            true,
+            { data: data, privileges: privilege }
+        );
         sendError(res, 403, 'You are not authorized to delete this user');
         return;
     }
@@ -349,22 +399,33 @@ export const DELETE: Operation = async (req, res, next) => {
         .where('student_uid', data.student_uid)
         .then((result) => {
             if (result === 0) {
-                logger.info(`${req.session.student_uid} failed to delete Student ${data.student_uid}`);
+                logger.logComposed(
+                    req.session.student_uid,
+                    Actions.delete,
+                    `student ${data.student_uid}`,
+                    false,
+                    "no students affected",
+                    true
+                );
                 sendSuccess(res, { message: 'No students affected' });
             }
             else {
-                logger.info(`Student ${data.student_uid} is deleted by ${req.session.student_uid}`);
+                logger.logComposed(
+                    req.session.student_uid,
+                    Actions.delete,
+                    `student ${data.student_uid}`,
+                    false,
+                    undefined,
+                    false,
+                );
                 sendSuccess(res, { message: 'Successfully deleted the student' });
             }
-        }).catch((err) => {
-            logger.error(err);
-            sendError(res, 400, 'Failed to delete the student');
-        });
+        }).catch((err) => dbHandleError(err, res, logger.logger));
 }
 
 export const post: Operation = async (req, res, next) => {
     const data = parseBody<typeof Service.postStudent>(req);
-    const logger = log4js.getLogger('register');
+    const logger = ServerLogger.getLogger('register');
     let [class_number, grad_year] = [undefined as any, undefined as any];
 
     if (!!data.registration_key) {
@@ -379,7 +440,16 @@ export const post: Operation = async (req, res, next) => {
             ) as any)[0];
 
         if (!!!registrationInfo) {
-            logger.info(`Invalid registration key '${data.registration_key}'`);
+            data.password = ''
+            logger.logComposed(
+                "Visitor",
+                Actions.create,
+                "a user",
+                false,
+                `the registration key ${data.registration_key} is invalid`,
+                true,
+                data,
+            )
             sendError(res, 200, 'The registration key is invalid, please double-check or contact the administrator');
             return;
         }
@@ -396,22 +466,42 @@ export const post: Operation = async (req, res, next) => {
         const student = await StudentService.get(req.session.student_uid);
 
         if (student === undefined) {
-            logger.error(`Invalid user`);
+            logger.logComposed(
+                req.session.student_uid,
+                Actions.create,
+                'a user without a registration key',
+                false,
+                'the user is invalid',
+                true
+            )
             sendError(res, 403, 'Invalid user for this operation');
             return;
         }
 
-        if ((student.level as number) === 0) {
-            sendError(res, 403, 'Only administrator can add users without registration keys');
-            return;
-        }
+        if (!validateAdmin(res, student, logger)) return;
 
         if (!!!data.class_number || !!!data.grad_year) {
+            logger.logComposed(
+                req.session.student_uid,
+                Actions.create,
+                'a user without a registration key',
+                false,
+                "the user didn't supply the class number and the graduation year",
+                true
+            )
             sendError(res, 400, 'Please supply the class number and the graduation year when not using a registration key');
             return;
         }
 
         if (student.role !== StudentRole.System && data.grad_year !== student.grad_year) {
+            logger.logComposed(
+                req.session.student_uid,
+                Actions.create,
+                'a user without a registration key',
+                false,
+                `the user cannot register for graduation year other than ${student.grad_year}`,
+                true
+            )
             sendError(res, 400, `Cannot register with graduation year other than ${student.grad_year}`);
             return;
         }
@@ -419,19 +509,41 @@ export const post: Operation = async (req, res, next) => {
         const class_ = await ClassService.get(data.grad_year, data.class_number);
 
         if (!!!class_) {
+            logger.logComposed(
+                req.session.student_uid,
+                Actions.create,
+                'a user without a registration key',
+                false,
+                `the class ${data.grad_year} ${data.class_number} doesn't exist`,
+                true
+            )
             sendError(res, 400, `Cannot register with a class ${data.class_number} which doesn't exist`);
             return;
         }
 
         if ((student.level as number) < 4 && data.class_number !== student.class_number) {
             sendError(res, 400, `Cannot register with class number other than ${student.class_number}`);
-            logger.error(`${student.name} failed to register for ${data.name} with curriculum ${class_.class_number}`);
+            logger.logComposed(
+                req.session.student_uid,
+                Actions.create,
+                `a user ${data.name} without a registration key`,
+                false,
+                `the user cannot register with class_number ${class_.class_number}`,
+                true
+            )
             return;
         }
 
         if ((student.level as number) < 8 && class_.curriculum_name !== student.curriculum_name) {
             sendError(res, 400, `Cannot register with curriculum other than ${student.curriculum_name}`);
-            logger.error(`${student.name} failed to register with curriculum ${class_.curriculum_name}`);
+            logger.logComposed(
+                req.session.student_uid,
+                Actions.create,
+                `a user ${data.name} without a registration key`,
+                false,
+                `the user cannot register with curriculum ${class_.curriculum_name}`,
+                true
+            )
             return;
         }
 
@@ -454,8 +566,17 @@ export const post: Operation = async (req, res, next) => {
             grad_year: grad_year,
             school_uid: data.school_uid,
         }).then((result) => {
-            logger.info(`Successfully registered ${data.name} with the key '${data.registration_key}'`);
+            data.password = "";
+            logger.logComposed(
+                req.session.student_uid ?? 'Visitor',
+                Actions.create,
+                `a user ${data.name}`,
+                false,
+                undefined,
+                false,
+                data,
+            );
             sendSuccess(res);
-        }).catch((err) => dbHandleError(err, res, logger));
+        }).catch((err) => dbHandleError(err, res, logger.logger));
     });
 }

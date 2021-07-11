@@ -1,29 +1,36 @@
 import { Operation } from "express-openapi";
-import { getLogger } from "log4js";
 import { pg } from "..";
 import { City, School, SchoolAlias } from "../generated/schema";
 import { School as apiSchool } from "../generated";
 import { Service } from "../generated/services/Service";
 import {
+  Actions,
   dbHandleError,
   parseBody,
   parseQuery,
   sendError,
   sendSuccess,
+  ServerLogger,
 } from "../utils";
 
 export const get: Operation = async (req, res) => {
   const data = parseQuery<typeof Service.getSchool>(req) as any;
-  const logger = getLogger("school.get");
+  const logger = ServerLogger.getLogger("school.get");
 
   if (
     (data !== undefined && data?.limit < 1) ||
     (data !== undefined && data?.offset < 0)
   ) {
     sendError(res, 400, "Illegal offset or limit");
-    logger.error(
-      `Illegal offset or limit. offset: ${data.offset}; limit: ${data.limit}`
-    );
+    logger.logComposed(
+      req.session.student_uid ?? 'Visitor',
+      Actions.access,
+      'schools',
+      false,
+      'illegal offset or limit was given',
+      true,
+      data
+    )
     return;
   }
 
@@ -35,6 +42,15 @@ export const get: Operation = async (req, res) => {
       !!!data.city)
   ) {
     sendSuccess(res, { schools: [] });
+    logger.logComposed(
+      req.session.student_uid ?? 'Visitor',
+      Actions.access,
+      'schools',
+      false,
+      'no filters were applied',
+      false,
+      data
+    )
     return;
   }
 
@@ -94,16 +110,25 @@ export const get: Operation = async (req, res) => {
           matched_alias: data.school_name ? v.alias : undefined,
         } as apiSchool)
       );
-      logger.info("Successfully fetched schools");
+
+      logger.logComposed(
+        req.session.student_uid ?? 'Visitor',
+        Actions.access,
+        'schools',
+        false,
+        undefined,
+        false,
+        data
+      )
       sendSuccess(res, { schools: schools });
       return;
     })
-    .catch((err) => dbHandleError(err, res, logger));
+    .catch((err) => dbHandleError(err, res, logger.logger));
 };
 
 export const post: Operation = async (req, res) => {
   const data = parseBody<typeof Service.postSchool>(req);
-  const logger = getLogger("school.post");
+  const logger = ServerLogger.getLogger("school.post");
 
   if (!!!data.city_uid) {
     pg("city")
@@ -126,13 +151,22 @@ export const post: Operation = async (req, res) => {
             },
             "school_uid"
           )
-          .then((result) =>
+          .then((result) => {
             sendSuccess(res, {
               school_uid: result[0],
-            })
-          )
+            });
+            logger.logComposed(
+              req.session.student_uid ?? 'Visitor',
+              Actions.create,
+              'a school with a new city',
+              false,
+              undefined,
+              false,
+              data,
+            )
+          })
       )
-      .catch((err) => dbHandleError(err, res, logger));
+      .catch((err) => dbHandleError(err, res, logger.logger));
   } else {
     pg("school")
       .insert(
@@ -144,7 +178,18 @@ export const post: Operation = async (req, res) => {
         },
         "school_uid"
       )
-      .then((result) => sendSuccess(res, { school_uid: result[0] }))
-      .catch((err) => dbHandleError(err, res, logger));
+      .then((result) => {
+        sendSuccess(res, { school_uid: result[0] });
+        logger.logComposed(
+          req.session.student_uid ?? 'Visitor',
+          Actions.create,
+          'a school',
+          false,
+          undefined,
+          false,
+          data,
+        )
+      })
+      .catch((err) => dbHandleError(err, res, logger.logger));
   }
 };

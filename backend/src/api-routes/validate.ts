@@ -1,10 +1,11 @@
 import { Operation } from 'express-openapi';
 import { pg } from '..';
 import { Service } from '../generated';
-import { parseBody, sendError, sendSuccess } from '../utils';
+import { Actions, parseBody, sendError, sendSuccess, ServerLogger } from '../utils';
 
 export const post: Operation = (req, res, next) => {
     const data = parseBody<typeof Service.validate>(req);
+    const logger = ServerLogger.getLogger('validate');
 
     pg('wwg.registration_key').joinRaw('NATURAL JOIN wwg.class')
         .select()
@@ -23,9 +24,23 @@ export const post: Operation = (req, res, next) => {
                     'curriculum': result[0].curriculum_name,
                     'expiration_date': result[0].expiration_date
                 });
+                logger.logComposed(
+                    req.session.student_uid ?? 'Visitor',
+                    Actions.access,
+                    'registration key validation',
+                );
             }
             else {
                 sendError(res, 200, 'The registration key is invalid');
+                logger.logComposed(
+                    req.session.student_uid ?? 'Visitor',
+                    Actions.access,
+                    'registration key validation',
+                    false,
+                    'registration key is invalid',
+                    false,
+                    data,
+                );
             }
         });
 }

@@ -4,25 +4,14 @@ import { pg } from '..';
 import { Student as StudentRes, School as SchoolRes, StudentVerbose } from '../generated';
 import { City, School, StudentClassRole, StudentVisibility } from '../generated/schema';
 import { RoleService } from '../services';
-import { parseHiddenFields, removeKeys, removeNull, sendError, sendSuccess } from '../utils';
+import { Actions, dbHandleError, getSelf, parseHiddenFields, removeKeys, removeNull, sendError, sendSuccess, ServerLogger, validateLogin } from '../utils';
 import { studentFieldVisibility } from './student';
 
 export const get: Operation = async (req, res, next) => {
-    const logger = log4js.getLogger('roster');
-    if (!!!req.session.identifier) {
-        logger.info('User not identified');
-        sendError(res, 401, 'Please login to access the roster');
-    }
-    else {
-        const self = await pg.select<StudentClassRole>().from('wwg.student_class_role')
-            .where('student_uid', req.session.student_uid).first();
+    const logger = ServerLogger.getLogger('roster');
+    if (!validateLogin(req, res, logger)) return;
 
-        if (!!!self || !self.class_number || !self.curriculum_name || !self.grad_year) {
-            logger.error(`Invalid user: ${self}`)
-            sendError(res, 403, 'Invalid user');
-            return;
-        }
-
+    getSelf(req, res, logger, self => !!self.class_number || !!self.curriculum_name || !!self.grad_year).then(self => {
         const queryStudents = pg.select()
             .from<StudentClassRole>('wwg.student_class_role')
             .where('student_uid', req.session.student_uid)
@@ -47,7 +36,11 @@ export const get: Operation = async (req, res, next) => {
             .select<(StudentClassRole & { hidden_fields: string | null })[]>()
             .leftOuterJoin(studentFieldVisibility, 'field_visibility.student_uid', 'students.student_uid')
             .then(async (students) => {
-                logger.info('Successfully GET roster');
+                logger.logComposed(
+                    self,
+                    Actions.access,
+                    'roster'
+                )
                 const schools = await pg.select().from<School & City>('wwg.school')
                     .joinRaw('NATURAL JOIN city')
                     .whereIn('school_uid', Object.values(students.map((student) => student.school_uid)));
@@ -84,9 +77,6 @@ export const get: Operation = async (req, res, next) => {
                         } as SchoolRes);
                     }).filter(school => school.students !== undefined && school.students.length > 0)
                 });
-            }).catch((err) => {
-                logger.error(err);
-                sendError(res, 500);
-            });
-    }
+            }).catch((err) => dbHandleError(err, res, logger.logger));
+    })
 }

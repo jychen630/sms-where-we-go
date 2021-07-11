@@ -1,12 +1,11 @@
 import { Operation } from "express-openapi";
-import { getLogger } from "log4js";
 import { pg } from "..";
 import { Service } from "../generated";
-import { dbHandleError, parseQuery, sendSuccess } from "../utils";
+import { Actions, dbHandleError, parseQuery, sendSuccess, ServerLogger } from "../utils";
 
 export const get: Operation = async (req, res) => {
     const data = parseQuery<typeof Service.getCity>(req) as any;
-    const logger = getLogger("city.get");
+    const logger = ServerLogger.getLogger("city.get");
 
     const subquery = pg("city")
         .column(
@@ -25,7 +24,7 @@ export const get: Operation = async (req, res) => {
         .limit(data?.limit ?? 1)
         .offset(data?.offset ?? 0)
         .then((result) => {
-            logger.info("Successfully fetched cities");
+            logger.logComposed(req.session.student_uid ?? 'Visitor', Actions.access, 'cities');
             sendSuccess(res, {
                 cities: result.map((value) => ({
                     city_uid: value.city_uid,
@@ -35,5 +34,5 @@ export const get: Operation = async (req, res) => {
                 }))
             });
         })
-        .catch((err) => dbHandleError(err, res, logger))
+        .catch((err) => dbHandleError(err, res, logger.logger))
 }

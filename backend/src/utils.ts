@@ -137,11 +137,11 @@ export const validateAdmin = async (res: Response, self: StudentClassRole, logge
     }
 }
 
-export const getSelf = async (req: Request, res: Response, logger: ServerLogger): Promise<StudentClassRole> => {
+export const getSelf = async (req: Request, res: Response, logger: ServerLogger, validator?: (self: StudentClassRole) => boolean): Promise<StudentClassRole> => {
     const student = await StudentService.get(req.session.student_uid);
 
-    if (student === undefined) {
-        logger.logComposed(req.session.student_uid, Actions.read, 'self', false, 'the student uid was invalid');
+    if (student === undefined || validator && !validator(student)) {
+        logger.logComposed(req.session.student_uid, Actions.read, 'self', false, 'the student was invalid');
         sendError(res, 403, 'Invalid user for this operation');
         return Promise.reject();
     }
@@ -176,11 +176,12 @@ export class ServerLogger {
      * @param error Whether display the log message as an error or not
      * @param additional Additional information as an object that will be converted to JSON to be displayed
      */
-    logComposed(who: StudentClassRole | number | string, action: (p: boolean) => string, target: string | StudentClassRole, showPrivilege: boolean = false, exception?: string, error: boolean = false, additional?: object): void {
+    logComposed(who: StudentClassRole | number | string, action: (p: boolean) => string, target?: string | StudentClassRole, showPrivilege: boolean = false, exception?: string, error: boolean = false, additional?: object): void {
         const formatPrivilege = (student: StudentClassRole) => showPrivilege ? `, role: ${student.role}, level: ${student.level}` : '';
         const hasException = exception !== undefined;
+        if (who === undefined) who = 'Unknown user';
         const student = typeof who === 'number' ? `uid ${who}` : typeof who === 'string' ? who : `${who.name} (uid: ${who.student_uid}${formatPrivilege(who)})`
-        let message = `${student}${hasException ? ' attemped to ' : ' '}${action(hasException)} ${typeof target === 'string' ? target : formatPrivilege(target)}`;
+        let message = `${student}${hasException ? ' attemped to ' : ' '}${action(hasException)}${!!target ? ` ${typeof target === 'string' ? target : formatPrivilege(target)}` : ''}`;
         if (hasException) {
             message = message.concat(` but ${exception}`);
         }
