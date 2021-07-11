@@ -1,6 +1,6 @@
 \encoding 'UTF8';
 DROP SCHEMA IF EXISTS wwg;
-CREATE SCHEMA wwg;
+CREATE SCHEMA wwg AUTHORIZATION wwgadmin;
 
 CREATE EXTENSION fuzzystrmatch
     SCHEMA wwg
@@ -129,7 +129,7 @@ CREATE TABLE wwg.comment (
     sender_name VARCHAR(120),
     content TEXT,
     posted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (feedback_uid) REFERENCES wwg.feedback(feedback_uid)
+    FOREIGN KEY (feedback_uid) REFERENCES wwg.feedback(feedback_uid) ON DELETE CASCADE
 );
 
 CREATE TYPE STUDENT_FIELD as ENUM ('phone_number', 'email', 'wxid', 'department', 'major', 'school_uid');
@@ -139,14 +139,14 @@ CREATE TABLE wwg.student_field_visibility (
     field STUDENT_FIELD NOT NULL,
     hidden BOOLEAN DEFAULT false,
     PRIMARY KEY (student_uid, field),
-    FOREIGN KEY (student_uid) REFERENCES wwg.student(student_uid)
+    FOREIGN KEY (student_uid) REFERENCES wwg.student(student_uid) ON DELETE CASCADE
 );
 
 CREATE TABLE wwg.additional_info (
     student_uid INT PRIMARY KEY,
     key_name VARCHAR(30) UNIQUE NOT NULL,
     value VARCHAR(255) NOT NULL,
-    FOREIGN KEY (student_uid) REFERENCES wwg.student(student_uid)
+    FOREIGN KEY (student_uid) REFERENCES wwg.student(student_uid) ON DELETE CASCADE
 );
 
 CREATE VIEW wwg.student_class AS 
@@ -171,3 +171,6 @@ CREATE TRIGGER school_insert
     AFTER INSERT ON wwg.school
     FOR EACH ROW
     EXECUTE FUNCTION add_alias();
+
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA wwg TO wwgadmin;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA wwg TO wwgadmin;
