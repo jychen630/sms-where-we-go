@@ -58,7 +58,7 @@ const StudentSearchTool = ({ data, onSelect, hasCoordinate = true }: { data: rea
                                 .reduce<{ similarity: number, keyword: string }>(
                                     (accu, val) => {
                                         if (typeof (val) === "string" || typeof (val) === "number") {
-                                            const similarity = compareTwoStrings(val.toString(), props.value);
+                                            const similarity = compareTwoStrings(val.toString().toLowerCase(), props.value.toLowerCase());
                                             return (similarity > accu.similarity) ? { similarity: similarity, keyword: val.toString() } : accu
                                         }
                                         else {
