@@ -9,12 +9,12 @@ type StudentSearchResult = {
     index: number,
     student: Student & StudentVerbose,
     original: School & { students: (Student & StudentVerbose)[] },
-    coordinates: readonly [number, number],
+    coordinates?: readonly [number, number],
     similarity: number,
     keyword: string,
 }
 
-const StudentSearchTool = ({ data, onSelect }: { data: readonly MapItem[], onSelect: (props: StudentSearchResult) => void }) => {
+const StudentSearchTool = ({ data, onSelect, hasCoordinate = true }: { data: readonly MapItem[], onSelect: (props: StudentSearchResult) => void, hasCoordinate?: boolean }) => {
     const [current, setCurrent] = useState<StudentSearchResult | undefined>();
     const [cached, setCached] = useState<StudentSearchResult[] | undefined>();
     const [cachedKeyword, setCachedKeyword] = useState("");
@@ -26,14 +26,17 @@ const StudentSearchTool = ({ data, onSelect }: { data: readonly MapItem[], onSel
                 if (cached !== undefined && props.value === cachedKeyword) {
                     return Promise.resolve(cached.slice(props.offset, props.offset + props.limit));
                 }
-                const result = data
-                    .filter((data): data is { longitude: number, latitude: number } & MapItem => data.latitude !== undefined && data.longitude !== undefined)
+                const result = (hasCoordinate ?
+                    data.filter((data): data is { longitude: number, latitude: number } & MapItem => data.latitude !== undefined && data.longitude !== undefined)
+                    :
+                    data
+                )
                     .flatMap((raw) => {
                         return raw.students?.map((student, index) => ({
                             index: index,
                             student: student,
                             original: Object.assign({}, raw, { students: [student] }),
-                            coordinates: [raw.longitude, raw.latitude] as const,
+                            coordinates: !!!raw.longitude || !!!raw.latitude ? undefined : [raw.longitude, raw.latitude] as const,
                         })) ?? [];
                     })
                     .map(data => {
