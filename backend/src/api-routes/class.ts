@@ -26,6 +26,8 @@ export const get: Operation = async (req, res) => {
                     qb.where('class.class_number', self.class_number as number);
                 }
             })
+            .orderBy('class.grad_year')
+            .orderBy('class.class_number')
             .then((result) => {
                 sendSuccess(res, {
                     classes: result.map(val => ({

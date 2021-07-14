@@ -1,6 +1,5 @@
 import { Operation } from 'express-openapi';
 import hash, { hashSync } from 'bcrypt';
-import log4js from 'log4js';
 import { pg } from '..';
 import { Knex } from 'knex';
 import { Service } from '../generated';
