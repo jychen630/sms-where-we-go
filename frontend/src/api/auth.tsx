@@ -77,7 +77,7 @@ export const useAuthProvider = () => {
     }
 
     const update = async () => {
-        Service.getStudent(true)
+        return Service.getStudent(true)
             .then(res => {
                 if (!!res.students) {
                     setRole(res.students[0].role);
@@ -85,6 +85,7 @@ export const useAuthProvider = () => {
                     setGradYear(res.students[0].grad_year);
                     setCurriculum(res.students[0].curriculum);
                     setClassNumber(res.students[0].class_number);
+                    return Promise.resolve();
                 }
                 else {
                     return Promise.reject();
@@ -92,6 +93,7 @@ export const useAuthProvider = () => {
             })
             .catch(err => {
                 clear();
+                return Promise.reject(err)
             });
     }
 

@@ -30,9 +30,15 @@ const LoginForm = () => {
             identifier,
             use_uid,
         )
-            .then((res) => {
-                // success
+            .then(async (res) => {
                 if (res.result === Result.result.SUCCESS) {
+                    try {
+                        await auth.update();
+                    }
+                    catch (err) {
+                        console.error(err)
+                        return Promise.reject("连接失败");
+                    }
                     notification.success({
                         message: '登录成功',
                         description: <Space>加载中 <Spin /></Space>,
