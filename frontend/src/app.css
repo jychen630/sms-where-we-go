@@ -45,7 +45,6 @@
 .mapboxgl-popup-content {
   padding: 0 0 0 0;
   min-width: 240px;
-  max-height: calc(50vh - var(--header-height));
 }
 
 .mapboxgl-popup-close-button {
@@ -71,7 +70,7 @@
 }
 
 .collapse-panel .ant-collapse-content-box {
-  max-height: 350px;
+  max-height: 150px;
   overflow-x: hidden;
   overflow-y: scroll;
   margin-right: -16px;

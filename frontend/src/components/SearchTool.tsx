@@ -24,6 +24,7 @@ export type SearchHandlerProps = {
 // See also for why we don't use forwardRef: https://github.com/microsoft/TypeScript/pull/30215
 const SearchTool = <T extends unknown>({ searchHandler, placeholder, item, initialValue, inputRef, searchLimit = 5, EmptyPlaceholder = () => <Empty />, searchProps }: SearchToolProps<T>) => {
     const [value, setValue] = useState('');
+    const [collapsed, setCollapsed] = useState(false);
     const [offset, setOffset] = useState(0);
     const [loading, setLoading] = useState(false);
     const [resultList, setResultList] = useState<T[]>([]);
@@ -50,6 +51,7 @@ const SearchTool = <T extends unknown>({ searchHandler, placeholder, item, initi
 
     const handleSearch = useCallback(({ offset, limit, value, append = false }: Partial<SearchHandlerProps> & { value: string, append?: boolean }) => {
         setLoading(true);
+        setCollapsed(false);
         search({
             offset: offset ?? 0,
             limit: limit ?? searchLimit,
@@ -79,7 +81,11 @@ const SearchTool = <T extends unknown>({ searchHandler, placeholder, item, initi
                 }}
                 {...searchProps}
             />
-            <Collapse defaultActiveKey={0} ghost>
+            <Collapse
+                activeKey={collapsed ? [] : [0]}
+                onChange={value => setCollapsed(value.length === 0)}
+                ghost
+            >
                 <Collapse.Panel
                     key={0}
                     header={
