@@ -1,4 +1,4 @@
-import { Button, Card, Divider, Form, Input, notification, Select } from 'antd';
+import { Button, Card, Divider, Form, Input, notification, Select, Space } from 'antd';
 import { useCallback } from 'react';
 import { useState } from 'react';
 import { useEffect } from 'react';
@@ -53,6 +53,25 @@ const Classes = () => {
             })
             .catch(err => handleApiError(err, createNotifyError(t, '错误', '未能添加新班级')));
     }, [t, fetchClasses]);
+
+    const handleDeleteClass = (classNumber: number, gradYear: number) => {
+        Service.deleteClass({
+            class_number: classNumber,
+            grad_year: gradYear,
+            force: false,
+        }).then(res => {
+            if (res.result === Result.result.SUCCESS) {
+                notification.success({
+                    message: '成功',
+                    description: `已移除${gradYear}届 ${classNumber}班`,
+                    duration: 1,
+                });
+            }
+            else {
+                return Promise.reject(res.message);
+            }
+        }).catch(err => handleApiError(err, createNotifyError(t, '错误', '班级删除失败')))
+    };
 
     return (
         <>
@@ -127,7 +146,10 @@ const Classes = () => {
             <Divider>查看班级</Divider>
             {!!classes && classes.map((class_) =>
                 <Card key={`${class_.grad_year} ${class_.class_number}`}>
-                    <InfoList {...class_} key={`${class_.grad_year} ${class_.class_number}`} />
+                    <Space direction='vertical'>
+                        <InfoList {...class_} key={`${class_.grad_year} ${class_.class_number}`} />
+                        <Button onClick={() => handleDeleteClass(class_.class_number, class_.grad_year)} danger>删除</Button>
+                    </Space>
                 </Card>
             )}
         </>
