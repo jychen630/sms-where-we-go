@@ -12,7 +12,7 @@ type KeyInfo = RegistrationKeyInfo & {
     activated?: boolean | undefined;
 };
 
-const RegistrationKeyForm = (props: { form: FormInstance<{ class: string }>, onSuccess?: () => void }) => {
+const RegistrationKeyForm = (props: { form: FormInstance<{ classes: string[] }>, onSuccess?: () => void }) => {
     const history = useHistory();
     const [t] = useTranslation();
     const [classes, setClasses] = useState<Class[]>([]);
@@ -20,31 +20,54 @@ const RegistrationKeyForm = (props: { form: FormInstance<{ class: string }>, onS
     useEffect(() => {
         Service.getClass()
             .then(res => {
-                props.form.setFieldsValue({ class: res.classes.length > 0 ? JSON.stringify(res.classes[0]) : '' })
+                props.form.setFieldsValue({ classes: res.classes.length > 0 ? [JSON.stringify(res.classes[0])] : [] })
                 setClasses(res.classes);
             })
             .catch(err => handleApiError(err, createNotifyError(t, '失败', '未能获取可用班级', (err) => err.requireLogin && setTimeout(() => history.push('/login', history.location), 1500))))
     }, [t, props.form, history]);
 
-    const handleFinish = useCallback((data: { class: string }) => {
-        const class_ = JSON.parse(data.class) as Class;
-        Service.postRegistrationKey({
-            class_number: class_.class_number,
-            grad_year: class_.grad_year,
-        })
-            .then(res => {
-                if (res.result === Result.result.SUCCESS) {
-                    notification.success({
-                        message: '成功',
-                        description: `已成功创建注册码: ${res.registration_key}`
-                    });
-                    props.onSuccess && props.onSuccess();
-                }
-                else {
-                    return Promise.reject(res.message);
-                }
+    const handleFinish = useCallback((data: { classes: string[] }) => {
+        let registrationKeys: {
+            registrationKey: string,
+            classNumber: number,
+            gradYear: number
+        }[] = [];
+        console.log(data);
+        Promise.all(data.classes.map(async value => {
+            const class_ = JSON.parse(value) as Class;
+            return Service.postRegistrationKey({
+                class_number: class_.class_number,
+                grad_year: class_.grad_year,
             })
-            .catch(err => handleApiError(err, createNotifyError(t, '失败', '未能添加注册码')))
+                .then(res => {
+                    if (res.result !== Result.result.SUCCESS || !!!res.registration_key) {
+                        return Promise.reject(res.message);
+                    }
+                    else {
+                        registrationKeys.push({
+                            registrationKey: res.registration_key,
+                            classNumber: class_.class_number,
+                            gradYear: class_.grad_year,
+                        });
+                    }
+                })
+                .catch(err => handleApiError(err, createNotifyError(t, '失败', `未能添加${class_.grad_year}届 ${class_.class_number}的注册码`)))
+        })).then(
+            res => {
+                notification.success({
+                    message: '成功',
+                    description: <>
+                        <p>已成功创建注册码:</p>
+                        <p>
+                            {registrationKeys
+                                .map(val => `${val.registrationKey} (${val.gradYear}届 ${val.classNumber}班)`)
+                                .join(',')}
+                        </p>
+                    </>,
+                });
+                props.onSuccess && props.onSuccess();
+            }
+        )
     }, [t, props]);
 
     return (
@@ -53,10 +76,10 @@ const RegistrationKeyForm = (props: { form: FormInstance<{ class: string }>, onS
             onFinish={handleFinish}
         >
             <Form.Item
-                name='class'
+                name='classes'
                 label='选择班级'
             >
-                <Select disabled={classes.length === 0}>
+                <Select disabled={classes.length === 0} mode='multiple'>
                     {classes.map((value, index) =>
                         <Select.Option
                             key={index}
@@ -75,7 +98,7 @@ const RegistrationKey = () => {
     const [t] = useTranslation();
     const [visible, setVisible] = useState(false);
     const [keys, setKeys] = useState<KeyInfo[]>([]);
-    const [form] = Form.useForm<{ class: string }>();
+    const [form] = Form.useForm<{ classes: string[] }>();
 
     const fetchKeys = useCallback(() => {
         Service.getRegistrationKey()
