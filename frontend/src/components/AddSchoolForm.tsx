@@ -251,7 +251,7 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                     </Form.Item>
                 </Space>
                 <h3>搜索 & 预览</h3>
-                <Map getData={mockStudentData} getPopup={(props) => <InfoCard {...props} />} zoom={8} startingCoordinate={!!location?.latitude && !!location.longitude ? { longitude: location.longitude, latitude: location.latitude - 0.005 } : undefined} responsive></Map>
+                <Map initialZoom={8} getData={mockStudentData} getPopup={(props) => <InfoCard {...props} />} zoom={8} startingCoordinate={!!location?.latitude && !!location.longitude ? { longitude: location.longitude, latitude: location.latitude - 0.005 } : undefined} responsive></Map>
                 {!!location && <Card>
                     <Optional content={location.name} icon={<FontAwesomeIcon icon={faAddressCard} />} />
                     <Optional content={<>({location.longitude?.toFixed(5)}, {location.latitude?.toFixed(5)})</>} icon={<FontAwesomeIcon icon={faMapPin} />} dependencies={[location.longitude, location.latitude]} />

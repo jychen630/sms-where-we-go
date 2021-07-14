@@ -29,7 +29,7 @@ const convertCoordinates = (e: any): [number, number] => {
     return coordinates
 }
 
-export default function Map({ getData, getPopup, zoom = 5, startingCoordinate = DEFAULT_CENTER, responsive = false }: { getData: () => Promise<MapItem[]>, getPopup: (props: MapItem) => JSX.Element, zoom?: number, startingCoordinate?: Coordinate, responsive?: boolean }) {
+export default function Map({ getData, getPopup, zoom, initialZoom = 5, startingCoordinate = DEFAULT_CENTER, responsive = false }: { getData: () => Promise<MapItem[]>, getPopup: (props: MapItem) => JSX.Element, zoom?: number, initialZoom?: number, startingCoordinate?: Coordinate, responsive?: boolean }) {
     const mapRef = useRef(null);
     const mapContainer = useRef(null);
     const [map, setMap] = useState<MapType>();
@@ -49,18 +49,28 @@ export default function Map({ getData, getPopup, zoom = 5, startingCoordinate = 
         const map = new mapboxgl.Map({
             container: mapContainer.current as any,
             style: 'mapbox://styles/mapbox/streets-v10',
+            zoom: initialZoom,
         }).addControl(lang);
         map.dragRotate.disable();
         map.touchZoomRotate.disableRotation();
         setMap(map);
-    }, [mapContainer]);
+    }, [initialZoom, mapContainer]);
 
     const flyTo = useCallback((lng = startingCoordinate.longitude, lat = startingCoordinate.latitude) => {
         if (!!map) {
-            map.flyTo({
-                center: [lng, lat],
-                zoom: zoom
-            })
+            if (!!zoom) {
+                map.flyTo({
+                    center: [lng, lat],
+                    duration: 250,
+                    zoom: zoom,
+                });
+            }
+            else {
+                map.flyTo({
+                    center: [lng, lat],
+                    duration: 250,
+                });
+            }
         }
     }, [map, zoom, startingCoordinate]);
 
