@@ -84,13 +84,13 @@ const InfoUpdateForm = ({ getStudent, showRoleOptions = false }: { showRoleOptio
         if (!!!fieldVisibility) {
             return {};
         }
-        const checked = fieldVisibility[name] !== undefined ? !fieldVisibility[name] : false;
+        const checked = fieldVisibility[name] !== undefined ? fieldVisibility[name] : true;
         return {
             suffix: <Switch
                 checked={checked}
-                onChange={val => { updateFieldVisibility(name, !val) }}
-                checkedChildren='已隐藏'
-                unCheckedChildren='他人可见'
+                onChange={val => { updateFieldVisibility(name, val) }}
+                checkedChildren='已公开'
+                unCheckedChildren='已隐藏'
             />
         };
     }, [fieldVisibility, updateFieldVisibility]);

@@ -90,7 +90,7 @@ const FeedbackCard = (props: FeedbackVerbose & { adminView: boolean }) => {
                             ))}
                         </div>
                         :
-                        <Empty />
+                        <Empty description="无数据" />
                     }
                     <Divider />
                     <ComposeBox sendBtnLabel='添加评论' onSent={handleSendComment} />

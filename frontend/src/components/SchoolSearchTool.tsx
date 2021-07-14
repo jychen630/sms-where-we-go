@@ -58,7 +58,7 @@ const SchoolSearchTool = ({ schoolUid, setSchoolUid, initialValue, searchProps }
                                         清空
                                     </Button>
                                     :
-                                    <Empty />
+                                    <Empty description="无数据" />
                             )
                         }}
                         initialValue={schoolUid !== -1 ? initialValue : ''}

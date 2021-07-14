@@ -1,4 +1,4 @@
-import { Space, Switch } from "antd";
+import { Empty, Space, Switch } from "antd";
 import { useEffect } from "react";
 import { useCallback } from "react";
 import { useState } from "react";
@@ -36,15 +36,18 @@ const Feedbacks = ({ adminView, count }: { adminView: boolean, count?: number })
         <>
             <Space direction='vertical' style={{ width: '100%' }}>
                 <Switch defaultChecked={pendingOnly} checkedChildren='仅未处理项' unCheckedChildren='所有项' onChange={val => setPendingOnly(val)}></Switch>
-                {feedbacks.map(val => (!pendingOnly || val.status === 'pending') && <FeedbackCard
-                    key={val.feedback_uid}
-                    onSent={fetchFeedbacks}
-                    onUpdateStatus={(status) => {
-                        updateFeedback(val.feedback_uid, status);
-                    }}
-                    adminView={adminView}
-                    {...val}
-                />)}
+                {feedbacks.length > 0 ?
+                    feedbacks.map(val => (!pendingOnly || val.status === 'pending') && <FeedbackCard
+                        key={val.feedback_uid}
+                        onSent={fetchFeedbacks}
+                        onUpdateStatus={(status) => {
+                            updateFeedback(val.feedback_uid, status);
+                        }}
+                        adminView={adminView}
+                        {...val}
+                    />)
+                    :
+                    <Empty description="无历史反馈" />}
             </Space>
         </>
     )
