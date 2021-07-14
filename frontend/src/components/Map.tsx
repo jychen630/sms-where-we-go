@@ -68,7 +68,7 @@ export default function Map({ getData, getPopup, zoom = 5, startingCoordinate = 
         if (!!focus && autoFlyTo) {
             flyTo(focus[0], focus[1]);
         }
-    }, [focus]);
+    }, [focus, autoFlyTo]);
 
     useEffect(() => {
         setFocus([startingCoordinate.longitude, startingCoordinate.latitude]);
@@ -83,12 +83,18 @@ export default function Map({ getData, getPopup, zoom = 5, startingCoordinate = 
             // We disable the popup on mobile devices due to its bad performance
             if (!!!map) return;
             map.getCanvas().style.cursor = "pointer";
-            if (isMobile || !showPopup) return;
+            let data = e.features[0].properties;
+            data.students = JSON.parse(data.students) ?? [];
+            setCurrentItem(data);
+            if (isMobile) return;
             const coordinates = convertCoordinates(e);
             const container = document.createElement('div');
-            let data = e.features[0].properties;
-            data.students = !!data.students ? JSON.parse(data.students) : [];
-            ReactDOM.render(<div style={{ maxHeight: "40vh" }}>{getPopup(data)}</div>, container);
+            if (showPopup) {
+                ReactDOM.render(getPopup(data), container);
+            }
+            else {
+                ReactDOM.render(data.school_name, container);
+            }
             tempPopup.setLngLat(coordinates).setDOMContent(container).addTo(map);
         }
 
@@ -185,37 +191,39 @@ export default function Map({ getData, getPopup, zoom = 5, startingCoordinate = 
     return (
         <>
             <div className={responsive ? 'map-container-responsive' : 'map-container'} ref={mapContainer}></div>
-            <div className="floating-control-container">
-                <div>
-                    <MapControl
-                        onToggle={(toggle) => {
-                            setModalMode(toggle);
-                            setShowModal(false);
-                            setInfoBarHidden(true);
-                        }}
-                        Content={() => <GroupOutlined />}
-                        AltContent={() => isMobile ? <UpSquareOutlined /> : <LeftCircleOutlined style={{ transform: "rotate(180deg)" }} />}
-                    />
-                    <MapControl
-                        onToggle={(toggle) => {
-                            setAutoFlyTo(toggle);
-                        }}
-                        defaultToggled={true}
-                        altType='ghost'
-                        Content={() => <FullscreenExitOutlined />}
-                    />
-                    {!isMobile &&
+            {!responsive &&
+                <div className="floating-control-container">
+                    <div>
                         <MapControl
                             onToggle={(toggle) => {
-                                setShowPopup(toggle);
+                                setModalMode(toggle);
+                                setShowModal(false);
+                                setInfoBarHidden(true);
+                            }}
+                            Content={() => <GroupOutlined />}
+                            AltContent={() => isMobile ? <UpSquareOutlined /> : <LeftCircleOutlined style={{ transform: "rotate(180deg)" }} />}
+                        />
+                        <MapControl
+                            onToggle={(toggle) => {
+                                setAutoFlyTo(toggle);
                             }}
                             defaultToggled={true}
                             altType='ghost'
-                            Content={() => <SolutionOutlined />}
+                            Content={() => <FullscreenExitOutlined />}
                         />
-                    }
+                        {!isMobile &&
+                            <MapControl
+                                onToggle={(toggle) => {
+                                    setShowPopup(toggle);
+                                }}
+                                defaultToggled={true}
+                                altType='ghost'
+                                Content={() => <SolutionOutlined />}
+                            />
+                        }
+                    </div>
                 </div>
-            </div>
+            }
             <Modal title={currentItem?.school_name} visible={modalMode && showModal} onCancel={() => setShowModal(false)} footer={null} bodyStyle={{ padding: '0 0 0 0' }}>
                 {currentItem !== undefined && getPopup(currentItem)}
             </Modal>
@@ -228,7 +236,9 @@ export default function Map({ getData, getPopup, zoom = 5, startingCoordinate = 
                                 <StudentSearchTool
                                     data={data}
                                     onSelect={(val) => {
-                                        setFocus([val.coordinates[0], val.coordinates[1]]);
+                                        if (val.coordinates) {
+                                            setFocus([val.coordinates[0], val.coordinates[1]]);
+                                        }
                                         setCurrentItem(val.original);
                                     }}
                                 />
