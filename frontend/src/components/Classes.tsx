@@ -8,7 +8,13 @@ import { useAuth } from '../api/auth';
 import { createNotifyError, handleApiError } from '../api/utils';
 import InfoList from './InfoList';
 
-type Values = { class_number: string, curriculum: string, grad_year: string };
+const classFormProps = (name: string) => ({
+    name: name,
+    required: true,
+    noStyle: true,
+})
+
+type Values = { class_number_lower: string, class_number_upper: string, curriculum: string, grad_year: string };
 const Classes = () => {
     const auth = useAuth();
     const [t] = useTranslation();
@@ -33,25 +39,55 @@ const Classes = () => {
     }, [fetchClasses]);
 
     const handleFinish = useCallback((data: Values) => {
-        Service.postClass({
-            class_number: Number.parseInt(data.class_number),
-            grad_year: Number.parseInt(data.grad_year),
-            curriculum: data.curriculum
-        })
-            .then(res => {
-                if (res.result === Result.result.SUCCESS) {
-                    notification.success({
-                        message: '成功',
-                        description: `已添加${data.grad_year}届 ${data.class_number}班 ${t(data.curriculum)}`,
-                        duration: 1
-                    });
-                    fetchClasses();
-                }
-                else {
-                    return Promise.reject(res.message);
-                }
+        let [lower, upper] = [parseInt(data.class_number_lower), parseInt(data.class_number_upper)]
+        if (isNaN(upper)) { upper = lower; }
+        let successes: string[] = [];
+        let errors: string[] = [];
+
+        Promise.all(new Array(upper - lower + 1).fill(0).map(async (_, index) => {
+            console.log(index)
+            return Service.postClass({
+                class_number: lower + index,
+                grad_year: Number.parseInt(data.grad_year),
+                curriculum: data.curriculum
             })
-            .catch(err => handleApiError(err, createNotifyError(t, '错误', '未能添加新班级')));
+                .then(res => {
+                    if (res.result === Result.result.SUCCESS) {
+                        successes.push(`${data.grad_year}届 ${lower + index}班`);
+                        return Promise.resolve();
+                    }
+                    else {
+                        errors.push(res.message);
+                    }
+                })
+                .catch(err => handleApiError(err, (error) => {
+                    errors.push(error.message);
+                }));
+        }))
+            .then(_ => {
+                if (errors.length > 0) return Promise.reject();
+                notification.success({
+                    message: '成功',
+                    description: `已添加${successes.join(', ')} ${t(data.curriculum)}`,
+                    duration: 2,
+                });
+                fetchClasses();
+            })
+            .catch(_ => {
+                notification.error({
+                    message: '失败',
+                    description: <>
+                        未能创建部分班级
+                        <ul>
+                            {errors.map(error =>
+                                <li>{error}</li>
+                            )}
+                        </ul>
+                    </>,
+                    style: { maxHeight: 200, overflow: "hidden scroll" }
+                });
+            });
+
     }, [t, fetchClasses]);
 
     const handleDeleteClass = (classNumber: number, gradYear: number) => {
@@ -66,6 +102,7 @@ const Classes = () => {
                     description: `已移除${gradYear}届 ${classNumber}班`,
                     duration: 1,
                 });
+                fetchClasses();
             }
             else {
                 return Promise.reject(res.message);
@@ -101,27 +138,51 @@ const Classes = () => {
                         </Select>
                     }
                 </Form.Item>
-                <Form.Item name='class_number' label='班级号码' required rules={[
-                    {
-                        required: true,
-                        message: '班级为必填项'
-                    },
-                    {
-                        min: 1,
-                        max: 2,
-                        message: '班级必须为 1~99 的区间内的数字'
-                    }
-                ]}>
-                    {auth.role === Role.CURRICULUM || auth.role === Role.YEAR || auth.role === Role.SYSTEM ?
-                        <Input type='number' placeholder='请输入班级'></Input>
-                        :
-                        <Select disabled defaultActiveFirstOption>
-                            {auth.classNumber &&
-                                <Select.Option value={auth.classNumber}>{auth.classNumber}</Select.Option>
-                            }
-                        </Select>
-                    }
-                </Form.Item>
+                {auth.role === Role.CURRICULUM || auth.role === Role.YEAR || auth.role === Role.SYSTEM ?
+                    <Form.Item
+                        name='class_number'
+                        label='班级号码'
+                        rules={[
+                            ({ getFieldsValue }) => ({
+                                transform: (val) => {
+                                    return getFieldsValue(['class_number_lower', 'class_number_upper'])
+                                },
+                                validator(_, val) {
+                                    if (val['class_number_upper'] === '') return Promise.resolve();
+                                    let [lower, upper]: Partial<[number, number]> = [undefined, undefined]
+                                    lower = parseInt(val['class_number_lower']);
+                                    upper = parseInt(val['class_number_upper']);
+                                    if (isNaN(lower) || isNaN(upper)) {
+                                        return Promise.reject('班级区间必须为整数');
+                                    }
+                                    if (lower < 1 || lower > 99 || upper < 1 || upper > 99) {
+                                        return Promise.reject('班级区间必须为 1~99 的整数');
+                                    }
+                                    if (lower > upper) {
+                                        return Promise.reject('班级上限不能小于下限');
+                                    }
+                                    return Promise.resolve()
+                                }
+                            })
+                        ]}
+                    >
+                        <Input.Group compact>
+                            <Form.Item {...classFormProps('class_number_lower')}>
+                                <Input type='number' style={{ width: 100 }} placeholder='下限'></Input>
+                            </Form.Item>
+                            <Input style={{ width: 35 }} placeholder='~' disabled></Input>
+                            <Form.Item {...classFormProps('class_number_upper')}>
+                                <Input type='number' style={{ width: 100 }} placeholder='上限'></Input>
+                            </Form.Item>
+                        </Input.Group>
+                    </Form.Item>
+                    :
+                    <Select disabled defaultActiveFirstOption>
+                        {auth.classNumber &&
+                            <Select.Option value={auth.classNumber}>{auth.classNumber}</Select.Option>
+                        }
+                    </Select>
+                }
                 <Form.Item name='curriculum' label='体系' required rules={[
                     {
                         required: true,
