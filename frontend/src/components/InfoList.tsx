@@ -24,7 +24,7 @@ const InfoList = (props: StudentInfo & { hideName?: boolean }) => {
     const [t] = useTranslation();
     return (
         <>
-            {!props.hideName && <h1>{props.name}</h1>}
+            {!props.hideName && <h2>{props.name}</h2>}
             <Optional content={props.phone_number} icon={<PhoneFilled />} />
             <Optional content={props.email ?? ""} icon={<MailOutlined />} />
             <Optional content={props.wxid} icon={<WechatFilled />} />

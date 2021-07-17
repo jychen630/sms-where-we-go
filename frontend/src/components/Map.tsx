@@ -29,7 +29,7 @@ const convertCoordinates = (e: any): [number, number] => {
     return coordinates
 }
 
-export default function Map({ getData, getPopup, zoom, initialZoom = 5, startingCoordinate = DEFAULT_CENTER, responsive = false }: { getData: () => Promise<MapItem[]>, getPopup: (props: MapItem) => JSX.Element, zoom?: number, initialZoom?: number, startingCoordinate?: Coordinate, responsive?: boolean }) {
+export default function Map({ getData, getPopup, zoom, initialZoom = 5, startingCoordinate = DEFAULT_CENTER, responsive = false }: { getData: () => Promise<MapItem[]>, getPopup: (props: MapItem[]) => JSX.Element, zoom?: number, initialZoom?: number, startingCoordinate?: Coordinate, responsive?: boolean }) {
     const mapRef = useRef(null);
     const mapContainer = useRef(null);
     const [map, setMap] = useState<MapType>();
@@ -41,7 +41,7 @@ export default function Map({ getData, getPopup, zoom, initialZoom = 5, starting
     const [showModal, setShowModal] = useState(false);
     const [infoBarHidden, setInfoBarHidden] = useState(true);
     const [focus, setFocus] = useState<[number, number] | undefined>();
-    const [currentItem, setCurrentItem] = useState<MapItem>();
+    const [currentItem, setCurrentItem] = useState<MapItem[]>();
 
     useEffect(() => {
         if (!!!mapContainer || !!!mapContainer.current) return
@@ -93,8 +93,10 @@ export default function Map({ getData, getPopup, zoom, initialZoom = 5, starting
             // We disable the popup on mobile devices due to its bad performance
             if (!!!map) return;
             map.getCanvas().style.cursor = "pointer";
-            let data = e.features[0].properties;
-            data.students = JSON.parse(data.students) ?? [];
+            let data = e.features.map((feature: any) => {
+                feature.properties.students = JSON.parse(feature.properties.students ?? []);
+                return feature.properties;
+            });
             setCurrentItem(data);
             if (isMobile) return;
             const coordinates = convertCoordinates(e);
@@ -110,8 +112,10 @@ export default function Map({ getData, getPopup, zoom, initialZoom = 5, starting
 
         function handleMouseUp(e: any) {
             if (!!!map) return;
-            let data = e.features[0].properties;
-            data.students = JSON.parse(data.students);
+            let data = e.features.map((feature: any) => {
+                feature.properties.students = JSON.parse(feature.properties.students ?? []);
+                return feature.properties;
+            });
             setCurrentItem(data);
             setInfoBarHidden(false);
             setShowModal(true);
@@ -234,7 +238,7 @@ export default function Map({ getData, getPopup, zoom, initialZoom = 5, starting
                     </div>
                 </div>
             }
-            <Modal title={currentItem?.school_name} visible={modalMode && showModal} onCancel={() => setShowModal(false)} footer={null} bodyStyle={{ padding: '0 0 0 0' }}>
+            <Modal title={currentItem && currentItem?.length > 0 ? currentItem[0].school_name : undefined} visible={modalMode && showModal} onCancel={() => setShowModal(false)} footer={null} bodyStyle={{ padding: '0 0 0 0' }}>
                 {currentItem !== undefined && getPopup(currentItem)}
             </Modal>
             {!modalMode && !responsive &&
@@ -249,7 +253,7 @@ export default function Map({ getData, getPopup, zoom, initialZoom = 5, starting
                                         if (val.coordinates) {
                                             setFocus([val.coordinates[0], val.coordinates[1]]);
                                         }
-                                        setCurrentItem(val.original);
+                                        setCurrentItem([val.original]);
                                     }}
                                 />
                                 {!!currentItem ? getPopup(currentItem) : <></>}

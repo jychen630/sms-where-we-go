@@ -90,7 +90,12 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
 
     const mockStudentData = useCallback(async (): Promise<MapItem[]> => {
         return [{
-            students: [],
+            students: [{
+                uid: 0,
+                name: "示例学生",
+                class_number: 2,
+                grad_year: 2020,
+            }],
             longitude: location?.longitude,
             latitude: location?.latitude,
             school_name: location?.name ?? '示例学校',
@@ -251,7 +256,7 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                     </Form.Item>
                 </Space>
                 <h3>搜索 & 预览</h3>
-                <Map initialZoom={8} getData={mockStudentData} getPopup={(props) => <InfoCard {...props} />} zoom={8} startingCoordinate={!!location?.latitude && !!location.longitude ? { longitude: location.longitude, latitude: location.latitude - 0.005 } : undefined} responsive></Map>
+                <Map initialZoom={8} getData={mockStudentData} getPopup={(props) => <InfoCard items={props} />} zoom={8} startingCoordinate={!!location?.latitude && !!location.longitude ? { longitude: location.longitude, latitude: location.latitude - 0.005 } : undefined} responsive></Map>
                 {!!location && <Card>
                     <Optional content={location.name} icon={<FontAwesomeIcon icon={faAddressCard} />} />
                     <Optional content={<>({location.longitude?.toFixed(5)}, {location.latitude?.toFixed(5)})</>} icon={<FontAwesomeIcon icon={faMapPin} />} dependencies={[location.longitude, location.latitude]} />
@@ -296,7 +301,7 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                 </Form.Item>
             </div>
             <Modal title='预览' visible={visible} okText={t('Save')} cancelText={t('Cancel')} onCancel={() => setVisible(false)} width={600}>
-                <Map getData={mockStudentData} getPopup={(props) => <InfoCard {...props} />} zoom={10.5} startingCoordinate={!!location?.latitude && !!location.longitude ? { longitude: location.longitude, latitude: location.latitude - 0.005 } : undefined} responsive></Map>
+                <Map getData={mockStudentData} getPopup={(props) => <InfoCard items={props} />} zoom={10.5} startingCoordinate={!!location?.latitude && !!location.longitude ? { longitude: location.longitude, latitude: location.latitude - 0.005 } : undefined} responsive></Map>
                 {!!location && <Card>
                     <Optional content={location.name} icon={<FontAwesomeIcon icon={faAddressCard} />} />
                     <Optional content={<>({location.longitude?.toFixed(5)}, {location.latitude?.toFixed(5)})</>} icon={<FontAwesomeIcon icon={faMapPin} />} dependencies={[location.longitude, location.latitude]} />

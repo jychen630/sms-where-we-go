@@ -4,25 +4,35 @@ import { MapItem } from "./Map";
 import { useTranslation } from "react-i18next";
 import "./InfoCard.css";
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
-import { Student, StudentVerbose } from "wwg-api";
+import { School, Student, StudentVerbose } from "wwg-api";
 import InfoList from "./InfoList";
 
 
-const InfoCard = (props: MapItem & CardProps) => {
+const InfoCard = (props: { items: MapItem[] } & CardProps) => {
     const [t] = useTranslation();
     const [index, setIndex] = useState(0);
 
-    const currentStudent = (): Partial<Student & StudentVerbose> => {
-        if (!!!props.students || props.students.length === 0) {
+    const students = props.items.flatMap(school =>
+        school.students?.map(student => ({
+            school_name: school.school_name,
+            school_country: school.school_country,
+            school_state_province: school.school_state_province,
+            city: school.city,
+            ...student,
+        })) ?? []
+    )
+
+    const currentStudent = (): Partial<Student & StudentVerbose & School> => {
+        if (!!!students || students.length === 0) {
             return {}
         }
 
-        if (index < props.students?.length) {
-            return props.students[index];
+        if (index < students?.length) {
+            return students[index];
         }
         else {
             setIndex(0);
-            return props.students[0];
+            return students[0];
         }
     }
 
@@ -30,22 +40,22 @@ const InfoCard = (props: MapItem & CardProps) => {
         <Card
             className="info-card"
             title={
-                props.students !== undefined && props.students?.length > 0 &&
+                students !== undefined && students?.length > 0 &&
                 <Row style={{ marginBottom: 10 }}>
                     <>
                         <Col span={4}>
-                            <Button shape='circle' icon={<LeftOutlined />} onClick={() => setIndex(index > 0 ? index - 1 : (props.students?.length ?? 1) - 1)} disabled={(props.students?.length ?? 0) <= 1}></Button>
+                            <Button shape='circle' icon={<LeftOutlined />} onClick={() => setIndex(index > 0 ? index - 1 : (students?.length ?? 1) - 1)} disabled={(students?.length ?? 0) <= 1}></Button>
                         </Col>
                         <Col span={16} style={{ textAlign: "center", verticalAlign: "center" }}>
-                            {index + 1}/{props.students?.length}
+                            {index + 1}/{students?.length}
                         </Col>
                         <Col span={4} style={{ textAlign: "right" }}>
-                            <Button shape='circle' icon={<RightOutlined />} onClick={() => setIndex(index < (props.students?.length ?? 0) - 1 ? index + 1 : 0)} disabled={(props.students?.length ?? 0) <= 1}></Button>
+                            <Button shape='circle' icon={<RightOutlined />} onClick={() => setIndex(index < (students?.length ?? 0) - 1 ? index + 1 : 0)} disabled={(students?.length ?? 0) <= 1}></Button>
                         </Col>
                     </>
                 </Row>
             }
-            {...props}
+            {...(() => { const { items, ...rest } = props; return rest })()}
         >
             <InfoList
                 hideName={false}
@@ -58,10 +68,10 @@ const InfoCard = (props: MapItem & CardProps) => {
                 curriculum={t(currentStudent().curriculum ?? '')}
                 department={currentStudent().department}
                 major={currentStudent().major}
-                school_name={props.school_name}
-                school_country={props.school_country}
-                school_state_province={props.school_state_province}
-                city={props.city}
+                school_name={currentStudent().school_name}
+                school_country={currentStudent().school_country}
+                school_state_province={currentStudent().school_state_province}
+                city={currentStudent().city}
             />
         </Card>
     )
