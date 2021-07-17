@@ -127,12 +127,30 @@ export default function Map({ getData, getPopup, zoom, initialZoom = 5, starting
             map.getCanvas().style.cursor = "";
         }
 
+        function normalize(v: number) {
+            // Quadratic function that maps map zoom level ranges in [-2, 22] to the radius of the circle ranges in [7, 12]
+            return -0.0086 * Math.pow(v - 22, 2) + 11.5
+        }
+
+        function handleZoom(e: any) {
+            if (!!!map) return;
+            map.setPaintProperty(
+                "schools",
+                'circle-radius',
+                normalize(map.getZoom()),
+            );
+        }
+
+        // @ts-ignore
+        map.on('zoom', 'schools', handleZoom);
         map.on('mouseenter', 'schools', handleMouseEnter);
         map.on('mouseup', 'schools', handleMouseUp)
         map.on('mouseleave', 'schools', handleMouseLeave);
 
         return () => {
-            // Do a cleanup to deduplicate event handlers 
+            // Do a cleanup to deduplicate event handlers
+            // @ts-ignore
+            map.off('zoom', 'schools', handleZoom);
             map.off('mouseenter', 'schools', handleMouseEnter);
             map.off('mouseup', 'schools', handleMouseUp)
             map.off('mouseleave', 'schools', handleMouseLeave);
