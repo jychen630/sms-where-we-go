@@ -89,7 +89,13 @@
       "User List": "用户列表",
       "Class List": "班级列表",
       "This user is invalid, please login again": "此用户无效，请尝试重新登录",
-      "Add Registration Key": "添加注册码"
+      "Add Registration Key": "添加注册码",
+      "School": "学校",
+      "Coordinator": "统筹",
+      "Development": "开发",
+      "Testing": "测试",
+      "Links": "链接",
+      "Misc": "其他"
     }
   }
 }
