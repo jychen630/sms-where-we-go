@@ -32,7 +32,7 @@ CREATE TABLE wwg.school_alias (
     school_uid INT,
     alias VARCHAR(60),
     PRIMARY KEY (school_uid, alias),
-    FOREIGN KEY (school_uid) REFERENCES wwg.school(school_uid)
+    FOREIGN KEY (school_uid) REFERENCES wwg.school(school_uid) ON DELETE CASCADE
 );
 
 CREATE TABLE wwg.curriculum (
@@ -54,7 +54,7 @@ CREATE TABLE wwg.registration_key (
     grad_year INT NOT NULL,
     activated BOOLEAN NOT NULL DEFAULT true,
     PRIMARY KEY (registration_key, expiration_date),
-    FOREIGN KEY (class_number, grad_year) REFERENCES wwg.class(class_number, grad_year)
+    FOREIGN KEY (class_number, grad_year) REFERENCES wwg.class(class_number, grad_year) ON DELETE CASCADE
 );
 
 CREATE TYPE student_visibility AS ENUM ('private', 'class', 'curriculum', 'year', 'students');
