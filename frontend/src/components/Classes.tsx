@@ -176,11 +176,17 @@ const Classes = () => {
                         </Input.Group>
                     </Form.Item>
                     :
-                    <Select disabled defaultActiveFirstOption>
-                        {auth.classNumber &&
-                            <Select.Option value={auth.classNumber}>{auth.classNumber}</Select.Option>
-                        }
-                    </Select>
+                    <Form.Item
+                        name='class_number'
+                        label='班级号码'
+                        required
+                    >
+                        <Select disabled defaultActiveFirstOption>
+                            {auth.classNumber &&
+                                <Select.Option value={auth.classNumber}>{auth.classNumber}</Select.Option>
+                            }
+                        </Select>
+                    </Form.Item>
                 }
                 <Form.Item name='curriculum' label='体系' required rules={[
                     {
@@ -201,7 +207,7 @@ const Classes = () => {
                         </Select>
                     }
                 </Form.Item>
-                <Button type='primary' htmlType='submit'>提交</Button>
+                <Button type='primary' htmlType='submit' disabled={auth.role === Role.CLASS}>提交</Button>
             </Form>
             <Divider>查看班级</Divider>
             {!!classes && classes.map((class_) =>
