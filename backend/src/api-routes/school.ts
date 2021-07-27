@@ -6,11 +6,14 @@ import { Service } from "../generated/services/Service";
 import {
   Actions,
   dbHandleError,
+  getSelf,
   parseBody,
   parseQuery,
   sendError,
   sendSuccess,
   ServerLogger,
+  validateAdmin,
+  validateLogin,
 } from "../utils";
 
 export const get: Operation = async (req, res) => {
@@ -39,7 +42,8 @@ export const get: Operation = async (req, res) => {
     (!!!data.school_name &&
       !!!data.school_country &&
       !!!data.school_state_province &&
-      !!!data.city)
+      !!!data.city &&
+      !!!data.limit)
   ) {
     sendSuccess(res, { schools: [] });
     logger.logComposed(
@@ -193,3 +197,30 @@ export const post: Operation = async (req, res) => {
       .catch((err) => dbHandleError(err, res, logger.logger));
   }
 };
+
+export const DELETE: Operation = (req, res) => {
+  const data = parseBody<typeof Service.deleteSchool>(req);
+  const logger = ServerLogger.getLogger("school.post");
+  sendSuccess(res)
+
+  if (!validateLogin(req, res, logger)) return;
+
+  getSelf(req, res, logger).then(self => {
+    if (!validateAdmin(res, self, logger)) return;
+
+    pg
+      .delete()
+      .where("school_uid", data.school_uid)
+      .then(result => {
+        if (result === 0) {
+          logger.logComposed(self, Actions.delete, `school ${data.school_uid}`, false, "no school is affected", true);
+          sendError(res, 200, "No school is deleted");
+        }
+        else {
+          logger.logComposed(self, Actions.delete, `school ${data.school_uid}`);
+          sendSuccess(res);
+        }
+      })
+      .catch(err => dbHandleError(err, res, logger.logger));
+  })
+}

@@ -378,6 +378,29 @@ school_uid?: number,
     }
 
     /**
+     * Delete an existing school
+     * @param requestBody 
+     * @returns Result Success
+     * @throws ApiError
+     */
+    public static async deleteSchool(
+requestBody: {
+school_uid: number,
+},
+): Promise<Result> {
+        const result = await __request({
+            method: 'DELETE',
+            path: `/school`,
+            body: requestBody,
+            errors: {
+                401: `Unauthorized to access the resource`,
+                403: `The user is not allowed to access the resource`,
+            },
+        });
+        return result.body;
+    }
+
+    /**
      * Get the role of the logged in student
      * @returns any Successfully fetched the role
      * @throws ApiError
