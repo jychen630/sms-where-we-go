@@ -22,7 +22,7 @@ const StudentSearchTool = ({ data, onSelect, hasCoordinate = true }: { data: rea
         <SearchTool
             placeholder="请输入搜索关键词"
             searchLimit={5}
-            searchHandler={(props) => {
+            dataHandler={(props) => {
                 if (cached !== undefined && props.value === cachedKeyword) {
                     return Promise.resolve(cached.slice(props.offset, props.offset + props.limit));
                 }

@@ -3,40 +3,33 @@ import { Button, Collapse, Empty, Input, Row, Space, Spin } from "antd";
 import { SearchProps } from "antd/lib/input";
 import throttle from "lodash/throttle";
 import React, { useCallback, useEffect, useState } from "react";
+import { DataHandlerProps, PaginatedQuery } from "../api/hooks";
 
 export type SearchToolProps<T> = {
-    searchHandler: (props: SearchHandlerProps) => Promise<T[] | undefined>,
     EmptyPlaceholder?: () => JSX.Element,
     placeholder: string,
-    item: (value: T, index: number) => JSX.Element,
     initialValue?: string,
     searchLimit?: number,
     inputRef?: React.Ref<Input>,
     searchProps?: SearchProps
-}
-
-export type SearchHandlerProps = {
-    offset: number,
-    limit: number,
-    value: string,
-}
+} & DataHandlerProps<T, PaginatedQuery>;
 
 // See also for why we don't use forwardRef: https://github.com/microsoft/TypeScript/pull/30215
-const SearchTool = <T extends unknown>({ searchHandler, placeholder, item, initialValue, inputRef, searchLimit = 5, EmptyPlaceholder = () => <Empty />, searchProps }: SearchToolProps<T>) => {
+const SearchTool = <T extends unknown>({ dataHandler, placeholder, item, initialValue, inputRef, searchLimit = 5, EmptyPlaceholder = () => <Empty description="无数据" />, searchProps }: SearchToolProps<T>) => {
     const [value, setValue] = useState('');
     const [collapsed, setCollapsed] = useState(false);
     const [offset, setOffset] = useState(0);
     const [loading, setLoading] = useState(false);
     const [resultList, setResultList] = useState<T[]>([]);
 
-    const search = useCallback(throttle(async ({ offset, limit, value, append, resultList }: SearchHandlerProps & { append: boolean, resultList?: T[] }) => { // eslint-disable-line react-hooks/exhaustive-deps
+    const search = useCallback(throttle(async ({ offset, limit, value, append, resultList }: PaginatedQuery & { append: boolean, resultList?: T[] }) => { // eslint-disable-line react-hooks/exhaustive-deps
         if (!!!value) {
             setResultList([]);
             setLoading(false);
             return;
         }
         setOffset(offset);
-        const result = await searchHandler({ offset: offset, limit: limit, value: value });
+        const result = await dataHandler({ offset: offset, limit: limit, value: value });
         setLoading(false);
         if (result === undefined || result?.length < searchLimit) {
             setOffset(-1);
@@ -47,9 +40,9 @@ const SearchTool = <T extends unknown>({ searchHandler, placeholder, item, initi
         else {
             setResultList(result ?? []);
         }
-    }, 1000), [searchHandler]);
+    }, 1000), [dataHandler]);
 
-    const handleSearch = useCallback(({ offset, limit, value, append = false }: Partial<SearchHandlerProps> & { value: string, append?: boolean }) => {
+    const handleSearch = useCallback(({ offset, limit, value, append = false }: Partial<PaginatedQuery> & { value: string, append?: boolean }) => {
         setLoading(true);
         setCollapsed(false);
         search({

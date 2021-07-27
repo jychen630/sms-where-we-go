@@ -4,7 +4,7 @@ import throttle from "lodash/throttle";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Result, Role, School, Service, Student, StudentFieldsVisibility, StudentVerbose, Visibility } from "wwg-api";
-import { useDict } from "../api/useDict";
+import { useDict } from "../api/hooks";
 import { handleApiError, ThenType } from "../api/utils";
 import { emailPattern, phonePattern } from "./RegistrationForm";
 import SchoolSearchTool from "./SchoolSearchTool";

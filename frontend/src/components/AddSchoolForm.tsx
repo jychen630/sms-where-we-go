@@ -6,11 +6,12 @@ import { useEffect } from 'react';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Coordinate, Result, Service } from 'wwg-api';
+import { PaginatedQuery } from '../api/hooks';
 import { createNotifyError, handleApiError } from '../api/utils';
 import InfoCard from './InfoCard';
 import { Optional } from './InfoList';
 import Map, { MapItem } from './Map';
-import SearchTool, { SearchHandlerProps } from './SearchTool';
+import SearchTool from './SearchTool';
 
 type Values = Parameters<typeof Service.postSchool>[0];
 
@@ -35,7 +36,7 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
     const [currentTab, setCurrentTab] = useState('select');
     const [provider, setProvider] = useState<Provider>(Provider.AMAP);
 
-    const fetchCity = useCallback(async (props: SearchHandlerProps) => {
+    const fetchCity = useCallback(async (props: PaginatedQuery) => {
         try {
             const result = await Service.getCity(props.offset, props.limit, props.value);
             if (!!result.cities && result.result === Result.result.SUCCESS) {
@@ -103,7 +104,7 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
         }];
     }, [location]);
 
-    const getPreview = useCallback(async (props: SearchHandlerProps): Promise<Location[]> => {
+    const getPreview = useCallback(async (props: PaginatedQuery): Promise<Location[]> => {
         return Service.getLocation(props.value, props.offset + 1, "", "", provider)
             .then(res => {
                 return res.locations;
@@ -136,7 +137,7 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                 <Tabs defaultActiveKey='select' onChange={(key) => { setCurrentTab(key) }}>
                     <Tabs.TabPane key='select' tab='选择城市'>
                         <SearchTool
-                            searchHandler={fetchCity}
+                            dataHandler={fetchCity}
                             item={(value, index) =>
                                 <Button onClick={() => setCityUid(value.city_uid)} type={value.city_uid === cityUid ? 'primary' : 'text'} block>
                                     {value.city}, {value.state_province}, {value.country}
@@ -274,7 +275,7 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                 <SearchTool
                     initialValue={form.getFieldValue('school_name')}
                     placeholder='输入学校名称'
-                    searchHandler={getPreview}
+                    dataHandler={getPreview}
                     searchLimit={1}
                     item={(value, index) =>
                         <Button style={{ textAlign: 'left', width: '100%', overflowX: 'hidden' }} onClick={() => setLocation(value)} type={(value.name === location?.name && value.address === location?.address) ? 'primary' : 'text'} block>
@@ -312,7 +313,7 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                 <SearchTool
                     initialValue={form.getFieldValue('school_name')}
                     placeholder='输入关键词'
-                    searchHandler={getPreview}
+                    dataHandler={getPreview}
                     searchLimit={1}
                     item={(value, index) =>
                         <Button style={{ textAlign: 'left', width: '100%', overflowX: 'hidden' }} onClick={() => setLocation(value)} type={(value.name === location?.name && value.address === location?.address) ? 'primary' : 'text'} block>

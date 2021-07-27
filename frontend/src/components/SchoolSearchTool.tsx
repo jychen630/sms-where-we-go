@@ -4,11 +4,12 @@ import { SearchProps } from "antd/lib/input";
 import Modal from "antd/lib/modal/Modal";
 import { useState } from "react";
 import { Result, Service } from "wwg-api";
+import { PaginatedQuery } from "../api/hooks";
 import { handleApiError } from "../api/utils";
 import AddSchoolForm from "./AddSchoolForm";
-import SearchTool, { SearchHandlerProps } from "./SearchTool";
+import SearchTool from "./SearchTool";
 
-export const fetchSchool = async ({ offset, limit, value }: SearchHandlerProps) => {
+export const fetchSchool = async ({ offset, limit, value }: PaginatedQuery) => {
     try {
         const result = await Service.getSchool(
             offset,
@@ -37,7 +38,7 @@ const SchoolSearchTool = ({ schoolUid, setSchoolUid, initialValue, searchProps }
             <Row>
                 <Col span={21}>
                     <SearchTool
-                        searchHandler={fetchSchool}
+                        dataHandler={fetchSchool}
                         item={(value, index) => (
                             <Tooltip title={`[uid: ${value.uid}] ${value.school_country ?? '无'}/${value.school_state_province ?? '无'}/${value.city ?? '无'}`}>
                                 <Button onClick={() => setSchoolUid(value.uid)} type={value.uid === schoolUid ? 'primary' : 'text'} block>
