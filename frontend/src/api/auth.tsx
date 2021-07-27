@@ -10,6 +10,7 @@ export interface AuthContext {
     login: LoginHandler,
     devLogin: (uid: number) => Promise<void>,
     logout: () => Promise<void>,
+    update: () => Promise<void>,
     gradYear?: number,
     classNumber?: number,
     curriculum?: string,
