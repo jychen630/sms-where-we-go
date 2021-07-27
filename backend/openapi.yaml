@@ -886,6 +886,27 @@ paths:
                         example: 21
         400:
           $ref: "#/components/responses/Default"
+    delete:
+      operationId: deleteSchool
+      description: Delete an existing school
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - school_uid
+              properties:
+                school_uid:
+                  type: integer
+      responses:
+        200:
+          $ref: "#/components/responses/Success"
+        401:
+          $ref: "#/components/responses/UnAuthorized"
+        403:
+          $ref: "#/components/responses/Forbidden"
   /role:
     get:
       operationId: getRole
