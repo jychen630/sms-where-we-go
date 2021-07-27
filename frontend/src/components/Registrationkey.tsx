@@ -5,7 +5,7 @@ import { Class, RegistrationKeyInfo, Result, Service } from "wwg-api";
 import { useTranslation } from "react-i18next";
 import { ClockCircleOutlined, PieChartOutlined, PlusOutlined } from "@ant-design/icons";
 import { useHistory } from "react-router";
-import Modal from "antd/lib/modal/Modal";
+import { useModal } from "../api/modal";
 
 type KeyInfo = RegistrationKeyInfo & {
     registration_key?: string | undefined;
@@ -53,18 +53,20 @@ const RegistrationKeyForm = (props: { form: FormInstance<{ classes: string[] }>,
                 .catch(err => handleApiError(err, createNotifyError(t, '失败', `未能添加${class_.grad_year}届 ${class_.class_number}的注册码`)))
         })).then(
             res => {
-                notification.success({
-                    message: '成功',
-                    description: <>
-                        <p>已成功创建注册码:</p>
-                        <p>
-                            {registrationKeys
-                                .map(val => `${val.registrationKey} (${val.gradYear}届 ${val.classNumber}班)`)
-                                .join(',')}
-                        </p>
-                    </>,
-                });
-                props.onSuccess && props.onSuccess();
+                if (registrationKeys.length > 0) {
+                    notification.success({
+                        message: '成功',
+                        description: <>
+                            <p>已成功创建注册码:</p>
+                            <p>
+                                {registrationKeys
+                                    .map(val => `${val.registrationKey} (${val.gradYear}届 ${val.classNumber}班)`)
+                                    .join(',')}
+                            </p>
+                        </>,
+                    });
+                    props.onSuccess && props.onSuccess();
+                }
             }
         )
     }, [t, props]);
@@ -95,7 +97,6 @@ const RegistrationKeyForm = (props: { form: FormInstance<{ classes: string[] }>,
 
 const RegistrationKey = () => {
     const [t] = useTranslation();
-    const [visible, setVisible] = useState(false);
     const [keys, setKeys] = useState<KeyInfo[]>([]);
     const [form] = Form.useForm<{ classes: string[] }>();
 
@@ -105,13 +106,23 @@ const RegistrationKey = () => {
             .catch(err => handleApiError(err, createNotifyError(t, '失败', '未能获取注册码')))
     }, [t])
 
+    const [FormModal, showModal] = useModal({
+        content: <RegistrationKeyForm form={form} onSuccess={() => fetchKeys()} />,
+        onOk: () => {
+            form.submit();
+        },
+        modalProps: {
+            title: t('Add Registration Key')
+        },
+    });
+
     useEffect(() => {
         fetchKeys();
     }, [fetchKeys]);
 
     return (
         <>
-            <Button onClick={() => setVisible(true)}><PlusOutlined /> 添加注册码</Button>
+            <Button onClick={showModal}><PlusOutlined /> 添加注册码</Button>
             <List>
                 {keys.map((value, index) =>
                     <List.Item
@@ -147,19 +158,7 @@ const RegistrationKey = () => {
                     </List.Item>
                 )}
             </List>
-            <Modal
-                title={t('Add Registration Key')}
-                visible={visible}
-                onOk={() => {
-                    form.submit();
-                    setVisible(false);
-                }}
-                okText={t('Confirm')}
-                onCancel={() => setVisible(false)}
-                cancelText={t('Cancel')}
-            >
-                <RegistrationKeyForm form={form} onSuccess={() => fetchKeys()} />
-            </Modal>
+            <FormModal />
         </>
     )
 }

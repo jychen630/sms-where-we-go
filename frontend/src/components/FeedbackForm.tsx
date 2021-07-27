@@ -1,8 +1,9 @@
-import { Button, Divider, Form, Input, Select, Space, Modal, notification } from "antd";
+import { Button, Divider, Form, Input, Select, Space, notification } from "antd";
 import { useState } from "react";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { Service } from "wwg-api";
+import { useModal } from "../api/modal";
 import { createNotifyError, handleApiError } from "../api/utils";
 
 type Values = Parameters<typeof Service.publicReportFeedback>[0]
@@ -11,14 +12,29 @@ const reasons = ["registration", "reset password", "update info", "improvement",
 const FeedbackForm = ({ isPublic, cb }: { isPublic: boolean, cb?: () => void }) => {
     const [t] = useTranslation();
     const [form] = Form.useForm<Values>();
-    const [visible, setVisible] = useState(false);
     const [feedbackUid, setFeedbackUid] = useState('');
+    const [SuccessModal, showModal] = useModal({
+        content: <>
+            你的反馈码
+            <p style={{ textAlign: 'center', backgroundColor: 'antiquewhite', fontSize: '1.5rem' }}>{feedbackUid}</p>
+            <p>请复制保留以备参考</p>
+            {!isPublic && <p>你也可以在 反馈-查看 一栏查看你过往的反馈信息及处理结果</p>}
+            {(form.getFieldValue('email') !== undefined || form.getFieldValue('phone_number') !== undefined) ?
+                <p>我们会通过你留下的电话号码或电子邮箱，尽快联系告知处理结果</p>
+                :
+                <p>由于你未填写电话号码或电子邮箱，我们将不会主动进行联系</p>}
+        </>,
+        modalProps: {
+            title: "提交成功!",
+            footer: null,
+        }
+    });
 
     const handleSubmit = useCallback((data: Values) => {
         (isPublic ? Service.publicReportFeedback : Service.userReportFeedback)(data)
             .then(result => {
                 if (isPublic && result.feedback_uid !== undefined) {
-                    setVisible(true);
+                    showModal();
                     setFeedbackUid(result.feedback_uid);
                 }
                 form.resetFields();
@@ -29,7 +45,7 @@ const FeedbackForm = ({ isPublic, cb }: { isPublic: boolean, cb?: () => void }) 
                 });
             })
             .catch(err => handleApiError(err, createNotifyError(t, t('Error'), '未能提交反馈')))
-    }, [t, cb, form, isPublic, setFeedbackUid]);
+    }, [t, cb, form, isPublic, showModal, setFeedbackUid]);
 
     return (
         <>
@@ -74,19 +90,10 @@ const FeedbackForm = ({ isPublic, cb }: { isPublic: boolean, cb?: () => void }) 
                 </Form.Item>
                 <Space>
                     <Button type='primary' htmlType='submit'>提交</Button>
-                    {!!feedbackUid && <Button type='default' onClick={() => setVisible(true)}>显示反馈码</Button>}
+                    {!!feedbackUid && <Button type='default' onClick={showModal}>显示反馈码</Button>}
                 </Space>
             </Form>
-            <Modal title='提交成功!' visible={visible} onOk={() => setVisible(false)} onCancel={() => setVisible(false)} okText={t('Confirm')} cancelText={<></>}>
-                你的反馈码
-                <p style={{ textAlign: 'center', backgroundColor: 'antiquewhite', fontSize: '1.5rem' }}>{feedbackUid}</p>
-                <p>请复制保留以备参考</p>
-                {!isPublic && <p>你也可以在 反馈-查看 一栏查看你过往的反馈信息及处理结果</p>}
-                {(form.getFieldValue('email') !== undefined || form.getFieldValue('phone_number') !== undefined) ?
-                    <p>我们会通过你留下的电话号码或电子邮箱，尽快联系告知处理结果</p>
-                    :
-                    <p>由于你未填写电话号码或电子邮箱，我们将不会主动联系</p>}
-            </Modal>
+            <SuccessModal />
         </>
     )
 }

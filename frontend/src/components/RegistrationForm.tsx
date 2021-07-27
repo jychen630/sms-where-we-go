@@ -1,4 +1,4 @@
-import { Button, Collapse, Checkbox, Form, Input, Modal, Space, Spin, Tooltip, Typography, notification } from 'antd';
+import { Button, Collapse, Checkbox, Form, Input, Space, Spin, Tooltip, Typography, notification } from 'antd';
 import { FieldTimeOutlined, InfoCircleOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
@@ -9,6 +9,7 @@ import PrivacyPolicy from './PrivacyPolicy';
 import SchoolSearchTool from './SchoolSearchTool';
 import { useTranslation } from 'react-i18next';
 import { useEffect } from 'react';
+import { useModal } from '../api/modal';
 
 type Values = Parameters<typeof Service.postStudent>[0];
 export const phonePattern = /^1(?:3\d{3}|5[^4\D]\d{2}|8\d{3}|7(?:[0-35-9]\d{2}|4(?:0\d|1[0-2]|9\d))|9[0-35-9]\d{2}|6[2567]\d{2}|4(?:(?:10|4[01])\d{3}|[68]\d{4}|[579]\d{2}))\d{6}$/;
@@ -22,8 +23,14 @@ const RegistrationForm = () => {
     const history = useHistory();
     const location = useLocation();
     const [schoolUid, setSchoolUid] = useState(0);
-    const [showPrivacyModal, setShowPrivacyModal] = useState(false);
     const [regInfo, setRegInfo] = useState<{ curriculum: string, classNumber: number, gradYear: number, expDate: Date }>();
+    const [PrivacyModal, showPrivacyModal] = useModal({
+        content: <PrivacyPolicy />,
+        modalProps: {
+            title: '用户隐私协议',
+            footer: null,
+        }
+    });
 
     useEffect(() => {
         const regkey = (new URLSearchParams(location.search).get('key'));
@@ -245,7 +252,7 @@ const RegistrationForm = () => {
                     ]}
                 >
                     <Checkbox>
-                        勾选即代表您同意<Button type='link' style={{ padding: '1px' }} onClick={() => setShowPrivacyModal(true)}>用户隐私协议</Button>
+                        勾选即代表您同意<Button type='link' style={{ padding: '1px' }} onClick={showPrivacyModal}>用户隐私协议</Button>
                     </Checkbox>
                 </Form.Item>
                 <Form.Item>
@@ -256,9 +263,7 @@ const RegistrationForm = () => {
                     </Space>
                 </Form.Item>
             </Form>
-            <Modal title='用户隐私协议' visible={showPrivacyModal} onOk={() => setShowPrivacyModal(false)} onCancel={() => setShowPrivacyModal(false)} footer={null}>
-                <PrivacyPolicy />
-            </Modal>
+            <PrivacyModal />
         </>
     )
 }

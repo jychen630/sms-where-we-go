@@ -1,7 +1,7 @@
 import { CheckCircleFilled, EnvironmentOutlined } from '@ant-design/icons';
 import { faAddressCard, faMap, faMapPin } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Button, Card, Divider, Form, Input, Modal, Space, Tabs, notification, Switch } from 'antd';
+import { Button, Card, Divider, Form, Input, Space, Tabs, notification, Switch } from 'antd';
 import { useEffect } from 'react';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -301,31 +301,6 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                     </Space>
                 </Form.Item>
             </div>
-            <Modal title='预览' visible={visible} okText={t('Save')} cancelText={t('Cancel')} onCancel={() => setVisible(false)} width={600}>
-                <Map getData={mockStudentData} getPopup={(props) => <InfoCard items={props} />} zoom={10.5} startingCoordinate={!!location?.latitude && !!location.longitude ? { longitude: location.longitude, latitude: location.latitude - 0.005 } : undefined} responsive></Map>
-                {!!location && <Card>
-                    <Optional content={location.name} icon={<FontAwesomeIcon icon={faAddressCard} />} />
-                    <Optional content={<>({location.longitude?.toFixed(5)}, {location.latitude?.toFixed(5)})</>} icon={<FontAwesomeIcon icon={faMapPin} />} dependencies={[location.longitude, location.latitude]} />
-                    <Optional content={location.city} icon={<EnvironmentOutlined />} />
-                    <Optional content={location.address} icon={<FontAwesomeIcon icon={faMap} />} />
-                </Card>
-                }
-                <SearchTool
-                    initialValue={form.getFieldValue('school_name')}
-                    placeholder='输入关键词'
-                    dataHandler={getPreview}
-                    searchLimit={1}
-                    item={(value, index) =>
-                        <Button style={{ textAlign: 'left', width: '100%', overflowX: 'hidden' }} onClick={() => setLocation(value)} type={(value.name === location?.name && value.address === location?.address) ? 'primary' : 'text'} block>
-                            {value.name === location?.name && value.address === location?.address &&
-                                <CheckCircleFilled />
-                            }
-                            {value.name}
-                            <span style={{ fontSize: '0.5rem' }}>{value.city} {value.address} ({value.longitude?.toFixed(5)}, {value.latitude?.toFixed(5)})</span>
-                        </Button>
-                    }
-                />
-            </Modal>
         </Form>
     )
 }
