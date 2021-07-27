@@ -45,7 +45,6 @@ const Classes = () => {
         let errors: string[] = [];
 
         Promise.all(new Array(upper - lower + 1).fill(0).map(async (_, index) => {
-            console.log(index)
             return Service.postClass({
                 class_number: lower + index,
                 grad_year: Number.parseInt(data.grad_year),

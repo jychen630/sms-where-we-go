@@ -32,7 +32,6 @@ const RegistrationKeyForm = (props: { form: FormInstance<{ classes: string[] }>,
             classNumber: number,
             gradYear: number
         }[] = [];
-        console.log(data);
         Promise.all(data.classes.map(async value => {
             const class_ = JSON.parse(value) as Class;
             return Service.postRegistrationKey({
