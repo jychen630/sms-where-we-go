@@ -108,10 +108,6 @@ initialize({
     }
 });
 
-app.get('/', (req, res) => {
-    res.send('testwas');
-});
-
 app.listen(port, () => {
     logger.info(`Environment: ${process.env.NODE_ENV}`);
     if (process.env.NODE_ENV?.trim() === 'development') {
