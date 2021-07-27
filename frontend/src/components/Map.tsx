@@ -29,6 +29,11 @@ const convertCoordinates = (e: any): [number, number] => {
     return coordinates
 }
 
+function normalize(v: number) {
+    // Quadratic function that maps map zoom level ranges in [-2, 22] to the radius of the circle ranges in [7, 12]
+    return -0.0086 * Math.pow(v - 22, 2) + 11.5
+}
+
 export default function Map({ getData, getPopup, zoom, initialZoom = 5, startingCoordinate = DEFAULT_CENTER, responsive = false }: { getData: () => Promise<MapItem[]>, getPopup: (props: MapItem[]) => JSX.Element, zoom?: number, initialZoom?: number, startingCoordinate?: Coordinate, responsive?: boolean }) {
     const mapRef = useRef(null);
     const mapContainer = useRef(null);
@@ -125,11 +130,6 @@ export default function Map({ getData, getPopup, zoom, initialZoom = 5, starting
         function handleMouseLeave(e: any) {
             if (!!!map) return;
             map.getCanvas().style.cursor = "";
-        }
-
-        function normalize(v: number) {
-            // Quadratic function that maps map zoom level ranges in [-2, 22] to the radius of the circle ranges in [7, 12]
-            return -0.0086 * Math.pow(v - 22, 2) + 11.5
         }
 
         function handleZoom(e: any) {

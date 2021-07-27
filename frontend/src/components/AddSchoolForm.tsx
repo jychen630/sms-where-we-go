@@ -268,7 +268,7 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                     <Switch
                         checkedChildren="国际"
                         unCheckedChildren="仅国内"
-                        onChange={(checked) => { console.log(checked ? Provider.MAPBOX : Provider.AMAP); setProvider(checked ? Provider.MAPBOX : Provider.AMAP) }}
+                        onChange={(checked) => { setProvider(checked ? Provider.MAPBOX : Provider.AMAP) }}
                     />
                 </Form.Item>
                 <SearchTool

@@ -93,7 +93,7 @@ export const useAuthProvider = () => {
             })
             .catch(err => {
                 clear();
-                return Promise.reject(err)
+                return Promise.reject(err);
             });
     }
 
