@@ -64,7 +64,7 @@ const RegistrationForm = () => {
     };
 
     const handleFinish = (data: Values) => {
-        const preparedData = Object.fromEntries(Object.entries(data).filter(([_, value]) => value !== '')) as Values
+        const preparedData = Object.fromEntries(Object.entries(data).filter(([key, value]) => value !== '' && key !== 'confirm')) as Values
         Service.postStudent({
             ...preparedData,
             school_uid: (!!schoolUid) ? schoolUid : undefined
