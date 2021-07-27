@@ -217,6 +217,8 @@ export const put: Operation = async (req, res, next) => {
 
     if (clear.has('email') && clear.has('phone_number')) {
         data.password = undefined;
+        // @ts-ignore
+        data.confirm = undefined;
         logger.logComposed(
             req.session.student_uid,
             Actions.update,
@@ -236,6 +238,8 @@ export const put: Operation = async (req, res, next) => {
 
     if (!privileges.update) {
         data.password = undefined;
+        // @ts-ignore
+        data.confirm = undefined;
         logger.logComposed(
             req.session.student_uid,
             Actions.update,
@@ -252,6 +256,8 @@ export const put: Operation = async (req, res, next) => {
     if (privileges.level < 16 && !!data.grad_year) {
         sendError(res, 403, `You are not allowed to update the graduation year`);
         data.password = undefined;
+        // @ts-ignore
+        data.confirm = undefined;
         logger.logComposed(
             req.session.student_uid,
             Actions.update,
@@ -267,6 +273,8 @@ export const put: Operation = async (req, res, next) => {
     if (privileges.level < 4 && !!data.class_number) {
         sendError(res, 403, `You are not allowed to update the class number`);
         data.password = undefined;
+        // @ts-ignore
+        data.confirm = undefined;
         logger.logComposed(
             req.session.student_uid,
             Actions.update,
@@ -285,6 +293,8 @@ export const put: Operation = async (req, res, next) => {
         (data.role === StudentRole.Year.valueOf() && privileges.level < 16) ||
         (data.role === StudentRole.System.valueOf() && privileges.level < 16))) {
         data.password = undefined;
+        // @ts-ignore
+        data.confirm = undefined;
         logger.logComposed(
             req.session.student_uid,
             Actions.update,
@@ -352,6 +362,8 @@ export const put: Operation = async (req, res, next) => {
             })
             .then(async result => {
                 data.password = undefined;
+                // @ts-ignore
+                data.confirm = undefined;
                 logger.logComposed(
                     req.session.student_uid,
                     Actions.update,
@@ -440,6 +452,8 @@ export const post: Operation = async (req, res, next) => {
 
         if (!!!registrationInfo) {
             data.password = ''
+            //@ts-ignore
+            data.confirm = undefined;
             logger.logComposed(
                 "Visitor",
                 Actions.create,
@@ -566,6 +580,8 @@ export const post: Operation = async (req, res, next) => {
             school_uid: data.school_uid,
         }).then((result) => {
             data.password = "";
+            //@ts-ignore
+            data.confirm = undefined;
             logger.logComposed(
                 req.session.student_uid ?? 'Visitor',
                 Actions.create,
