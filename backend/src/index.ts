@@ -18,7 +18,10 @@ dotenv.config()
 app.use(session({
     secret: process.env.SECRET as string,
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    cookie: {
+        maxAge: 1800000
+    },
 }));
 
 app.use(cors({ credentials: true, origin: ['http://192.168.0.29:3000', 'http://localhost:3000', 'http://localhost:5000', 'http://47.106.186.142:5000'] }));
