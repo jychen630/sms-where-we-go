@@ -101,7 +101,7 @@ const RegistrationKey = () => {
     const [form] = Form.useForm<{ classes: string[] }>();
 
     const fetchKeys = useCallback(() => {
-        Service.getRegistrationKey()
+        Service.getRegistrationKey(0, 100)
             .then(result => setKeys(result.registration_keys ?? []))
             .catch(err => handleApiError(err, createNotifyError(t, '失败', '未能获取注册码')))
     }, [t])
