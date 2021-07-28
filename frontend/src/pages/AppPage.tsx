@@ -1,4 +1,4 @@
-import { BarsOutlined, CompassOutlined, ControlOutlined, InfoCircleOutlined, LogoutOutlined, RadarChartOutlined, SettingOutlined } from '@ant-design/icons';
+import { BarsOutlined, CompassOutlined, ControlOutlined, LogoutOutlined, RadarChartOutlined, SettingOutlined } from '@ant-design/icons';
 import { Layout, Menu, Space } from 'antd';
 import React from 'react';
 import { useHistory } from 'react-router';
@@ -8,7 +8,7 @@ import '../app.css';
 
 const { Header, Content } = Layout;
 export enum menuOptions {
-    MAP = 'map', LIST = 'list', SETTINGS = 'settings', ADMIN = 'admin', FEEDBACK = 'feedback', ABOUT = 'info'
+    MAP = 'map', LIST = 'list', SETTINGS = 'settings', ADMIN = 'admin', FEEDBACK = 'feedback'
 }
 
 const AppPage = ({ activeKey, children }: { activeKey: menuOptions, children: React.ReactNode }) => {
@@ -50,11 +50,6 @@ const AppPage = ({ activeKey, children }: { activeKey: menuOptions, children: Re
                             </Space>
                         </Menu.Item>
                     }
-                    <Menu.Item key='about' onClick={() => history.push('/about')}>
-                        <Space>
-                            <InfoCircleOutlined /> 关于
-                        </Space>
-                    </Menu.Item>
                     <Menu.Item key='logout' onClick={() => {
                         history.push('/login');
                         logout();
