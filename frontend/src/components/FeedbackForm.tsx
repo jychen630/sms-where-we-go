@@ -1,4 +1,4 @@
-import { Button, Divider, Form, Input, Select, Space, notification } from "antd";
+import { Button, Divider, Form, Input, Select, Space, notification, InputNumber } from "antd";
 import { useState } from "react";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
@@ -65,10 +65,10 @@ const FeedbackForm = ({ isPublic, cb }: { isPublic: boolean, cb?: () => void }) 
                         <Input placeholder='请输入你的电话号码 (选填)' />
                     </Form.Item>
                     <Form.Item name='class_number' label='班级号码'>
-                        <Input placeholder='请输入你的班级号码 (如高三 (3)班请填3) (选填)' type='number' />
+                        <InputNumber min={1} placeholder='请输入你的班级号码 (如高三 (3)班请填3) (选填)' />
                     </Form.Item>
                     <Form.Item name='grad_year' label='毕业年份'>
-                        <Input placeholder='请输入你的毕业年份 (如2021) (选填)' />
+                        <InputNumber min={2019} placeholder='请输入你的毕业年份 (如2021) (选填)' />
                     </Form.Item>
                 </>
                 }

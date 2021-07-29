@@ -107,3 +107,7 @@
 .underdotted {
   border-bottom: 1px black dotted;
 }
+
+.ant-input-number {
+  width: 100% !important;
+}
