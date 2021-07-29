@@ -1,9 +1,10 @@
 import { WarningOutlined } from "@ant-design/icons";
-import { Alert, Button, Divider, Form, Input, notification, Select, Space, Switch, Tooltip } from "antd"
+import { Alert, Button, Divider, Form, Input, InputNumber, notification, Select, Space, Switch, Tooltip } from "antd"
 import throttle from "lodash/throttle";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Result, Role, School, Service, Student, StudentFieldsVisibility, StudentVerbose, Visibility } from "wwg-api";
+import { useAuth } from "../api/auth";
 import { useDict } from "../api/hooks";
 import { handleApiError, ThenType } from "../api/utils";
 import { emailPattern, phonePattern } from "./RegistrationForm";
@@ -14,6 +15,7 @@ const { Item } = Form;
 
 const InfoUpdateForm = ({ getStudent, showRoleOptions = false }: { showRoleOptions?: boolean, getStudent: () => Promise<Partial<Student & StudentVerbose & School & { role?: Role, visibility?: Visibility, field_visibility?: StudentFieldsVisibility }> | undefined> }) => {
     const [t] = useTranslation();
+    const auth = useAuth();
     const [form] = Form.useForm<Values>();
     const [role, setRole] = useState<Role | undefined>(undefined);
     const [schoolUid, setSchoolUid] = useState(-1);
@@ -294,6 +296,22 @@ const InfoUpdateForm = ({ getStudent, showRoleOptions = false }: { showRoleOptio
                         }
                     </Select>
                 </Form.Item>
+            }
+            {showRoleOptions && auth.role === Role.SYSTEM &&
+                <>
+                    <Form.Item
+                        name='class_number'
+                        label={t('Class')}
+                    >
+                        <InputNumber min={1} placeholder='请输入要变更的班级号码'></InputNumber>
+                    </Form.Item>
+                    <Form.Item
+                        name='grad_year'
+                        label={t('Year of Graduation')}
+                    >
+                        <InputNumber min={2019} placeholder='请输入要变更的毕业年份'></InputNumber>
+                    </Form.Item>
+                </>
             }
             <Form.Item>
                 <Space>
