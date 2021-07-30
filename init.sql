@@ -149,6 +149,30 @@ CREATE TABLE wwg.additional_info (
     FOREIGN KEY (student_uid) REFERENCES wwg.student(student_uid) ON DELETE CASCADE
 );
 
+CREATE TYPE CONSENT_TYPE as ENUM ('privacy');
+
+CREATE TABLE wwg.consent (
+    consent_uid SERIAL PRIMARY KEY,
+    consent_type CONSENT_TYPE NOT NULL,
+    version VARCHAR(20) NOT NULL
+);
+
+CREATE TABLE wwg.consent_history (
+    consent_history_uid SERIAL PRIMARY KEY,
+    student_uid INT NOT NULL,
+    consent_uid INT NOT NULL,
+    granted BOOLEAN DEFAULT false,
+    FOREIGN KEY (student_uid) REFERENCES wwg.student(student_uid) ON DELETE CASCADE,
+    FOREIGN KEY (consent_uid) REFERENCES wwg.consent(consent_uid) ON DELETE CASCADE
+);
+
+CREATE TABLE wwg.activity_hisotry (
+    history_uid SERIAL PRIMARY KEY,
+    student_uid INT NOT NULL,
+    last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (student_uid) REFERENCES wwg.student(student_uid) ON DELETE CASCADE
+);
+
 CREATE VIEW wwg.student_class AS 
     SELECT * FROM wwg.student
     NATURAL JOIN wwg.class;
