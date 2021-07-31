@@ -25,7 +25,19 @@ function App() {
   const authProvider = useAuthProvider();
   useEffect(() => {
     document.title = 'SMS Where We Go'
-    authProvider.update();
+    authProvider
+      .update()
+      .catch((e) => {
+        // We expect a 401 when the user is not logged in, so we can safely ignore it.
+        // However, if an error occurs and the status code is undefined or something
+        // else, it's likely that something goes wrong with the server.
+        if (e.status !== 401) {
+          notification.error({
+            message: "错误",
+            description: "连接到服务器时出现问题"
+          })
+        }
+      });
   }, []); //eslint-disable-line
   return (
     <AuthProvider value={authProvider}>
