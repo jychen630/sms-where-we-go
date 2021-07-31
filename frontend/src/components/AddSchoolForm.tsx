@@ -31,7 +31,6 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
     const [page, setPage] = useState(0);
     const [form] = Form.useForm<Values>();
     const [cityUid, setCityUid] = useState(-1);
-    const [visible, setVisible] = useState(false);
     const [location, setLocation] = useState<Location>();
     const [currentTab, setCurrentTab] = useState('select');
     const [provider, setProvider] = useState<Provider>(Provider.AMAP);
