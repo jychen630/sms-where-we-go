@@ -18,6 +18,7 @@ import DevLoginForm from './components/DevLoginForm';
 import ListPage from './pages/ListPage';
 import FeedbackPage from './pages/FeedbackPage';
 import FeedbackForm from './components/FeedbackForm';
+import AboutPage from './pages/AboutPage';
 
 OpenAPI.WITH_CREDENTIALS = true;
 OpenAPI.TOKEN = '';
@@ -75,6 +76,9 @@ function App() {
           </Route>
           <Route path="/list">
             <ListPage />
+          </Route>
+          <Route path="/about">
+            <AboutPage />
           </Route>
           {authProvider.role !== Role.STUDENT &&
             <Route path="/admin">
