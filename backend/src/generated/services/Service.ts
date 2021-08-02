@@ -828,4 +828,42 @@ feedback_uid?: string,
         return result.body;
     }
 
+    /**
+     * Get the number of likes the site has received
+     * @returns any Return the total number of likes
+     * @throws ApiError
+     */
+    public static async getLikes(): Promise<{
+/**
+ * The total number of likes
+ */
+count: number,
+}> {
+        const result = await __request({
+            method: 'GET',
+            path: `/like`,
+            errors: {
+                401: `Success`,
+                403: `The user is not allowed to access the resource`,
+            },
+        });
+        return result.body;
+    }
+
+    /**
+     * Give a like to the developers
+     * @returns Result Success
+     * @throws ApiError
+     */
+    public static async like(): Promise<Result> {
+        const result = await __request({
+            method: 'POST',
+            path: `/like`,
+            errors: {
+                401: `Unauthorized to access the resource`,
+            },
+        });
+        return result.body;
+    }
+
 }

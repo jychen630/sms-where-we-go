@@ -1361,3 +1361,32 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Result"
+  /like:
+    get:
+      operationId: getLikes
+      description: Get the number of likes the site has received
+      responses:
+        200:
+          description: Return the total number of likes
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - count
+                properties:
+                  count:
+                    type: integer
+                    description: The total number of likes
+        401:
+          $ref: "#/components/responses/Success"
+        403:
+          $ref: "#/components/responses/Forbidden"
+    post:
+      operationId: like
+      description: Give a like to the developers
+      responses:
+        200:
+          $ref: "#/components/responses/Success"
+        401:
+          $ref: "#/components/responses/UnAuthorized"
