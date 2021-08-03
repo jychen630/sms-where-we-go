@@ -2,7 +2,7 @@ import { Badge, Button, Form, Select } from "antd";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router";
-import { Result, Service } from "wwg-api";
+import { Service } from "wwg-api";
 import { useAuth } from "../api/auth";
 import { createNotifyError, handleApiError, ThenType } from "../api/utils";
 
@@ -35,22 +35,7 @@ const DevLoginForm = () => {
                     err,
                     createNotifyError(t, t('Error'), t('Failed to login as dev'))
                 )
-            )
-        Service.postDevLogin({ uid: data.uid })
-            .then(res => {
-                if (res.result === Result.result.SUCCESS) {
-                    history.push('/map');
-                }
-                else {
-                    return Promise.reject(res.message);
-                }
-            })
-            .catch(err =>
-                handleApiError(
-                    err,
-                    createNotifyError(t, t('Error'), t('Failed to login as dev'))
-                )
-            )
+            );
     }
 
     return (
