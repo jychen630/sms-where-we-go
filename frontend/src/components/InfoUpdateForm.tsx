@@ -8,7 +8,7 @@ import { useAuth } from "../api/auth";
 import { useDict } from "../api/hooks";
 import { handleApiError, ThenType } from "../api/utils";
 import { emailPattern, phonePattern } from "./RegistrationForm";
-import SchoolSearchTool from "./SchoolSearchTool";
+import SchoolSearchTool, { QuerySchoolResult } from "./SchoolSearchTool";
 
 type Values = Parameters<typeof Service.updateStudent>[0];
 const { Item } = Form;
@@ -18,6 +18,7 @@ const InfoUpdateForm = ({ getStudent, showRoleOptions = false }: { showRoleOptio
     const auth = useAuth();
     const [form] = Form.useForm<Values>();
     const [role, setRole] = useState<Role | undefined>(undefined);
+    const [currentSchool, setCurrentSchool] = useState<QuerySchoolResult | undefined>();
     const [schoolUid, setSchoolUid] = useState(-1);
     const [studentUid, setStudentUid] = useState(-1);
     const [initialSchool, setInitialSchool] = useState('');
@@ -170,6 +171,10 @@ const InfoUpdateForm = ({ getStudent, showRoleOptions = false }: { showRoleOptio
         initialize();
     };
 
+    const handleSchoolUpdate = (school?: QuerySchoolResult) => {
+        setCurrentSchool(school);
+    }
+
     useEffect(initialize, [initialize]);
 
     return <>
@@ -249,7 +254,7 @@ const InfoUpdateForm = ({ getStudent, showRoleOptions = false }: { showRoleOptio
                 label='去向院校'
                 tooltip='没有找到你的学校？点击右方 + 来添加一个学校。若目前未定去向，此项可不填。海外院校请输入英文名'
             >
-                <SchoolSearchTool schoolUid={schoolUid} setSchoolUid={setSchoolUid} initialValue={initialSchool} searchProps={{ ...createToggleSuffix('school_uid') }} />
+                <SchoolSearchTool schoolUid={schoolUid} setSchoolUid={setSchoolUid} initialValue={initialSchool} searchProps={{ ...createToggleSuffix('school_uid') }} onUpdate={handleSchoolUpdate} />
             </Form.Item>
             <Form.Item
                 name='department'
