@@ -1,10 +1,9 @@
 import { randomBytes } from "crypto";
 import { Operation } from "express-openapi";
-import log4js from 'log4js';
 import { pg } from "..";
 import { RegistrationKeyInfo, Service } from "../generated";
 import { Class, RegistrationKey } from "../generated/schema";
-import { ClassService, RoleResource, RoleService, StudentService } from "../services";
+import { ClassService, RoleResource, RoleService } from "../services";
 import { Actions, dbHandleError, getSelf, parseBody, parseQuery, sendError, sendSuccess, ServerLogger, validateAdmin, validateLogin } from "../utils";
 
 export const get: Operation = async (req, res) => {
@@ -19,7 +18,7 @@ export const get: Operation = async (req, res) => {
         pg('wwg.registration_key').joinRaw('NATURAL JOIN wwg.class')
             .select()
             .modify<(RegistrationKey & Class)[], (RegistrationKey & Class)[]>((qb) => {
-                if (data['notExpired']) {
+                if (data['not_expired']) {
                     qb.where(
                         'expiration_date', '>', new Date().toISOString()
                     )

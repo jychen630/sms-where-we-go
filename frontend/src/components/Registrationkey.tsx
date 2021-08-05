@@ -1,5 +1,5 @@
 import { createNotifyError, handleApiError } from "../api/utils";
-import { Button, Form, FormInstance, List, notification, Select, Switch } from "antd";
+import { Button, Form, FormInstance, List, notification, Select, Space, Switch } from "antd";
 import { useCallback, useEffect, useState } from 'react';
 import { Class, RegistrationKeyInfo, Result, Service } from "wwg-api";
 import { useTranslation } from "react-i18next";
@@ -97,14 +97,15 @@ const RegistrationKeyForm = (props: { form: FormInstance<{ classes: string[] }>,
 
 const RegistrationKey = () => {
     const [t] = useTranslation();
+    const [notExpired, setNotExpired] = useState(true);
     const [keys, setKeys] = useState<KeyInfo[]>([]);
     const [form] = Form.useForm<{ classes: string[] }>();
 
     const fetchKeys = useCallback(() => {
-        Service.getRegistrationKey(0, 100)
+        Service.getRegistrationKey(0, 100, notExpired)
             .then(result => setKeys(result.registration_keys ?? []))
             .catch(err => handleApiError(err, createNotifyError(t, '失败', '未能获取注册码')))
-    }, [t])
+    }, [t, notExpired])
 
     const [FormModal, showModal] = useModal({
         content: <RegistrationKeyForm form={form} onSuccess={() => fetchKeys()} />,
@@ -122,7 +123,10 @@ const RegistrationKey = () => {
 
     return (
         <>
-            <Button onClick={showModal}><PlusOutlined /> 添加注册码</Button>
+            <Space direction='vertical'>
+                <Button onClick={showModal}><PlusOutlined /> 添加注册码</Button>
+                <Switch defaultChecked={notExpired} checkedChildren='未过期' unCheckedChildren='全部' onChange={val => setNotExpired(val)} style={{ display: "block" }}></Switch>
+            </Space>
             <List>
                 {keys.map((value, index) =>
                     <List.Item
