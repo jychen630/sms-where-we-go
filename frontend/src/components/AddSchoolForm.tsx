@@ -4,10 +4,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button, Card, Divider, Form, Input, Space, Tabs, notification, Switch } from 'antd';
 import { useEffect } from 'react';
 import { useCallback, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Coordinate, Result, Service } from 'wwg-api';
+import useSearchCity from '../api/citySearchTool';
 import { PaginatedQuery } from '../api/hooks';
-import { createNotifyError, handleApiError } from '../api/utils';
+import { handleApiError } from '../api/utils';
 import InfoCard from './InfoCard';
 import { Optional } from './InfoList';
 import Map, { MapItem } from './Map';
@@ -27,28 +27,12 @@ enum Provider {
 };
 
 const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
-    const [t] = useTranslation();
     const [page, setPage] = useState(0);
     const [form] = Form.useForm<Values>();
-    const [cityUid, setCityUid] = useState(-1);
+    const [renderSearchTool, cityUid] = useSearchCity();
     const [location, setLocation] = useState<Location>();
     const [currentTab, setCurrentTab] = useState('select');
     const [provider, setProvider] = useState<Provider>(Provider.AMAP);
-
-    const fetchCity = useCallback(async (props: PaginatedQuery) => {
-        try {
-            const result = await Service.getCity(props.offset, props.limit, props.value);
-            if (!!result.cities && result.result === Result.result.SUCCESS) {
-                return result.cities;
-            }
-            else {
-                throw new Error('Failed to search for the cities');
-            }
-        }
-        catch (err) {
-            handleApiError(err, createNotifyError(t, '错误', '获取城市列表失败'));
-        }
-    }, [t]);
 
     const handleFinish = (data: Values) => {
         if (data.longitude === undefined || data.latitude === undefined) {
@@ -135,18 +119,7 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                 </Form.Item>
                 <Tabs defaultActiveKey='select' onChange={(key) => { setCurrentTab(key) }}>
                     <Tabs.TabPane key='select' tab='选择城市'>
-                        <SearchTool
-                            dataHandler={fetchCity}
-                            item={(value, index) =>
-                                <Button onClick={() => setCityUid(value.city_uid)} type={value.city_uid === cityUid ? 'primary' : 'text'} block>
-                                    {value.city}, {value.state_province}, {value.country}
-                                    {value.city_uid === cityUid &&
-                                        <CheckCircleFilled />
-                                    }
-                                </Button>
-                            }
-                            placeholder='输入城市名 (已收录国内大部分城市)'
-                        />
+                        {renderSearchTool()}
                     </Tabs.TabPane>
                     <Tabs.TabPane key='add' tab='添加城市 (国外/国内未收录地区)'>
                         <Form.Item
