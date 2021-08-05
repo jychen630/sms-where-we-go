@@ -9,7 +9,7 @@ import { City, School, StudentClassRole, StudentRole, StudentVisibility } from '
 import { ArrayType } from '../wwg_types/custom_types';
 
 // These are the fields that will not be stored in the database
-export const pseudoFields = ['school_name', 'school_state_province', 'school_country', 'city'];
+export const pseudoFields = ['school_name'];
 
 export const studentFieldVisibility = pg(
     pg('wwg.student_field_visibility')

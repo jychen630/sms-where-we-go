@@ -313,6 +313,7 @@ registration_key: string,
      * @param schoolCountry 
      * @param schoolStateProvince 
      * @param city 
+     * @param uid 
      * @returns any Return the schools that satisfy the constraints
      * @throws ApiError
      */
@@ -323,6 +324,7 @@ schoolName?: string,
 schoolCountry?: string,
 schoolStateProvince?: string,
 city?: string,
+uid?: number,
 ): Promise<(Result & {
 schools?: Array<(School & {
 /**
@@ -345,6 +347,7 @@ matched_alias?: string,
                 'school_country': schoolCountry,
                 'school_state_province': schoolStateProvince,
                 'city': city,
+                'uid': uid,
             },
         });
         return result.body;

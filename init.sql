@@ -132,7 +132,7 @@ CREATE TABLE wwg.comment (
     FOREIGN KEY (feedback_uid) REFERENCES wwg.feedback(feedback_uid) ON DELETE CASCADE
 );
 
-CREATE TYPE STUDENT_FIELD as ENUM ('phone_number', 'email', 'wxid', 'department', 'major', 'school_uid');
+CREATE TYPE STUDENT_FIELD as ENUM ('phone_number', 'email', 'wxid', 'department', 'major', 'school_uid', 'school_country', 'school_state_province', 'city');
 
 CREATE TABLE wwg.student_field_visibility (
     student_uid INT NOT NULL,

@@ -58,9 +58,6 @@ export const parseHiddenFields = (original: string | null) => {
         hiddenFields = new Set(original.slice(1, -1).split(','));
         if (hiddenFields.has('school_uid')) {
             hiddenFields.add('school_name');
-            hiddenFields.add('school_country');
-            hiddenFields.add('school_state_province');
-            hiddenFields.add('city');
         }
     }
     else {

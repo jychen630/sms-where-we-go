@@ -256,6 +256,24 @@ const InfoUpdateForm = ({ getStudent, showRoleOptions = false }: { showRoleOptio
             >
                 <SchoolSearchTool schoolUid={schoolUid} setSchoolUid={setSchoolUid} initialValue={initialSchool} searchProps={{ ...createToggleSuffix('school_uid') }} onUpdate={handleSchoolUpdate} />
             </Form.Item>
+            {currentSchool && <>
+                <Form.Item
+                    label='国家'
+                >
+                    <Input value={currentSchool?.school_country} disabled {...createToggleSuffix('school_country')} />
+                </Form.Item>
+                <Form.Item
+                    label='省/州/郡'
+                >
+                    <Input value={currentSchool?.school_state_province} disabled {...createToggleSuffix('school_state_province')} />
+                </Form.Item>
+                <Form.Item
+                    label='城市'
+                >
+                    <Input value={currentSchool?.city} disabled {...createToggleSuffix('city')} />
+                </Form.Item>
+            </>
+            }
             <Form.Item
                 name='department'
                 label='学院'

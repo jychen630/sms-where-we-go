@@ -9,4 +9,7 @@ export type StudentFieldsVisibility = {
     wxid?: boolean;
     department?: boolean;
     major?: boolean;
+    city?: boolean;
+    school_state_province?: boolean;
+    school_country?: boolean;
 }

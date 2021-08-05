@@ -205,6 +205,12 @@ components:
           type: boolean
         major:
           type: boolean
+        city:
+          type: boolean
+        school_state_province:
+          type: boolean
+        school_country:
+          type: boolean
     Feedback:
       type: object
       required:
@@ -828,6 +834,11 @@ paths:
           schema:
             type: string
             example: Shenzhen
+        - in: query
+          name: uid
+          schema:
+            type: integer
+            example: 1
       responses:
         200:
           description: Return the schools that satisfy the constraints
