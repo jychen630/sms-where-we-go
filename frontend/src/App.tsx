@@ -5,6 +5,8 @@ import {
   Route,
   Redirect
 } from 'react-router-dom';
+import { Collapse } from 'antd';
+import { useModal } from './api/modal';
 import CardPage from './pages/CardPage';
 import LoginForm from './components/LoginForm';
 import RegistrationForm from './components/RegistrationForm';
@@ -19,14 +21,39 @@ import ListPage from './pages/ListPage';
 import FeedbackPage from './pages/FeedbackPage';
 import FeedbackForm from './components/FeedbackForm';
 import AboutPage from './pages/AboutPage';
+import { notification } from 'antd';
 
 OpenAPI.WITH_CREDENTIALS = true;
 OpenAPI.TOKEN = '';
 function App() {
   const authProvider = useAuthProvider();
+  const [FeedbackModal, showFeedback] = useModal({
+    content: <>
+      <p>使用过程中有哪些地方不满意？你可以直接在下方反馈，让我们一起进步 :-)</p>
+      <p>同时，欢迎访问SMS Where We Go <a href="https://github.com/AcKindle3/sms-where-we-go">Github 仓库</a>，给我们 Star，提 Issue 或者 PR，感谢你的支持！</p>
+      <Collapse ghost>
+        <Collapse.Panel key='feedback' header="添加反馈">
+          <FeedbackForm isPublic={false} />
+        </Collapse.Panel>
+      </Collapse>
+    </>,
+    onOk: () => {
+      window.localStorage.setItem("feedback", "hidden");
+    },
+    modalProps: {
+      title: "你的想法对 SMS Where We Go 很重要",
+      okText: "不再显示",
+      cancelText: "下次再说"
+    }
+  });
   useEffect(() => {
     authProvider
       .update()
+      .then(() => {
+        if (window.localStorage.getItem("feedback") !== "hidden" && Math.random() < 0.5) {
+          showFeedback();
+        }
+      })
       .catch((e) => {
         // We expect a 401 when the user is not logged in, so we can safely ignore it.
         // However, if an error occurs and the status code is undefined or something

@@ -1,5 +1,6 @@
 import { ModalProps } from "antd";
 import Modal from "antd/lib/modal/Modal";
+import { useCallback } from "react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -22,7 +23,7 @@ export const useModal = ({ content, onOk, onCancel, modalProps, defaultVisible =
         setShow(false);
     };
     return [
-        () => (
+        useCallback(() => (
             <Modal
                 okText={okText}
                 cancelText={cancelText}
@@ -33,7 +34,7 @@ export const useModal = ({ content, onOk, onCancel, modalProps, defaultVisible =
             >
                 {content}
             </Modal>
-        ),
+        ), [okText, cancelText, show]), //  eslint-disable-line
         () => {
             setShow(true);
         },
