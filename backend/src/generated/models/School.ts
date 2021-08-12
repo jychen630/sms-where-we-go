@@ -9,4 +9,4 @@ export type School = {
     school_country?: string;
     school_state_province?: string;
     city?: string;
-}
+};

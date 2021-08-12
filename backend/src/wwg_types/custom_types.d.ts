@@ -1,9 +1,9 @@
-import { Session } from 'express-session';
+import { Session } from "express-session";
 
-declare module 'express-session' {
+declare module "express-session" {
     interface Session {
-        student_uid: number,
-        identifier: string | number
+        student_uid: number;
+        identifier: string | number;
     }
 }
 

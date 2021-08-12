@@ -23,4 +23,4 @@ export type FeedbackInfo = {
      * The year of graduation reported by the student
      */
     grad_year?: number;
-}
+};

@@ -1,13 +1,13 @@
 {
-  "compilerOptions": {
-    "target": "es2015",
-    "module": "commonjs",
-    "declaration": true,
-    "outDir": "./build",
-    "strict": true,
-    "typeRoots": ["node_modules/@types", "src/wwg_typings"],
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
-  }
+    "compilerOptions": {
+        "target": "es2015",
+        "module": "commonjs",
+        "declaration": true,
+        "outDir": "./build",
+        "strict": true,
+        "typeRoots": ["node_modules/@types", "src/wwg_typings"],
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true
+    }
 }

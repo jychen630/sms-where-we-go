@@ -15,20 +15,17 @@ export type Feedback = {
      * The reason for sending the feedback
      */
     reason: Feedback.reason;
-}
+};
 
 export namespace Feedback {
-
     /**
      * The reason for sending the feedback
      */
     export enum reason {
-        GENERAL = 'general',
-        REGISTRATION = 'registration',
-        RESET_PASSWORD = 'reset password',
-        UPDATE_INFO = 'update info',
-        IMPROVEMENT = 'improvement',
+        GENERAL = "general",
+        REGISTRATION = "registration",
+        RESET_PASSWORD = "reset password",
+        UPDATE_INFO = "update info",
+        IMPROVEMENT = "improvement",
     }
-
-
 }

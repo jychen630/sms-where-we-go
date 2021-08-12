@@ -1,21 +1,23 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import { ApiError } from './ApiError';
-import type { ApiRequestOptions } from './ApiRequestOptions';
-import type { ApiResult } from './ApiResult';
-import { OpenAPI } from './OpenAPI';
+import { ApiError } from "./ApiError";
+import type { ApiRequestOptions } from "./ApiRequestOptions";
+import type { ApiResult } from "./ApiResult";
+import { OpenAPI } from "./OpenAPI";
 
-function isDefined<T>(value: T | null | undefined): value is Exclude<T, null | undefined> {
+function isDefined<T>(
+    value: T | null | undefined
+): value is Exclude<T, null | undefined> {
     return value !== undefined && value !== null;
 }
 
 function isString(value: any): value is string {
-    return typeof value === 'string';
+    return typeof value === "string";
 }
 
 function isStringWithValue(value: any): value is string {
-    return isString(value) && value !== '';
+    return isString(value) && value !== "";
 }
 
 function isBlob(value: any): value is Blob {
@@ -24,26 +26,34 @@ function isBlob(value: any): value is Blob {
 
 function getQueryString(params: Record<string, any>): string {
     const qs: string[] = [];
-    Object.keys(params).forEach(key => {
+    Object.keys(params).forEach((key) => {
         const value = params[key];
         if (isDefined(value)) {
             if (Array.isArray(value)) {
-                value.forEach(value => {
-                    qs.push(`${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`);
+                value.forEach((value) => {
+                    qs.push(
+                        `${encodeURIComponent(key)}=${encodeURIComponent(
+                            String(value)
+                        )}`
+                    );
                 });
             } else {
-                qs.push(`${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`);
+                qs.push(
+                    `${encodeURIComponent(key)}=${encodeURIComponent(
+                        String(value)
+                    )}`
+                );
             }
         }
     });
     if (qs.length > 0) {
-        return `?${qs.join('&')}`;
+        return `?${qs.join("&")}`;
     }
-    return '';
+    return "";
 }
 
 function getUrl(options: ApiRequestOptions): string {
-    const path = options.path.replace(/[:]/g, '_');
+    const path = options.path.replace(/[:]/g, "_");
     const url = `${OpenAPI.BASE}${path}`;
 
     if (options.query) {
@@ -54,7 +64,7 @@ function getUrl(options: ApiRequestOptions): string {
 
 function getFormData(params: Record<string, any>): FormData {
     const formData = new FormData();
-    Object.keys(params).forEach(key => {
+    Object.keys(params).forEach((key) => {
         const value = params[key];
         if (isDefined(value)) {
             formData.append(key, value);
@@ -65,8 +75,11 @@ function getFormData(params: Record<string, any>): FormData {
 
 type Resolver<T> = (options: ApiRequestOptions) => Promise<T>;
 
-async function resolve<T>(options: ApiRequestOptions, resolver?: T | Resolver<T>): Promise<T | undefined> {
-    if (typeof resolver === 'function') {
+async function resolve<T>(
+    options: ApiRequestOptions,
+    resolver?: T | Resolver<T>
+): Promise<T | undefined> {
+    if (typeof resolver === "function") {
         return (resolver as Resolver<T>)(options);
     }
     return resolver;
@@ -79,27 +92,30 @@ async function getHeaders(options: ApiRequestOptions): Promise<Headers> {
     const defaultHeaders = await resolve(options, OpenAPI.HEADERS);
 
     const headers = new Headers({
-        Accept: 'application/json',
+        Accept: "application/json",
         ...defaultHeaders,
         ...options.headers,
     });
 
     if (isStringWithValue(token)) {
-        headers.append('Authorization', `Bearer ${token}`);
+        headers.append("Authorization", `Bearer ${token}`);
     }
 
     if (isStringWithValue(username) && isStringWithValue(password)) {
         const credentials = btoa(`${username}:${password}`);
-        headers.append('Authorization', `Basic ${credentials}`);
+        headers.append("Authorization", `Basic ${credentials}`);
     }
 
     if (options.body) {
         if (isBlob(options.body)) {
-            headers.append('Content-Type', options.body.type || 'application/octet-stream');
+            headers.append(
+                "Content-Type",
+                options.body.type || "application/octet-stream"
+            );
         } else if (isString(options.body)) {
-            headers.append('Content-Type', 'text/plain');
+            headers.append("Content-Type", "text/plain");
         } else {
-            headers.append('Content-Type', 'application/json');
+            headers.append("Content-Type", "application/json");
         }
     }
     return headers;
@@ -119,19 +135,25 @@ function getRequestBody(options: ApiRequestOptions): BodyInit | undefined {
     return undefined;
 }
 
-async function sendRequest(options: ApiRequestOptions, url: string): Promise<Response> {
+async function sendRequest(
+    options: ApiRequestOptions,
+    url: string
+): Promise<Response> {
     const request: RequestInit = {
         method: options.method,
         headers: await getHeaders(options),
         body: getRequestBody(options),
     };
     if (OpenAPI.WITH_CREDENTIALS) {
-        request.credentials = 'include';
+        request.credentials = "include";
     }
     return await fetch(url, request);
 }
 
-function getResponseHeader(response: Response, responseHeader?: string): string | null {
+function getResponseHeader(
+    response: Response,
+    responseHeader?: string
+): string | null {
     if (responseHeader) {
         const content = response.headers.get(responseHeader);
         if (isString(content)) {
@@ -143,9 +165,11 @@ function getResponseHeader(response: Response, responseHeader?: string): string 
 
 async function getResponseBody(response: Response): Promise<any> {
     try {
-        const contentType = response.headers.get('Content-Type');
+        const contentType = response.headers.get("Content-Type");
         if (contentType) {
-            const isJSON = contentType.toLowerCase().startsWith('application/json');
+            const isJSON = contentType
+                .toLowerCase()
+                .startsWith("application/json");
             if (isJSON) {
                 return await response.json();
             } else {
@@ -160,15 +184,15 @@ async function getResponseBody(response: Response): Promise<any> {
 
 function catchErrors(options: ApiRequestOptions, result: ApiResult): void {
     const errors: Record<number, string> = {
-        400: 'Bad Request',
-        401: 'Unauthorized',
-        403: 'Forbidden',
-        404: 'Not Found',
-        500: 'Internal Server Error',
-        502: 'Bad Gateway',
-        503: 'Service Unavailable',
+        400: "Bad Request",
+        401: "Unauthorized",
+        403: "Forbidden",
+        404: "Not Found",
+        500: "Internal Server Error",
+        502: "Bad Gateway",
+        503: "Service Unavailable",
         ...options.errors,
-    }
+    };
 
     const error = errors[result.status];
     if (error) {
@@ -176,7 +200,7 @@ function catchErrors(options: ApiRequestOptions, result: ApiResult): void {
     }
 
     if (!result.ok) {
-        throw new ApiError(result, 'Generic Error');
+        throw new ApiError(result, "Generic Error");
     }
 }
 

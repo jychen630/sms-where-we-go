@@ -6,4 +6,4 @@ export type FeedbackComment = {
     content: string;
     sender_name: string;
     posted_at: string;
-}
+};

@@ -12,4 +12,4 @@ export type StudentFieldsVisibility = {
     city?: boolean;
     school_state_province?: boolean;
     school_country?: boolean;
-}
+};
