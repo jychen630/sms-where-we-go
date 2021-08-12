@@ -1,10 +1,9 @@
-import knex from "knex";
-import dotenv from "dotenv";
 import log4js from "log4js";
 import knexTypes from "knex-types";
 import initSchools from "./load-school.mjs";
 
 import argparse from "argparse";
+import { pg } from "./config.mjs";
 
 const parser = new argparse.ArgumentParser({
     description: "Load or incrementally add initial data to the database",
@@ -50,17 +49,6 @@ const logger = log4js.getLogger("load");
 
 const RETRIES = 5;
 const DATA_PATHS = ["./tools/ChinaUniversityList.json", "./tools/test.json"];
-dotenv.config();
-export const pg = knex.knex({
-    client: "pg",
-    connection: {
-        host: process.env.PGHOST,
-        user: process.env.PGUSER,
-        password: process.env.PGPASSWORD,
-        database: "wwg_base",
-    },
-    searchPath: ["wwg", "public"],
-});
 
 function handleError(err) {
     if (!!err.detail) {
