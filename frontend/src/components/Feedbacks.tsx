@@ -7,26 +7,42 @@ import { Service } from "wwg-api";
 import { createNotifyError, handleApiError } from "../api/utils";
 import FeedbackCard, { FeedbackVerbose } from "./FeedbackCard";
 
-const Feedbacks = ({ adminView, count }: { adminView: boolean, count?: number }) => {
+const Feedbacks = ({
+    adminView,
+    count,
+}: {
+    adminView: boolean;
+    count?: number;
+}) => {
     const [t] = useTranslation();
     const [pendingOnly, setPendingOnly] = useState(true);
     const [feedbacks, setFeedbacks] = useState<FeedbackVerbose[]>([]);
 
     const fetchFeedbacks = useCallback(() => {
         (adminView ? Service.manageGetFeedback : Service.viewGetFeedback)()
-            .then(res => {
+            .then((res) => {
                 setFeedbacks(res.feedbacks ?? []);
             })
-            .catch(err => handleApiError(err, createNotifyError(t, t('Error'), '未能获取反馈列表')))
+            .catch((err) =>
+                handleApiError(
+                    err,
+                    createNotifyError(t, t("Error"), "未能获取反馈列表")
+                )
+            );
     }, [t, adminView, setFeedbacks]);
 
-    const updateFeedback = useCallback((uid: string, status: string) => {
-        setFeedbacks(feedbacks.map(
-            feedback =>
-                feedback.feedback_uid !== uid
-                    ? feedback
-                    : Object.assign(feedback, { status: status })))
-    }, [feedbacks, setFeedbacks])
+    const updateFeedback = useCallback(
+        (uid: string, status: string) => {
+            setFeedbacks(
+                feedbacks.map((feedback) =>
+                    feedback.feedback_uid !== uid
+                        ? feedback
+                        : Object.assign(feedback, { status: status })
+                )
+            );
+        },
+        [feedbacks, setFeedbacks]
+    );
 
     useEffect(() => {
         fetchFeedbacks();
@@ -34,23 +50,37 @@ const Feedbacks = ({ adminView, count }: { adminView: boolean, count?: number })
 
     return (
         <>
-            <Space direction='vertical' style={{ width: '100%' }}>
-                <Switch defaultChecked={pendingOnly} checkedChildren='仅未处理项' unCheckedChildren='所有项' onChange={val => setPendingOnly(val)}></Switch>
-                {feedbacks.length > 0 ?
-                    feedbacks.map(val => (!pendingOnly || val.status === 'pending') && <FeedbackCard
-                        key={val.feedback_uid}
-                        onSent={fetchFeedbacks}
-                        onUpdateStatus={(status) => {
-                            updateFeedback(val.feedback_uid, status);
-                        }}
-                        adminView={adminView}
-                        {...val}
-                    />)
-                    :
-                    <Empty description="无历史反馈" />}
+            <Space direction="vertical" style={{ width: "100%" }}>
+                <Switch
+                    defaultChecked={pendingOnly}
+                    checkedChildren="仅未处理项"
+                    unCheckedChildren="所有项"
+                    onChange={(val) => setPendingOnly(val)}
+                ></Switch>
+                {feedbacks.length > 0 ? (
+                    feedbacks.map(
+                        (val) =>
+                            (!pendingOnly || val.status === "pending") && (
+                                <FeedbackCard
+                                    key={val.feedback_uid}
+                                    onSent={fetchFeedbacks}
+                                    onUpdateStatus={(status) => {
+                                        updateFeedback(
+                                            val.feedback_uid,
+                                            status
+                                        );
+                                    }}
+                                    adminView={adminView}
+                                    {...val}
+                                />
+                            )
+                    )
+                ) : (
+                    <Empty description="无历史反馈" />
+                )}
             </Space>
         </>
-    )
-}
+    );
+};
 
 export default Feedbacks;

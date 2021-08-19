@@ -14,19 +14,38 @@ const MapPage = () => {
     const getRoster = useCallback(async () => {
         return Service.getRoster()
             .then((result) => {
-                return result.schools.filter((school) => !!school.latitude && !!school.longitude);
+                return result.schools.filter(
+                    (school) => !!school.latitude && !!school.longitude
+                );
             })
             .catch((err) => {
-                handleApiError(err, createNotifyError(t, '错误', '未能获取地图数据', err => err.requireLogin && setTimeout(() => history.push('/login', history.location), 1500)));
+                handleApiError(
+                    err,
+                    createNotifyError(
+                        t,
+                        "错误",
+                        "未能获取地图数据",
+                        (err) =>
+                            err.requireLogin &&
+                            setTimeout(
+                                () => history.push("/login", history.location),
+                                1500
+                            )
+                    )
+                );
                 return [];
             });
     }, [t, history]);
 
     return (
         <AppPage activeKey={menuOptions.MAP}>
-            <Map getData={getRoster} initialZoom={1} getPopup={(props) => <InfoCard items={props} />} />
+            <Map
+                getData={getRoster}
+                initialZoom={1}
+                getPopup={(props) => <InfoCard items={props} />}
+            />
         </AppPage>
-    )
-}
+    );
+};
 
 export default MapPage;

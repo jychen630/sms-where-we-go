@@ -34,7 +34,10 @@ const AdminPage = () => {
     };
 
     useEffect(() => {
-        if (match === null || (!Object.values(AdminTab).includes(match.params.tab as AdminTab))) {
+        if (
+            match === null ||
+            !Object.values(AdminTab).includes(match.params.tab as AdminTab)
+        ) {
             history.replace(`/admin/${AdminTab.Users}`);
         }
     }, [history, match]);
@@ -42,21 +45,49 @@ const AdminPage = () => {
     useEffect(() => {
         Service.getStudent(false, true)
             .then((result) => setStudents(result.students ?? []))
-            .catch(err => handleApiError(err, createNotifyError(t, '错误', '未能获取学生数据', (err) => err.requireLogin && setTimeout(() => history.push('/login', history.location), 1500))))
+            .catch((err) =>
+                handleApiError(
+                    err,
+                    createNotifyError(
+                        t,
+                        "错误",
+                        "未能获取学生数据",
+                        (err) =>
+                            err.requireLogin &&
+                            setTimeout(
+                                () => history.push("/login", history.location),
+                                1500
+                            )
+                    )
+                )
+            );
     }, [t, history]);
 
     const getCurrentStudent = useCallback(
-        async () => index === -1 ? undefined : students[index],
+        async () => (index === -1 ? undefined : students[index]),
         [students, index]
     );
 
     return (
         <AppPage activeKey={menuOptions.ADMIN}>
-            <Layout className='centered-layout'>
+            <Layout className="centered-layout">
                 <Layout.Content>
                     <Card>
-                        <Tabs activeKey={match !== null && Object.values(AdminTab).includes(match.params.tab as AdminTab) ? match.params.tab : AdminTab.Users} onChange={(key) => history.replace(`/admin/${key}`)}>
-                            <Tabs.TabPane tab={t('User List')} key={AdminTab.Users}>
+                        <Tabs
+                            activeKey={
+                                match !== null &&
+                                Object.values(AdminTab).includes(
+                                    match.params.tab as AdminTab
+                                )
+                                    ? match.params.tab
+                                    : AdminTab.Users
+                            }
+                            onChange={(key) => history.replace(`/admin/${key}`)}
+                        >
+                            <Tabs.TabPane
+                                tab={t("User List")}
+                                key={AdminTab.Users}
+                            >
                                 <List itemLayout="horizontal">
                                     {students.map((value, index) => (
                                         <List.Item
@@ -72,30 +103,51 @@ const AdminPage = () => {
                                                 </Button>,
                                                 <Button
                                                     onClick={() => {
-                                                        setPasswordFormVisibile(true);
+                                                        setPasswordFormVisibile(
+                                                            true
+                                                        );
                                                         setIndex(index);
                                                     }}
-                                                    type='link'
+                                                    type="link"
                                                 >
                                                     {t("Password Reset")}
-                                                </Button>
+                                                </Button>,
                                             ]}
                                         >
                                             <List.Item.Meta
                                                 title={value.name}
-                                                description={<p>{value.class_number}/{value.grad_year} [{t(value.curriculum ?? '')}]</p>}
+                                                description={
+                                                    <p>
+                                                        {value.class_number}/
+                                                        {value.grad_year} [
+                                                        {t(
+                                                            value.curriculum ??
+                                                                ""
+                                                        )}
+                                                        ]
+                                                    </p>
+                                                }
                                             />
                                         </List.Item>
                                     ))}
                                 </List>
                             </Tabs.TabPane>
-                            <Tabs.TabPane tab={t('Class List')} key={AdminTab.Classes}>
+                            <Tabs.TabPane
+                                tab={t("Class List")}
+                                key={AdminTab.Classes}
+                            >
                                 <Classes />
                             </Tabs.TabPane>
-                            <Tabs.TabPane tab={t('Registration Keys')} key={AdminTab.Keys}>
+                            <Tabs.TabPane
+                                tab={t("Registration Keys")}
+                                key={AdminTab.Keys}
+                            >
                                 <RegistrationKey />
                             </Tabs.TabPane>
-                            <Tabs.TabPane tab={t('Feedbacks')} key={AdminTab.Feedbacks}>
+                            <Tabs.TabPane
+                                tab={t("Feedbacks")}
+                                key={AdminTab.Feedbacks}
+                            >
                                 <Feedbacks adminView />
                             </Tabs.TabPane>
                         </Tabs>
@@ -106,18 +158,27 @@ const AdminPage = () => {
                 title="编辑学生信息：" //{value.name}
                 visible={visible}
                 okText={<></>}
-                cancelText={t('Close')}
+                cancelText={t("Close")}
                 onCancel={handleCancel}
             >
-                <InfoUpdateForm showRoleOptions={auth.role !== Role.STUDENT} getStudent={getCurrentStudent} />
+                <InfoUpdateForm
+                    showRoleOptions={auth.role !== Role.STUDENT}
+                    getStudent={getCurrentStudent}
+                />
             </Modal>
             <Modal
                 visible={passwordFormVisible}
                 okText={<></>}
-                cancelText={t('Close')}
+                cancelText={t("Close")}
                 onCancel={() => setPasswordFormVisibile(false)}
             >
-                <PasswordResetForm studentUid={(!!students && index >= 0 && students.length > 0) ? students[index].uid : undefined} />
+                <PasswordResetForm
+                    studentUid={
+                        !!students && index >= 0 && students.length > 0
+                            ? students[index].uid
+                            : undefined
+                    }
+                />
             </Modal>
         </AppPage>
     );

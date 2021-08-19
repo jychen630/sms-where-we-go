@@ -1,113 +1,113 @@
 :root {
-  --header-height: 64px;
+    --header-height: 64px;
 }
 
 @media (max-width: 576px) {
-  body {
-    position: fixed;
-  }
+    body {
+        position: fixed;
+    }
 
-  #root {
-    position: absolute;
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden auto;
-  }
+    #root {
+        position: absolute;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden auto;
+    }
 }
 
 .app-header {
-  color: black;
-  background-color: white;
-  font-size: 1.25rem;
-  padding: 0 0 0 0 !important;
-  height: var(--header-height);
-  white-space: nowrap;
-  width: 100%;
-  box-shadow: #d3d3d385 0 2px 4px 2px;
+    color: black;
+    background-color: white;
+    font-size: 1.25rem;
+    padding: 0 0 0 0 !important;
+    height: var(--header-height);
+    white-space: nowrap;
+    width: 100%;
+    box-shadow: #d3d3d385 0 2px 4px 2px;
 }
 
 .app-content-container {
-  background-color: white;
-  min-height: calc(100vh - var(--header-height));
-  position: relative;
+    background-color: white;
+    min-height: calc(100vh - var(--header-height));
+    position: relative;
 }
 
 .app-content {
-  height: 100%;
-  width: 100%;
-  background: linear-gradient(
-    135deg,
-    rgb(243 243 243 / 50%),
-    rgb(232 232 232 / 50%)
-  );
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(
+        135deg,
+        rgb(243 243 243 / 50%),
+        rgb(232 232 232 / 50%)
+    );
 }
 
 .mapboxgl-popup-content {
-  padding: 0 0 0 0;
-  min-width: 240px;
+    padding: 0 0 0 0;
+    min-width: 240px;
 }
 
 .mapboxgl-popup-close-button {
-  display: none;
+    display: none;
 }
 
 .centered-layout {
-  --layout-padding: 20px;
-  position: absolute;
-  overflow-x: hidden;
-  width: 100%;
-  height: 100%;
+    --layout-padding: 20px;
+    position: absolute;
+    overflow-x: hidden;
+    width: 100%;
+    height: 100%;
 }
 
 .centered-layout main {
-  overflow-y: auto;
-  padding: var(--layout-padding) var(--layout-padding) var(--layout-padding)
-    var(--layout-padding);
+    overflow-y: auto;
+    padding: var(--layout-padding) var(--layout-padding) var(--layout-padding)
+        var(--layout-padding);
 }
 
 .collapse-panel {
-  overflow-x: hidden;
+    overflow-x: hidden;
 }
 
 .collapse-panel .ant-collapse-content-box {
-  max-height: 150px;
-  overflow-x: hidden;
-  overflow-y: scroll;
-  margin-right: -16px;
+    max-height: 150px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    margin-right: -16px;
 }
 
 .centered-layout main > div {
-  transform: translateX(calc(50vw - 50% - var(--layout-padding)));
-  max-width: 480px;
+    transform: translateX(calc(50vw - 50% - var(--layout-padding)));
+    max-width: 480px;
 }
 
 @media (max-width: 576px) {
-  .ant-modal {
-    top: 0 !important;
-  }
-  .collapse-panel .ant-collapse-content-box {
-    overflow-y: auto;
-    margin-right: 0;
-  }
+    .ant-modal {
+        top: 0 !important;
+    }
+    .collapse-panel .ant-collapse-content-box {
+        overflow-y: auto;
+        margin-right: 0;
+    }
 }
 
 @media (max-width: 767px) {
-  .centered-layout main {
-    padding: 0 0 0 0;
-  }
+    .centered-layout main {
+        padding: 0 0 0 0;
+    }
 
-  .centered-layout main > div {
-    width: 100%;
-    transform: unset;
-    max-width: unset;
-    min-height: calc(100vh - var(--header-height));
-  }
+    .centered-layout main > div {
+        width: 100%;
+        transform: unset;
+        max-width: unset;
+        min-height: calc(100vh - var(--header-height));
+    }
 }
 
 .underdotted {
-  border-bottom: 1px black dotted;
+    border-bottom: 1px black dotted;
 }
 
 .ant-input-number {
-  width: 100% !important;
+    width: 100% !important;
 }

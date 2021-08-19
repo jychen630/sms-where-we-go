@@ -1,7 +1,7 @@
 .list-page-flex-box {
-  display: inline-flex;
-  align-content: flex-start;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  padding: 10px;
+    display: inline-flex;
+    align-content: flex-start;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    padding: 10px;
 }

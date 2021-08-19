@@ -12,56 +12,59 @@ const DevLoginForm = () => {
     const { devLogin } = useAuth();
     const history = useHistory();
     const [form] = Form.useForm<Values>();
-    const [users, setUsers] = useState<NonNullable<ThenType<ReturnType<typeof Service.getDevLogin>>['users']>>([]);
+    const [users, setUsers] = useState<
+        NonNullable<ThenType<ReturnType<typeof Service.getDevLogin>>["users"]>
+    >([]);
 
     useEffect(() => {
         Service.getDevLogin()
-            .then(result => setUsers(result.users ?? []))
-            .catch(err =>
+            .then((result) => setUsers(result.users ?? []))
+            .catch((err) =>
                 handleApiError(
                     err,
-                    createNotifyError(t, t('Error'), t('Failed to fetch available users'))
+                    createNotifyError(
+                        t,
+                        t("Error"),
+                        t("Failed to fetch available users")
+                    )
                 )
-            )
+            );
     }, [t, setUsers]);
 
     const handleFinish = (data: Values) => {
         devLogin(data.uid)
             .then(() => {
-                history.push('/map');
+                history.push("/map");
             })
-            .catch(err =>
+            .catch((err) =>
                 handleApiError(
                     err,
-                    createNotifyError(t, t('Error'), t('Failed to login as dev'))
+                    createNotifyError(
+                        t,
+                        t("Error"),
+                        t("Failed to login as dev")
+                    )
                 )
             );
-    }
+    };
 
     return (
-        <Form
-            form={form}
-            onFinish={handleFinish}
-        >
-            <Form.Item
-                name='uid'
-                label={t('SELECT LOGIN')}
-            >
+        <Form form={form} onFinish={handleFinish}>
+            <Form.Item name="uid" label={t("SELECT LOGIN")}>
                 <Select>
-                    {users.map((value) =>
-                        <Select.Option
-                            key={value.uid}
-                            value={value.uid}
-                        >
+                    {users.map((value) => (
+                        <Select.Option key={value.uid} value={value.uid}>
                             {value.name} <Badge>{value.uid}</Badge>
                             <p>权限: {t(value.role.toUpperCase())}</p>
                         </Select.Option>
-                    )}
+                    ))}
                 </Select>
             </Form.Item>
-            <Button type='primary' htmlType='submit'>{t('Login')}</Button>
+            <Button type="primary" htmlType="submit">
+                {t("Login")}
+            </Button>
         </Form>
-    )
-}
+    );
+};
 
 export default DevLoginForm;

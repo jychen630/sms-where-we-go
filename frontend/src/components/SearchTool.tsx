@@ -6,53 +6,90 @@ import React, { useCallback, useEffect, useState } from "react";
 import { DataHandlerProps, PaginatedQuery } from "../api/hooks";
 
 export type SearchToolProps<T> = {
-    EmptyPlaceholder?: () => JSX.Element,
-    placeholder: string,
-    initialValue?: string,
-    searchLimit?: number,
-    inputRef?: React.Ref<Input>,
-    searchProps?: SearchProps
+    EmptyPlaceholder?: () => JSX.Element;
+    placeholder: string;
+    initialValue?: string;
+    searchLimit?: number;
+    inputRef?: React.Ref<Input>;
+    searchProps?: SearchProps;
 } & DataHandlerProps<T, PaginatedQuery>;
 
 // See also for why we don't use forwardRef: https://github.com/microsoft/TypeScript/pull/30215
-const SearchTool = <T extends unknown>({ dataHandler, placeholder, item, initialValue, inputRef, searchLimit = 5, EmptyPlaceholder = () => <Empty description="无数据" />, searchProps }: SearchToolProps<T>) => {
-    const [value, setValue] = useState('');
+const SearchTool = <T extends unknown>({
+    dataHandler,
+    placeholder,
+    item,
+    initialValue,
+    inputRef,
+    searchLimit = 5,
+    EmptyPlaceholder = () => <Empty description="无数据" />,
+    searchProps,
+}: SearchToolProps<T>) => {
+    const [value, setValue] = useState("");
     const [collapsed, setCollapsed] = useState(false);
     const [offset, setOffset] = useState(0);
     const [loading, setLoading] = useState(false);
     const [resultList, setResultList] = useState<T[]>([]);
 
-    const search = useCallback(throttle(async ({ offset, limit, value, append, resultList }: PaginatedQuery & { append: boolean, resultList?: T[] }) => { // eslint-disable-line react-hooks/exhaustive-deps
-        if (!!!value) {
-            setResultList([]);
-            setLoading(false);
-            return;
-        }
-        setOffset(offset);
-        const result = await dataHandler({ offset: offset, limit: limit, value: value });
-        setLoading(false);
-        if (result === undefined || result?.length < searchLimit) {
-            setOffset(-1);
-        }
-        if (append) {
-            setResultList(!!resultList ? resultList.concat(result ?? []) : result ?? []);
-        }
-        else {
-            setResultList(result ?? []);
-        }
-    }, 1000), [dataHandler]);
+    const search = useCallback(
+        throttle(
+            async ({
+                offset,
+                limit,
+                value,
+                append,
+                resultList,
+            }: PaginatedQuery & { append: boolean; resultList?: T[] }) => {
+                // eslint-disable-line react-hooks/exhaustive-deps
+                if (!!!value) {
+                    setResultList([]);
+                    setLoading(false);
+                    return;
+                }
+                setOffset(offset);
+                const result = await dataHandler({
+                    offset: offset,
+                    limit: limit,
+                    value: value,
+                });
+                setLoading(false);
+                if (result === undefined || result?.length < searchLimit) {
+                    setOffset(-1);
+                }
+                if (append) {
+                    setResultList(
+                        !!resultList
+                            ? resultList.concat(result ?? [])
+                            : result ?? []
+                    );
+                } else {
+                    setResultList(result ?? []);
+                }
+            },
+            1000
+        ),
+        [dataHandler]
+    );
 
-    const handleSearch = useCallback(({ offset, limit, value, append = false }: Partial<PaginatedQuery> & { value: string, append?: boolean }) => {
-        setLoading(true);
-        setCollapsed(false);
-        search({
-            offset: offset ?? 0,
-            limit: limit ?? searchLimit,
-            value: value,
-            append: append,
-            resultList: resultList
-        });
-    }, [setLoading, resultList, search, searchLimit]);
+    const handleSearch = useCallback(
+        ({
+            offset,
+            limit,
+            value,
+            append = false,
+        }: Partial<PaginatedQuery> & { value: string; append?: boolean }) => {
+            setLoading(true);
+            setCollapsed(false);
+            search({
+                offset: offset ?? 0,
+                limit: limit ?? searchLimit,
+                value: value,
+                append: append,
+                resultList: resultList,
+            });
+        },
+        [setLoading, resultList, search, searchLimit]
+    );
 
     useEffect(() => {
         if (initialValue !== undefined) {
@@ -76,7 +113,7 @@ const SearchTool = <T extends unknown>({ dataHandler, placeholder, item, initial
             />
             <Collapse
                 activeKey={collapsed ? [] : [0]}
-                onChange={value => setCollapsed(value.length === 0)}
+                onChange={(value) => setCollapsed(value.length === 0)}
                 ghost
             >
                 <Collapse.Panel
@@ -84,41 +121,39 @@ const SearchTool = <T extends unknown>({ dataHandler, placeholder, item, initial
                     header={
                         <Space>
                             匹配结果
-                            {loading &&
+                            {loading && (
                                 <Spin indicator={<LoadingOutlined />} />
-                            }
+                            )}
                         </Space>
                     }
-                    className='collapse-panel'
+                    className="collapse-panel"
                 >
-                    {resultList.length === 0 &&
-                        <EmptyPlaceholder />
-                    }
+                    {resultList.length === 0 && <EmptyPlaceholder />}
 
-                    {
-                        resultList.map((value, index) => {
-                            return (
-                                <Row key={index}>
-                                    {item(value, index)}
-                                </Row>
-                            )
-                        })
-                    }
+                    {resultList.map((value, index) => {
+                        return <Row key={index}>{item(value, index)}</Row>;
+                    })}
 
-                    {resultList.length >= searchLimit && offset !== -1 &&
+                    {resultList.length >= searchLimit && offset !== -1 && (
                         <Button
-                            onClick={() => handleSearch({ value: value ?? "", offset: offset + searchLimit, append: true })}
+                            onClick={() =>
+                                handleSearch({
+                                    value: value ?? "",
+                                    offset: offset + searchLimit,
+                                    append: true,
+                                })
+                            }
                             loading={loading}
                             disabled={loading}
                             block
                         >
                             加载更多
                         </Button>
-                    }
+                    )}
                 </Collapse.Panel>
             </Collapse>
         </>
-    )
+    );
 };
 
 export default SearchTool;

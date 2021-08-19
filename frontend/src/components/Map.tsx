@@ -1,19 +1,19 @@
-import { useEffect, useRef, useState } from 'react';
-import ReactDOM from 'react-dom';
-import geojson from 'geojson';
-import mapboxgl, { Map as MapType } from 'mapbox-gl';
-import MapboxLanguage from '@mapbox/mapbox-gl-language';
-import './Map.css';
-import { Modal } from 'antd';
-import { Coordinate, School, Student, StudentVerbose } from 'wwg-api';
-import LeftCircleOutlined from '@ant-design/icons/LeftCircleOutlined';
-import GroupOutlined from '@ant-design/icons/GroupOutlined';
-import UpSquareOutlined from '@ant-design/icons/UpSquareOutlined';
-import FullscreenExitOutlined from '@ant-design/icons/FullscreenExitOutlined';
-import SolutionOutlined from '@ant-design/icons/SolutionOutlined';
-import { useCallback } from 'react';
-import StudentSearchTool from './StudentSearchTool';
-import MapControl from './MapControl';
+import { useEffect, useRef, useState } from "react";
+import ReactDOM from "react-dom";
+import geojson from "geojson";
+import mapboxgl, { Map as MapType } from "mapbox-gl";
+import MapboxLanguage from "@mapbox/mapbox-gl-language";
+import "./Map.css";
+import { Modal } from "antd";
+import { Coordinate, School, Student, StudentVerbose } from "wwg-api";
+import LeftCircleOutlined from "@ant-design/icons/LeftCircleOutlined";
+import GroupOutlined from "@ant-design/icons/GroupOutlined";
+import UpSquareOutlined from "@ant-design/icons/UpSquareOutlined";
+import FullscreenExitOutlined from "@ant-design/icons/FullscreenExitOutlined";
+import SolutionOutlined from "@ant-design/icons/SolutionOutlined";
+import { useCallback } from "react";
+import StudentSearchTool from "./StudentSearchTool";
+import MapControl from "./MapControl";
 
 mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_TOKEN as string;
 
@@ -26,15 +26,29 @@ const convertCoordinates = (e: any): [number, number] => {
     while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
         coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
     }
-    return coordinates
-}
+    return coordinates;
+};
 
 function normalize(v: number) {
     // Quadratic function that maps map zoom level ranges in [-2, 22] to the radius of the circle ranges in [7, 12]
-    return -0.0086 * Math.pow(v - 22, 2) + 11.5
+    return -0.0086 * Math.pow(v - 22, 2) + 11.5;
 }
 
-export default function Map({ getData, getPopup, zoom, initialZoom = 5, startingCoordinate = DEFAULT_CENTER, responsive = false }: { getData: () => Promise<MapItem[]>, getPopup: (props: MapItem[]) => JSX.Element, zoom?: number, initialZoom?: number, startingCoordinate?: Coordinate, responsive?: boolean }) {
+export default function Map({
+    getData,
+    getPopup,
+    zoom,
+    initialZoom = 5,
+    startingCoordinate = DEFAULT_CENTER,
+    responsive = false,
+}: {
+    getData: () => Promise<MapItem[]>;
+    getPopup: (props: MapItem[]) => JSX.Element;
+    zoom?: number;
+    initialZoom?: number;
+    startingCoordinate?: Coordinate;
+    responsive?: boolean;
+}) {
     const mapRef = useRef(null);
     const mapContainer = useRef(null);
     const [map, setMap] = useState<MapType>();
@@ -49,11 +63,14 @@ export default function Map({ getData, getPopup, zoom, initialZoom = 5, starting
     const [currentItem, setCurrentItem] = useState<MapItem[]>();
 
     useEffect(() => {
-        if (!!!mapContainer || !!!mapContainer.current) return
-        let lang = new MapboxLanguage({ defaultLanguage: 'zh', supportedLanguages: ['zh', 'en'] });
+        if (!!!mapContainer || !!!mapContainer.current) return;
+        let lang = new MapboxLanguage({
+            defaultLanguage: "zh",
+            supportedLanguages: ["zh", "en"],
+        });
         const map = new mapboxgl.Map({
             container: mapContainer.current as any,
-            style: 'mapbox://styles/mapbox/streets-v10',
+            style: "mapbox://styles/mapbox/streets-v10",
             zoom: initialZoom,
         }).addControl(lang);
         map.dragRotate.disable();
@@ -61,23 +78,28 @@ export default function Map({ getData, getPopup, zoom, initialZoom = 5, starting
         setMap(map);
     }, [initialZoom, mapContainer]);
 
-    const flyTo = useCallback((lng = startingCoordinate.longitude, lat = startingCoordinate.latitude) => {
-        if (!!map) {
-            if (!!zoom) {
-                map.flyTo({
-                    center: [lng, lat],
-                    duration: 250,
-                    zoom: zoom,
-                });
+    const flyTo = useCallback(
+        (
+            lng = startingCoordinate.longitude,
+            lat = startingCoordinate.latitude
+        ) => {
+            if (!!map) {
+                if (!!zoom) {
+                    map.flyTo({
+                        center: [lng, lat],
+                        duration: 250,
+                        zoom: zoom,
+                    });
+                } else {
+                    map.flyTo({
+                        center: [lng, lat],
+                        duration: 250,
+                    });
+                }
             }
-            else {
-                map.flyTo({
-                    center: [lng, lat],
-                    duration: 250,
-                });
-            }
-        }
-    }, [map, zoom, startingCoordinate]);
+        },
+        [map, zoom, startingCoordinate]
+    );
 
     useEffect(() => {
         if (!!focus && autoFlyTo) {
@@ -87,38 +109,47 @@ export default function Map({ getData, getPopup, zoom, initialZoom = 5, starting
 
     useEffect(() => {
         setFocus([startingCoordinate.longitude, startingCoordinate.latitude]);
-    }, [startingCoordinate])
+    }, [startingCoordinate]);
 
     useEffect(() => {
         if (!!!map) return;
 
-        let tempPopup = new mapboxgl.Popup({ closeOnMove: true, closeOnClick: true });
+        let tempPopup = new mapboxgl.Popup({
+            closeOnMove: true,
+            closeOnClick: true,
+        });
 
         function handleMouseEnter(e: any) {
             // We disable the popup on mobile devices due to its bad performance
             if (!!!map) return;
             map.getCanvas().style.cursor = "pointer";
             let data = e.features.map((feature: any) => {
-                feature.properties.students = JSON.parse(feature.properties.students ?? []);
+                feature.properties.students = JSON.parse(
+                    feature.properties.students ?? []
+                );
                 return feature.properties;
             });
             setCurrentItem(data);
             if (isMobile) return;
             const coordinates = convertCoordinates(e);
-            const container = document.createElement('div');
+            const container = document.createElement("div");
             if (showPopup) {
                 ReactDOM.render(getPopup(data), container);
-            }
-            else {
+            } else {
                 ReactDOM.render(data.school_name, container);
             }
-            tempPopup.setLngLat(coordinates).setDOMContent(container).addTo(map);
+            tempPopup
+                .setLngLat(coordinates)
+                .setDOMContent(container)
+                .addTo(map);
         }
 
         function handleMouseUp(e: any) {
             if (!!!map) return;
             let data = e.features.map((feature: any) => {
-                feature.properties.students = JSON.parse(feature.properties.students ?? []);
+                feature.properties.students = JSON.parse(
+                    feature.properties.students ?? []
+                );
                 return feature.properties;
             });
             setCurrentItem(data);
@@ -136,25 +167,25 @@ export default function Map({ getData, getPopup, zoom, initialZoom = 5, starting
             if (!!!map) return;
             map.setPaintProperty(
                 "schools",
-                'circle-radius',
-                normalize(map.getZoom()),
+                "circle-radius",
+                normalize(map.getZoom())
             );
         }
 
         // @ts-ignore
-        map.on('zoom', 'schools', handleZoom);
-        map.on('mouseenter', 'schools', handleMouseEnter);
-        map.on('mouseup', 'schools', handleMouseUp)
-        map.on('mouseleave', 'schools', handleMouseLeave);
+        map.on("zoom", "schools", handleZoom);
+        map.on("mouseenter", "schools", handleMouseEnter);
+        map.on("mouseup", "schools", handleMouseUp);
+        map.on("mouseleave", "schools", handleMouseLeave);
 
         return () => {
             // Do a cleanup to deduplicate event handlers
             // @ts-ignore
-            map.off('zoom', 'schools', handleZoom);
-            map.off('mouseenter', 'schools', handleMouseEnter);
-            map.off('mouseup', 'schools', handleMouseUp)
-            map.off('mouseleave', 'schools', handleMouseLeave);
-        }
+            map.off("zoom", "schools", handleZoom);
+            map.off("mouseenter", "schools", handleMouseEnter);
+            map.off("mouseup", "schools", handleMouseUp);
+            map.off("mouseleave", "schools", handleMouseLeave);
+        };
     }, [map, isMobile, flyTo, getPopup, showPopup]);
 
     useEffect(() => {
@@ -163,31 +194,31 @@ export default function Map({ getData, getPopup, zoom, initialZoom = 5, starting
 
         getData().then((result) => {
             setData(result);
-            const data = geojson.parse(result ?? [], { Point: ['latitude', 'longitude'] });
+            const data = geojson.parse(result ?? [], {
+                Point: ["latitude", "longitude"],
+            });
             try {
-                if (map.getLayer('schools') !== undefined) {
-                    (map.getSource('schools') as any).setData(data);
-                }
-                else {
+                if (map.getLayer("schools") !== undefined) {
+                    (map.getSource("schools") as any).setData(data);
+                } else {
                     map.addLayer({
-                        'id': 'schools',
-                        'type': 'circle',
-                        'source': {
-                            'type': 'geojson',
-                            'data': data
+                        id: "schools",
+                        type: "circle",
+                        source: {
+                            type: "geojson",
+                            data: data,
                         },
-                        'paint': {
-                            'circle-radius': 10,
-                            'circle-color': "rgba(24, 144, 255, 0.8)"
-                        }
+                        paint: {
+                            "circle-radius": 10,
+                            "circle-color": "rgba(24, 144, 255, 0.8)",
+                        },
                     });
                 }
-            }
-            catch (err) {
+            } catch (err) {
                 console.error(err);
             }
         });
-    }, [map, getData])
+    }, [map, getData]);
 
     useEffect(() => {
         // Handle data fetching when the map is first loaded
@@ -198,32 +229,42 @@ export default function Map({ getData, getPopup, zoom, initialZoom = 5, starting
                 return;
             }
             setData(result);
-            const data = geojson.parse(result, { Point: ['latitude', 'longitude'] });
-            map.on('load', () => {
-                if (map.getLayer('schools') !== undefined) return
+            const data = geojson.parse(result, {
+                Point: ["latitude", "longitude"],
+            });
+            map.on("load", () => {
+                if (map.getLayer("schools") !== undefined) return;
 
-                setFocus([startingCoordinate.longitude, startingCoordinate.latitude]);
+                setFocus([
+                    startingCoordinate.longitude,
+                    startingCoordinate.latitude,
+                ]);
                 map.addLayer({
-                    'id': 'schools',
-                    'type': 'circle',
-                    'source': {
-                        'type': 'geojson',
-                        'data': data
+                    id: "schools",
+                    type: "circle",
+                    source: {
+                        type: "geojson",
+                        data: data,
                     },
-                    'paint': {
-                        'circle-radius': 10,
-                        'circle-color': "rgba(24, 144, 255, 0.8)"
-                    }
+                    paint: {
+                        "circle-radius": 10,
+                        "circle-color": "rgba(24, 144, 255, 0.8)",
+                    },
                 });
                 mapRef.current = map as any;
-            })
+            });
         });
     }, [map, setFocus, getData, startingCoordinate]);
 
     return (
         <>
-            <div className={responsive ? 'map-container-responsive' : 'map-container'} ref={mapContainer}></div>
-            {!responsive &&
+            <div
+                className={
+                    responsive ? "map-container-responsive" : "map-container"
+                }
+                ref={mapContainer}
+            ></div>
+            {!responsive && (
                 <div className="floating-control-container">
                     <div>
                         <MapControl
@@ -233,43 +274,71 @@ export default function Map({ getData, getPopup, zoom, initialZoom = 5, starting
                                 setInfoBarHidden(true);
                             }}
                             Content={() => <GroupOutlined />}
-                            AltContent={() => isMobile ? <UpSquareOutlined /> : <LeftCircleOutlined style={{ transform: "rotate(180deg)" }} />}
+                            AltContent={() =>
+                                isMobile ? (
+                                    <UpSquareOutlined />
+                                ) : (
+                                    <LeftCircleOutlined
+                                        style={{ transform: "rotate(180deg)" }}
+                                    />
+                                )
+                            }
                         />
                         <MapControl
                             onToggle={(toggle) => {
                                 setAutoFlyTo(toggle);
                             }}
                             defaultToggled={true}
-                            altType='ghost'
+                            altType="ghost"
                             Content={() => <FullscreenExitOutlined />}
                         />
-                        {!isMobile &&
+                        {!isMobile && (
                             <MapControl
                                 onToggle={(toggle) => {
                                     setShowPopup(toggle);
                                 }}
                                 defaultToggled={true}
-                                altType='ghost'
+                                altType="ghost"
                                 Content={() => <SolutionOutlined />}
                             />
-                        }
+                        )}
                     </div>
                 </div>
-            }
-            <Modal title={currentItem && currentItem?.length > 0 ? currentItem[0].school_name : undefined} visible={modalMode && showModal} onCancel={() => setShowModal(false)} footer={null} bodyStyle={{ padding: '0 0 0 0' }}>
+            )}
+            <Modal
+                title={
+                    currentItem && currentItem?.length > 0
+                        ? currentItem[0].school_name
+                        : undefined
+                }
+                visible={modalMode && showModal}
+                onCancel={() => setShowModal(false)}
+                footer={null}
+                bodyStyle={{ padding: "0 0 0 0" }}
+            >
                 {currentItem !== undefined && getPopup(currentItem)}
             </Modal>
-            {!modalMode && !responsive &&
-                <div className={`info-bar-container${infoBarHidden ? " info-bar-hidden" : ""}`}>
+            {!modalMode && !responsive && (
+                <div
+                    className={`info-bar-container${
+                        infoBarHidden ? " info-bar-hidden" : ""
+                    }`}
+                >
                     <div className="info-bar">
-                        <LeftCircleOutlined className="info-bar-switch" onClick={() => setInfoBarHidden(!infoBarHidden)} />
+                        <LeftCircleOutlined
+                            className="info-bar-switch"
+                            onClick={() => setInfoBarHidden(!infoBarHidden)}
+                        />
                         <div className="info-bar-content">
                             <div style={{ padding: "1 1 1 1" }}>
                                 <StudentSearchTool
                                     data={data}
                                     onSelect={(val) => {
                                         if (val.coordinates) {
-                                            setFocus([val.coordinates[0], val.coordinates[1]]);
+                                            setFocus([
+                                                val.coordinates[0],
+                                                val.coordinates[1],
+                                            ]);
                                         }
                                         setCurrentItem([val.original]);
                                     }}
@@ -279,7 +348,7 @@ export default function Map({ getData, getPopup, zoom, initialZoom = 5, starting
                         </div>
                     </div>
                 </div>
-            }
+            )}
         </>
-    )
+    );
 }

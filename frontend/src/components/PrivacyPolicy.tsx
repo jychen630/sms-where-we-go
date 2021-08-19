@@ -1,4 +1,4 @@
-import { Typography } from 'antd';
+import { Typography } from "antd";
 
 const { Title, Paragraph } = Typography;
 
@@ -22,14 +22,17 @@ const PrivacyPolicy = () => {
             </Paragraph>
             <Title level={4}>我们向谁提供服务</Title>
             <Paragraph>
-                SMS Where We Go (深圳中学学生去向网站，下称 “网站”) 仅向各届深圳中学 (下称 “深中”) 毕业生，以及深中校内老师提供服务。
+                SMS Where We Go (深圳中学学生去向网站，下称 “网站”)
+                仅向各届深圳中学 (下称 “深中”)
+                毕业生，以及深中校内老师提供服务。
             </Paragraph>
             <Paragraph>
                 网站采用短期有效的注册码，及管理员手动添加用户的方式进行新用户的注册。
             </Paragraph>
             <Title level={4}>我们如何提供服务</Title>
             <Paragraph>
-                网站收集各届深中毕业生信息（下称 “信息”），在保障信息安全的前提下，向毕业生提供其他学生的去向信息（大学名称，位置信息等），及个人联系方式（包括邮箱，手机号码等）。
+                网站收集各届深中毕业生信息（下称
+                “信息”），在保障信息安全的前提下，向毕业生提供其他学生的去向信息（大学名称，位置信息等），及个人联系方式（包括邮箱，手机号码等）。
             </Paragraph>
             <Title level={4}>我们如何收集，管理您的信息</Title>
             <Paragraph>
@@ -58,7 +61,7 @@ const PrivacyPolicy = () => {
                 如对隐私协议，或网站提供的服务有任何疑问，请联系网站当前的管理员。
             </Paragraph>
         </>
-    )
-}
+    );
+};
 
 export default PrivacyPolicy;

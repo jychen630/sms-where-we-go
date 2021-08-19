@@ -1,10 +1,7 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import 'mapbox-gl/dist/mapbox-gl.css';
-import App from './App';
-import './i18n';
+import React from "react";
+import ReactDOM from "react-dom";
+import "mapbox-gl/dist/mapbox-gl.css";
+import App from "./App";
+import "./i18n";
 
-ReactDOM.render(
-  <App />,
-  document.getElementById('root')
-);
+ReactDOM.render(<App />, document.getElementById("root"));
