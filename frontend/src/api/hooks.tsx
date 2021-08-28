@@ -62,17 +62,25 @@ export const useData = <T, V>({
 }: DataHandlerProps<T, V> & { query: V }) => {
     const [data, setData] = useState<T[] | undefined>(undefined);
 
-    useEffect(() => {
+    const fetchData = useCallback((query: V) => {
         dataHandler(query).then((result) => {
             setData(result);
             onFetch && onFetch(result);
         });
-    }, [query, dataHandler, onFetch]);
+    }, [dataHandler, onFetch])
+
+    useEffect(() => {
+        fetchData(query);
+    }, [query, fetchData]);
+
+    const forceUpdate = (query: V) => {
+        fetchData(query)
+    }
 
     const items = useCallback(
         () => <>{data?.map((value, index) => item(value, index))}</>,
         [data, item]
     );
 
-    return { data, items };
+    return { data, items, forceUpdate };
 };
