@@ -5,10 +5,10 @@ type Key = string | number | symbol;
 export const useDict = <V extends any, R extends Record<Key, V>>(
     obj?: R
 ): [
-    R | undefined,
-    (key: Key, val: V) => void,
-    Dispatch<SetStateAction<R | undefined>>
-] => {
+        R | undefined,
+        (key: Key, val: V) => void,
+        Dispatch<SetStateAction<R | undefined>>
+    ] => {
     const [dict, setDict] = useState<R | undefined>(obj);
 
     const update = useCallback(
