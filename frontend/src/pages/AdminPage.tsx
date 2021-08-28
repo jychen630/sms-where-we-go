@@ -11,12 +11,14 @@ import PasswordResetForm from "../components/PasswordResetForm";
 import RegistrationKey from "../components/Registrationkey";
 import Feedbacks from "../components/Feedbacks";
 import Classes from "../components/Classes";
+import Schools from "../components/Schools";
 
 enum AdminTab {
     Users = "users",
     Classes = "classes",
     Keys = "keys",
     Feedbacks = "feedbacks",
+    Schools = "schools",
 }
 
 const AdminPage = () => {
@@ -76,9 +78,9 @@ const AdminPage = () => {
                         <Tabs
                             activeKey={
                                 match !== null &&
-                                Object.values(AdminTab).includes(
-                                    match.params.tab as AdminTab
-                                )
+                                    Object.values(AdminTab).includes(
+                                        match.params.tab as AdminTab
+                                    )
                                     ? match.params.tab
                                     : AdminTab.Users
                             }
@@ -122,7 +124,7 @@ const AdminPage = () => {
                                                         {value.grad_year} [
                                                         {t(
                                                             value.curriculum ??
-                                                                ""
+                                                            ""
                                                         )}
                                                         ]
                                                     </p>
@@ -149,6 +151,12 @@ const AdminPage = () => {
                                 key={AdminTab.Feedbacks}
                             >
                                 <Feedbacks adminView />
+                            </Tabs.TabPane>
+                            <Tabs.TabPane
+                                tab={t("Schools")}
+                                key={AdminTab.Schools}
+                            >
+                                <Schools />
                             </Tabs.TabPane>
                         </Tabs>
                     </Card>
