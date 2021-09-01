@@ -1,6 +1,5 @@
 import {
     Button,
-    Card,
     Divider,
     Form,
     Input,
@@ -14,8 +13,10 @@ import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Class, Result, Role, Service } from "wwg-api";
 import { useAuth } from "../api/auth";
+import { DataHandler, PaginatedFetch } from "../api/hooks";
 import { createNotifyError, handleApiError } from "../api/utils";
 import InfoList from "./InfoList";
+import PaginatedBox from "./PaginatedCardPage";
 
 const classFormProps = (name: string) => ({
     name: name,
@@ -33,7 +34,7 @@ const Classes = () => {
     const auth = useAuth();
     const [t] = useTranslation();
     const [form] = Form.useForm<Values>();
-    const [classes, setClasses] = useState<Class[]>();
+    const [classes, setClasses] = useState<Class[]>([]);
 
     const fetchClasses = useCallback(() => {
         Service.getClass()
@@ -149,6 +150,32 @@ const Classes = () => {
             );
     };
 
+    const dataHandler: DataHandler<Class, PaginatedFetch> = useCallback(async (props) => {
+        return classes.slice(props.offset, props.offset + props.limit);
+    }, [classes]);
+
+    const classItem = (item: Class) => {
+        return (
+            <Space direction="vertical">
+                <InfoList
+                    {...item}
+                    key={`${item.grad_year} ${item.class_number}`}
+                />
+                <Button
+                    onClick={() =>
+                        handleDeleteClass(
+                            item.class_number,
+                            item.grad_year
+                        )
+                    }
+                    danger
+                >
+                    删除
+                </Button>
+            </Space>
+        )
+    };
+
     return (
         <>
             <Divider>添加班级</Divider>
@@ -184,8 +211,8 @@ const Classes = () => {
                     )}
                 </Form.Item>
                 {auth.role === Role.CURRICULUM ||
-                auth.role === Role.YEAR ||
-                auth.role === Role.SYSTEM ? (
+                    auth.role === Role.YEAR ||
+                    auth.role === Role.SYSTEM ? (
                     <Form.Item
                         name="class_number"
                         label="班级号码"
@@ -305,29 +332,15 @@ const Classes = () => {
                     提交
                 </Button>
             </Form>
-            <Divider>查看班级</Divider>
-            {!!classes &&
-                classes.map((class_) => (
-                    <Card key={`${class_.grad_year} ${class_.class_number}`}>
-                        <Space direction="vertical">
-                            <InfoList
-                                {...class_}
-                                key={`${class_.grad_year} ${class_.class_number}`}
-                            />
-                            <Button
-                                onClick={() =>
-                                    handleDeleteClass(
-                                        class_.class_number,
-                                        class_.grad_year
-                                    )
-                                }
-                                danger
-                            >
-                                删除
-                            </Button>
-                        </Space>
-                    </Card>
-                ))}
+            <PaginatedBox
+                item={classItem}
+                dataHandler={dataHandler}
+                limit={5}
+                defaultSize={classes.length}
+                fixedSize={true}
+            >
+                <Divider>查看班级</Divider>
+            </PaginatedBox>
         </>
     );
 };

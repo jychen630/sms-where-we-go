@@ -20,7 +20,9 @@ import { HasChildren } from "../api/utils";
  */
 export type PaginatedBoxProps<T> = HasChildren<
     {
+        defaultSize?: number;
         limit?: number;
+        fixedSize?: boolean,
         altBox?: (props: HasChildren) => JSX.Element;
     } & DataHandlerProps<T, PaginatedQuery>
 >;
@@ -32,17 +34,20 @@ const DEFAULT_LIMIT = 20;
 const PaginatedBox = <T extends unknown>({
     dataHandler,
     onFetch,
+    defaultSize,
+    fixedSize,
     ...props
 }: PaginatedBoxProps<T>) => {
     const limit = props.limit ?? DEFAULT_LIMIT;
     const ItemContainer = props.altBox ?? Card;
+    const compuatedDefaultTotal = Math.ceil((defaultSize ?? limit) / limit)
 
     const [page, setPage] = useState(1);
-    const [total, setTotal] = useState(1);
+    const [total, setTotal] = useState(compuatedDefaultTotal);
     // TODO: Implement caching
     const [cache] = useState<T[]>([]);
     const [keywords, setKeywords] = useState("");
-    const [exhausted, setExhausted] = useState(false);
+    const [exhausted, setExhausted] = useState(!!fixedSize);
 
     const offset = (page - 1) * limit;
 
@@ -56,10 +61,10 @@ const PaginatedBox = <T extends unknown>({
     );
 
     useEffect(() => {
-        setPage(1);
-        setTotal(1);
-        setExhausted(false);
-    }, [setPage, setTotal, setExhausted, keywords]);
+        setTotal(compuatedDefaultTotal);
+        setPage(page => page > compuatedDefaultTotal ? compuatedDefaultTotal : page !== 0 ? page : 1);
+        setExhausted(!!fixedSize);
+    }, [limit, fixedSize, compuatedDefaultTotal, setPage, setTotal, setExhausted, keywords]);
 
     const wrappedDataHandler: PaginatedDataHandler<T> = useCallback(
         async (query) => {
@@ -85,7 +90,7 @@ const PaginatedBox = <T extends unknown>({
     const { items } = useData<T, PaginatedQuery>({
         query: query,
         item(value, index) {
-            return <ItemContainer>{props.item(value, index)}</ItemContainer>;
+            return <ItemContainer key={index}>{props.item(value, index)}</ItemContainer>;
         },
         dataHandler: wrappedDataHandler,
         onFetch: handleDataFetch,
