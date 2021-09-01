@@ -604,6 +604,14 @@ paths:
                   schema:
                       type: string
                       example: China
+                - in: query
+                  name: limit
+                  schema:
+                    type: integer
+                - in: query
+                  name: offset
+                  schema:
+                    type: integer
             responses:
                 200:
                     description: Return a list of students

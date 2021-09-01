@@ -25,4 +25,4 @@ export type Student = {
     department?: string;
     major?: string;
     school_uid?: number;
-};
+}

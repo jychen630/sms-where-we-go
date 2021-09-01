@@ -10,4 +10,4 @@ export type City = {
     city: string;
     state_province?: string;
     country: string;
-};
+}

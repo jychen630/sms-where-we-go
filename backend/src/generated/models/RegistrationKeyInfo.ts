@@ -7,4 +7,4 @@ export type RegistrationKeyInfo = {
     grad_year?: number;
     curriculum?: string;
     expiration_date?: string;
-};
+}

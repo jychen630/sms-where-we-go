@@ -19,4 +19,4 @@ export type StudentVerbose = {
      * The year when the student graduates from high school
      */
     grad_year: number;
-};
+}

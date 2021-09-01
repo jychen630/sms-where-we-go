@@ -178,6 +178,12 @@ export const get: Operation = async (req, res, next) => {
                             `school_uid = ANY(${hiddenFieldsColumn}})`
                         );
                 }
+                if (!!data["limit"]) {
+                    qb.limit(data["limit"])
+                }
+                if (!!data["offset"]) {
+                    qb.offset(data["offset"])
+                }
             };
 
         pg(queryStudent)
@@ -274,22 +280,22 @@ export const get: Operation = async (req, res, next) => {
                                     field_visibility:
                                         self.student_uid === student.student_uid
                                             ? ((obj: any) => {
-                                                  hiddenFields.forEach(
-                                                      (val) =>
-                                                          (obj[val] = false)
-                                                  );
-                                                  return obj;
-                                              })({})
+                                                hiddenFields.forEach(
+                                                    (val) =>
+                                                        (obj[val] = false)
+                                                );
+                                                return obj;
+                                            })({})
                                             : undefined,
                                     // Role and visibility are only visible to admins or the users themselves
                                     role:
                                         privilege.level > 0 ||
-                                        self.student_uid === student.student_uid
+                                            self.student_uid === student.student_uid
                                             ? student.role
                                             : undefined,
                                     visibility:
                                         privilege.level > 0 ||
-                                        self.student_uid === student.student_uid
+                                            self.student_uid === student.student_uid
                                             ? student.visibility_type
                                             : undefined,
                                 }),
@@ -325,8 +331,7 @@ export const put: Operation = async (req, res, next) => {
         logger.logComposed(
             req.session.student_uid,
             Actions.update,
-            `${
-                data.student_uid ?? req.session.student_uid
+            `${data.student_uid ?? req.session.student_uid
             }'s phone_number and email`,
             false,
             "phone_number and email cannot be cleared at the same time",
@@ -427,10 +432,9 @@ export const put: Operation = async (req, res, next) => {
             Actions.update,
             target_uid.toString(),
             false,
-            `${
-                privileges.grant
-                    ? "the privilege level was too low"
-                    : "the role was not allow for this operation"
+            `${privileges.grant
+                ? "the privilege level was too low"
+                : "the role was not allow for this operation"
             }`,
             true,
             { data: data, privileges: privileges }
@@ -438,10 +442,9 @@ export const put: Operation = async (req, res, next) => {
         sendError(
             res,
             403,
-            `You are not allowed to alter this student\'s role${
-                privileges.grant
-                    ? ` to '${data.role}' as your privilege level is ${privileges.level}`
-                    : ""
+            `You are not allowed to alter this student\'s role${privileges.grant
+                ? ` to '${data.role}' as your privilege level is ${privileges.level}`
+                : ""
             }`
         );
         return;
@@ -516,8 +519,7 @@ export const put: Operation = async (req, res, next) => {
                 logger.logComposed(
                     req.session.student_uid,
                     Actions.update,
-                    `${target_uid}'s information${
-                        !!!data.student_uid ? " (self-update)" : ""
+                    `${target_uid}'s information${!!!data.student_uid ? " (self-update)" : ""
                     }`,
                     false,
                     undefined,
