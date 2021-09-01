@@ -3,8 +3,10 @@ import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Student, StudentVerbose, Service, Role } from "wwg-api";
 import { useAuth } from "../api/auth";
+import { DataHandler, PaginatedQuery } from "../api/hooks";
 import { createNotifyError, handleApiError } from "../api/utils";
 import InfoUpdateForm from "./InfoUpdateForm";
+import PaginatedBox from "./PaginatedCardPage";
 import PasswordResetForm from "./PasswordResetForm";
 
 const Users = () => {
@@ -18,6 +20,66 @@ const Users = () => {
     const handleCancel = () => {
         setVisible(false);
     };
+
+    const StudentItem = (student: Student) => {
+        return (
+            <List.Item
+                key={index}
+                actions={[
+                    <Button
+                        onClick={() => {
+                            setVisible(true);
+                            setIndex(index);
+                        }}
+                    >
+                        {t("Edit")}
+                    </Button>,
+                    <Button
+                        onClick={() => {
+                            setPasswordFormVisibile(
+                                true
+                            );
+                            setIndex(index);
+                        }}
+                        type="link"
+                    >
+                        {t("Password Reset")}
+                    </Button>,
+                ]}
+            >
+                <List.Item.Meta
+                    title={student.name}
+                    description={
+                        <p>
+                            {student.class_number}/
+                            {student.grad_year} [
+                            {t(
+                                student.curriculum ??
+                                ""
+                            )}
+                            ]
+                        </p>
+                    }
+                />
+            </List.Item>);
+    }
+
+    const fetchStudent: DataHandler<Student, PaginatedQuery> = async ({ limit, offset, value }) => {
+        return Service.getStudent(false, true, value, undefined, undefined, undefined, undefined, undefined, limit, offset).then((res) => {
+            return res.students ?? [];
+        })
+            .catch((err) => {
+                handleApiError(
+                    err,
+                    createNotifyError(
+                        t,
+                        "错误",
+                        "未能获取学生数据"
+                    )
+                );
+                return [];
+            });
+    }
 
     useEffect(() => {
         Service.getStudent(false, true)
@@ -41,47 +103,12 @@ const Users = () => {
 
     return (
         <><List itemLayout="horizontal">
-            {students.map((value, index) => (
-                <List.Item
-                    key={index}
-                    actions={[
-                        <Button
-                            onClick={() => {
-                                setVisible(true);
-                                setIndex(index);
-                            }}
-                        >
-                            {t("Edit")}
-                        </Button>,
-                        <Button
-                            onClick={() => {
-                                setPasswordFormVisibile(
-                                    true
-                                );
-                                setIndex(index);
-                            }}
-                            type="link"
-                        >
-                            {t("Password Reset")}
-                        </Button>,
-                    ]}
-                >
-                    <List.Item.Meta
-                        title={value.name}
-                        description={
-                            <p>
-                                {value.class_number}/
-                                {value.grad_year} [
-                                {t(
-                                    value.curriculum ??
-                                    ""
-                                )}
-                                ]
-                            </p>
-                        }
-                    />
-                </List.Item>
-            ))}
+            <PaginatedBox
+                item={StudentItem}
+                dataHandler={fetchStudent}
+            >
+                学生列表
+            </PaginatedBox>
         </List>
             <Modal
                 title="编辑学生信息：" //{value.name}
