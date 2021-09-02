@@ -27,6 +27,8 @@ yarn patch-package
 cd ../
 echo "[setup] Setting up environment variables..."
 PG_USER=postgres
+PG_HOST=localhost
+PG_PORT=5432
 WWG_USER=wwgadmin
 DB_NAME=wwg_base
 SEARCH_PATH=wwg,public
@@ -35,7 +37,14 @@ AMAP_SECRET=TheAPIKeyOfAmap
 export PGPASSFILE=~/.pgpass
 PASSWORD="ThePasswordHere"
 echo "*:*:$DB_NAME:$WWG_USER:$PASSWORD" > $PGPASSFILE
-echo AMAP_SECRET=$AMAP_SECRET$'\n'SECRET=MySecretHere$'\n'PGHOST=localhost$'\n'PGUSER=$WWG_USER$'\n'PGPASSWORD=$PASSWORD$'\n'PGDBNAME=$DB_NAME > $BACKEND_ENV
+cat > $BACKEND_ENV << EOF
+AMAP_SECRET=$AMAP_SECRET
+SECRET=MySecretHere
+PGHOST=$PG_HOST
+PGUSER=$WWG_USER
+PGPASSWORD=$PASSWORD
+PGDBNAME=$DB_NAME
+EOF
 if ! pg_isready -U "$PG_USER" -q
 then
     echo "[error] PostgreSQL is not running!"
