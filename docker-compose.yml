@@ -25,16 +25,15 @@ services:
   web-dev:
     build:
       context: ./frontend
-      target: setup
+      target: source
     ports:
       - 3000:3000
-    working_dir: /app
     volumes:
       - ./frontend/src:/app/src
     command: yarn start
     environment:
       CHOKIDAR_USEPOLLING: true
-  
+
   api-prod:
     build:
       context: ./backend
