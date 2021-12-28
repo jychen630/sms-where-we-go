@@ -51,6 +51,7 @@ services:
       dockerfile: api.Dockerfile
       target: source
     volumes:
+      - ./backend/src:/app/src/
       - wwgclient:/app/src/generated/
     ports:
       - 8080:8080

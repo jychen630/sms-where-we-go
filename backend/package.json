@@ -44,7 +44,7 @@
         "build": "tsc -b",
         "watch": "tsc -w",
         "generate": "openapi --input ./openapi.yaml --output ./src/generated",
-        "start": "NODE_ENV=development sh -c 'supervisor --no-restart-on exit build/index.js'",
+        "start": "NODE_ENV=development sh -c 'supervisor build/index.js'",
         "start-prod": "NODE_ENV=production sh -c 'node build/index.js'",
         "load": "node tools/load.mjs",
         "deploy": "yarn npm-run-all -p -l watch start"
