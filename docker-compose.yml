@@ -21,16 +21,20 @@ services:
     build: ./frontend
     ports:
       - 5000:5000
+    depends_on:
+      - api-prod
 
   web-dev:
     build:
       context: ./frontend
-      target: source
+      target: development
     ports:
       - 3000:3000
     volumes:
       - ./frontend/src:/app/src
-    command: yarn start
+      - wwgclient:/usr/local/lib/wwgclient/
+    depends_on:
+      - api-dev
     environment:
       CHOKIDAR_USEPOLLING: true
 
@@ -46,8 +50,11 @@ services:
       context: ./backend
       dockerfile: api.Dockerfile
       target: source
+    volumes:
+      - wwgclient:/app/src/generated/
     ports:
       - 8080:8080
 
 volumes:
   pgdata:
+  wwgclient:
