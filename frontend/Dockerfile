@@ -22,4 +22,4 @@ COPY --from=build /app/build ./
 RUN yarn global add serve \
     && yarn cache clean
 EXPOSE 5000/tcp
-CMD serve -s build -p 5000
+CMD serve -s . -p 5000
