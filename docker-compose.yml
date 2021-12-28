@@ -1,0 +1,55 @@
+version: '3.9'
+
+services:
+  db:
+    build:
+      context: ./backend
+      dockerfile: db.Dockerfile
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: postgres
+      WWG_USER: wwgadmin
+      WWG_PASSWORD: ThePasswordHere
+      DB_NAME: wwg_base
+      SEARCH_PATH: wwg,public
+
+  web-prod:
+    build: ./frontend
+    ports:
+      - 5000:5000
+
+  web-dev:
+    build:
+      context: ./frontend
+      target: setup
+    ports:
+      - 3000:3000
+    working_dir: /app
+    volumes:
+      - ./frontend/src:/app/src
+    command: yarn start
+    environment:
+      CHOKIDAR_USEPOLLING: true
+  
+  api-prod:
+    build:
+      context: ./backend
+      dockerfile: api.Dockerfile
+    ports:
+      - 8080:8080
+    command: [sh, -c, "yarn generate && yarn build && yarn start-prod"]
+
+  api-dev:
+    build:
+      context: ./backend
+      dockerfile: api.Dockerfile
+    ports:
+      - 8080:8080
+    command: [sh, -c, "yarn generate && yarn deploy"]
+
+volumes:
+  pgdata:
