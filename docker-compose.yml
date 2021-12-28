@@ -40,15 +40,14 @@ services:
       dockerfile: api.Dockerfile
     ports:
       - 8080:8080
-    command: [sh, -c, "yarn generate && yarn build && yarn start-prod"]
 
   api-dev:
     build:
       context: ./backend
       dockerfile: api.Dockerfile
+      target: source
     ports:
       - 8080:8080
-    command: [sh, -c, "yarn generate && yarn deploy"]
 
 volumes:
   pgdata:
