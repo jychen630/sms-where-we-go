@@ -11,10 +11,10 @@ services:
     ports:
       - 5432:5432
     environment:
+      POSTGRES_DB: development
       POSTGRES_PASSWORD: postgres
       WWG_USER: wwgadmin
       WWG_PASSWORD: ThePasswordHere
-      DB_NAME: wwg_base
       SEARCH_PATH: wwg,public
 
   web-prod:
@@ -42,6 +42,8 @@ services:
     build:
       context: ./backend
       dockerfile: api.Dockerfile
+    depends_on:
+      - db
     ports:
       - 8080:8080
 
@@ -53,6 +55,8 @@ services:
     volumes:
       - ./backend/src:/app/src/
       - wwgclient:/app/src/generated/
+    depends_on:
+      - db
     ports:
       - 8080:8080
 
