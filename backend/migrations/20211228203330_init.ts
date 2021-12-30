@@ -29,6 +29,13 @@ export async function up(knex: Knex): Promise<void> {
         .createTable("curriculum", t => {
             t.string("curriculum_name", 20).primary();
         })
+        .createTable("class", t => {
+            t.specificType("class_number", "SMALLINT");
+            t.integer("grad_year");
+            t.string("curriculum_name").notNullable();
+            t.primary(["class_number", "grad_year"]);
+            t.foreign("curriculum_name").references("curriculum_name").inTable("wwg.curriculum");
+        })
         .createTable("registration_key", t => {
             t.string("registration_key", 14);
             t.timestamp("expiration_date");
@@ -45,7 +52,7 @@ export async function up(knex: Knex): Promise<void> {
         })
         .raw("CREATE TYPE student_role AS ENUM ('student', 'class', 'curriculum', 'year', 'system');")
         .createTable("role", t => {
-            t.specificType("role", "student_role").notNullable();
+            t.specificType("role", "student_role").notNullable().primary();
             t.specificType("level", "SMALLINT");
             t.text("description");
         })
@@ -63,10 +70,10 @@ export async function up(knex: Knex): Promise<void> {
             t.integer("school_uid");
             t.specificType("visibility_type", "student_visibility").defaultTo("year");
             t.specificType("role", "student_role").defaultTo("student");
-            t.foreign(["class_number", "grad_year"]).references(["class_number", "grad_year"]).inTable("class");
-            t.foreign("school_uid").references("wwg.school.school_uid")
-            t.foreign("role").references("wwg.role.role")
-            t.foreign("visibility_type").references("wwg.visibility.type")
+            t.foreign(["class_number", "grad_year"]).references(["class_number", "grad_year"]).inTable("wwg.class");
+            t.foreign("school_uid").references("school_uid").inTable("wwg.school");
+            t.foreign("role").references("role").inTable("wwg.role");
+            t.foreign("visibility_type").references("type").inTable("wwg.visibility");
         })
         .raw("CREATE TYPE FEEDBACK_STATUS as ENUM ('resolved', 'pending', 'closed');")
         .createTable("feedback", t => {
@@ -81,14 +88,15 @@ export async function up(knex: Knex): Promise<void> {
             t.string("name", 120);
             t.integer("class_number");
             t.integer("grad_year");
-            t.timestamp("posted_at").defaultTo("CURRENT_TIMESTAMP");
+            t.timestamp("posted_at", { useTz: false }).defaultTo(knex.raw("CURRENT_TIMESTAMP"));
         })
+        .raw("CREATE TYPE STUDENT_FIELD as ENUM ('phone_number', 'email', 'wxid', 'department', 'major', 'school_uid', 'school_country', 'school_state_province', 'city');")
         .createTable("comment", t => {
             t.increments("comment_uid");
             t.specificType("feedback_uid", "CHAR(22)").notNullable();
             t.string("sender_name", 120);
             t.text("content");
-            t.timestamp("posted_at").defaultTo("CURRENT_TIMESTAMP");
+            t.timestamp("posted_at").defaultTo(knex.raw("CURRENT_TIMESTAMP"));
             t.foreign("feedback_uid").references("feedback_uid").inTable("wwg.feedback").onDelete("CASCADE");
         })
         .createTable("student_field_visibility", t => {
@@ -115,6 +123,10 @@ export async function down(knex: Knex): Promise<void> {
         .dropTableIfExists("comment")
         .dropTableIfExists("feedback")
         .dropTableIfExists("student")
+        .dropTableIfExists("role")
+        .dropTableIfExists("visibility")
+        .dropTableIfExists("registration_key")
+        .dropTableIfExists("class")
         .dropTableIfExists("curriculum")
         .dropTableIfExists("school_alias")
         .dropTableIfExists("school")
