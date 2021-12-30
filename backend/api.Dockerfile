@@ -21,8 +21,12 @@ RUN yarn tsc -b
 # This prepares for build and is used as the target for development environment
 FROM node:16-alpine as source
 WORKDIR /app
+# Install knex cli
+RUN yarn global install knex
 COPY src ./src
-COPY package.json yarn.lock tsconfig.json .env openapi.yaml ./
+# Prepare files necessary for development and building
+COPY package.json yarn.lock tsconfig.json .env openapi.yaml knexfile.ts ./
+COPY migrations ./migrations
 COPY --from=dependencies /app/node_modules ./node_modules
 COPY --from=openapi-build /app/build ./src/generated/build
 RUN yarn build
