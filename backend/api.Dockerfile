@@ -2,6 +2,8 @@ FROM node:16-alpine as dependencies
 WORKDIR /app
 # The followings use separate RUN to help with caching
 # Prepare the dependencies
+# Install git
+RUN apk --no-cache add git
 COPY package.json yarn.lock ./
 RUN yarn
 # Apply patches
@@ -21,11 +23,9 @@ RUN yarn tsc -b
 # This prepares for build and is used as the target for development environment
 FROM node:16-alpine as source
 WORKDIR /app
-# Install knex cli
-RUN yarn global install knex
 COPY src ./src
 # Prepare files necessary for development and building
-COPY package.json yarn.lock tsconfig.json .env openapi.yaml knexfile.ts ./
+COPY package.json yarn.lock tsconfig.json openapi.yaml knexfile.ts ./
 COPY migrations ./migrations
 COPY --from=dependencies /app/node_modules ./node_modules
 COPY --from=openapi-build /app/build ./src/generated/build

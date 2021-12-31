@@ -23,7 +23,7 @@
         "express": "^4.17.1",
         "express-openapi": "^9.0.0",
         "express-session": "^1.17.2",
-        "knex": "^0.95.6",
+        "knex": "git+https://git@github.com/knex/knex.git#44dbbca5240ccddff3c635561c1eb1424f27e12c",
         "log4js": "^6.3.0",
         "node": "^16.1.0",
         "patch-package": "^6.4.7",
