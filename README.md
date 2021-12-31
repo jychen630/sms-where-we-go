@@ -24,8 +24,9 @@ This will run the development build of the website.
 
 ## Overview
 
-- Frontend: React + Typescript + Ant Design + MapBox GL
-- Backend: Node.js + TypeScript + Express + OpenAPI
+-   Web: React + Typescript + Ant Design + MapBox GL
+-   API: Node.js + TypeScript + Express + OpenAPI
+-   Database: PostgreSQL + Knex.js
 
 ## Workflow
 
