@@ -5,6 +5,7 @@ module.exports = {
   development: {
     client: "postgresql",
     connection: {
+      host: "db",
       database: "development",
       user: "wwgadmin",
       password: "ThePasswordHere"
@@ -19,25 +20,10 @@ module.exports = {
     }
   },
 
-  staging: {
-    client: "postgresql",
-    connection: {
-      database: "development",
-      user: "wwgadmin",
-      password: "ThePasswordHere"
-    },
-    pool: {
-      min: 2,
-      max: 10
-    },
-    migrations: {
-      tableName: "knex_migrations"
-    }
-  },
-
   production: {
     client: "postgresql",
     connection: {
+      host: "db",
       database: "wwg_base",
       user: "wwgadmin",
       password: "ThePasswordHere"
