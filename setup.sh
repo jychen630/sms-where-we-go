@@ -17,80 +17,20 @@ fi
 
 echo "[setup] Setting up packages for frontend..."
 cd frontend
-yarn -i
+yarn
 echo "[setup] Setting up packages for backend..."
 cd ../backend
-yarn -i
+yarn
 echo "[setup] Applying patches..."
 yarn patch-package
 
-cd ../
-echo "[setup] Setting up environment variables..."
-PG_USER=postgres
-PG_HOST=localhost
-PG_PORT=5432
-WWG_USER=wwgadmin
-DB_NAME=wwg_base
-SEARCH_PATH=wwg,public
-BACKEND_ENV=backend/.env
-AMAP_SECRET=TheAPIKeyOfAmap
-export PGPASSFILE=~/.pgpass
-PASSWORD="ThePasswordHere"
-echo "*:*:$DB_NAME:$WWG_USER:$PASSWORD" > $PGPASSFILE
-cat > $BACKEND_ENV << EOF
-AMAP_SECRET=$AMAP_SECRET
-SECRET=MySecretHere
-PGHOST=$PG_HOST
-PGUSER=$WWG_USER
-PGPASSWORD=$PASSWORD
-PGDBNAME=$DB_NAME
-EOF
-if ! pg_isready -U "$PG_USER" -q
-then
-    echo "[error] PostgreSQL is not running!"
-    echo "[error] Please check your installation and start the service"
-    exit 1
-fi
 
-echo "[setup] Setting up PostgreSQL..."
-echo "----BEGIN POSTGRESQL----"
-psql -v ON_ERROR_STOP=1 -h localhost -U $PG_USER -q -e << EOF
-SET CLIENT_ENCODING TO utf8;
-DO \$\$
-BEGIN
-    CREATE USER $WWG_USER;
-EXCEPTION WHEN duplicate_object THEN
-    RAISE NOTICE '$WWG_USER already exists';
-END \$\$;
-ALTER ROLE $WWG_USER PASSWORD '$PASSWORD';
-ALTER ROLE $WWG_USER SET search_path TO $SEARCH_PATH;
-DROP DATABASE IF EXISTS $DB_NAME;
-CREATE DATABASE $DB_NAME;
-GRANT ALL PRIVILEGES ON DATABASE $DB_NAME TO $WWG_USER;
-EOF
-if [ $? -eq 0 ];
-then
-    echo "[setup] Successfully set up the role and the database."
-else
-    echo "[error] Some error has occurred during the process of initializing the role and the database..."
-    exit 1
-fi
-echo "----END POSTGRESQL----"
+echo "[setup] Setting up secret files..."
+mkdir ../secrets
+cd ../secrets
+touch amap_token pg_password
 
-echo "[setup] Credentials for $WWG_USER are stored to $PGPASSFILE."
-echo "[setup] Initializing the schema."
-echo "----BEGIN POSTGRESQL----"
-psql -v ON_ERROR_STOP=1 -f ./init.sql -U $WWG_USER -h localhost -q -e $DB_NAME
-if [ $? -eq 0 ];
-then
-    echo "[setup] Successfully set up PostgreSQL."
-else
-    echo "[Error] Some error has occurred during the process of initializing the schema..."
-    exit 1
-fi
-echo "----END POSTGRESQL----"
-
-cd backend
+cd ../backend
 echo "[setup] Running yarn load to prepare the types and test data..."
 yarn load
 

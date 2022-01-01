@@ -10,11 +10,12 @@ services:
     restart: always
     ports:
       - 5432:5432
+    secrets:
+      - pg_password
     environment:
       POSTGRES_DB: development
       POSTGRES_PASSWORD: postgres
       WWG_USER: wwgadmin
-      WWG_PASSWORD: ThePasswordHere
       SEARCH_PATH: wwg,public
 
   web-prod:
@@ -44,6 +45,9 @@ services:
       dockerfile: api.Dockerfile
     depends_on:
       - db
+    secrets:
+      - amap_token
+      - pg_password
     ports:
       - 8080:8080
 
@@ -53,13 +57,26 @@ services:
       dockerfile: api.Dockerfile
       target: source
     volumes:
+      - ./backend/migrations:/app/migrations
+      - ./backend/seeds:/app/seeds
       - ./backend/src:/app/src/
       - wwgclient:/app/src/generated/
     depends_on:
       - db
+    secrets:
+      - amap_token
+      - pg_password
     ports:
       - 8080:8080
 
 volumes:
   pgdata:
   wwgclient:
+
+secrets:
+  pg_password:
+    file:
+      secrets/pg_password
+  amap_token:
+    file:
+      secrets/amap_token

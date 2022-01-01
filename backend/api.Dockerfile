@@ -27,6 +27,7 @@ COPY src ./src
 # Prepare files necessary for development and building
 COPY package.json yarn.lock tsconfig.json openapi.yaml knexfile.ts ./
 COPY migrations ./migrations
+COPY seeds ./seeds
 COPY --from=dependencies /app/node_modules ./node_modules
 COPY --from=openapi-build /app/build ./src/generated/build
 RUN yarn build

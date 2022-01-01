@@ -1,4 +1,5 @@
 // Update with your config settings.
+import fs from "fs";
 
 module.exports = {
 
@@ -8,7 +9,7 @@ module.exports = {
       host: "db",
       database: "development",
       user: "wwgadmin",
-      password: "ThePasswordHere"
+      password: fs.readFileSync("/run/secrets/pg_password").toString()
     },
     pool: {
       min: 2,
@@ -17,6 +18,9 @@ module.exports = {
     migrations: {
       tableName: "knex_migrations",
       schemaName: "wwg"
+    },
+    seeds: {
+      directory: "./seeds"
     }
   },
 

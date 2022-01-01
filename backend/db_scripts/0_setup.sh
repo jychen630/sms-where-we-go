@@ -1,6 +1,7 @@
 set -e
 
 echo "Setting up the users"
+WWG_PASSWORD=$(tr -d '\r' < /run/secrets/pg_password)
 psql -v ON_ERROR_STOP=1 -U $POSTGRES_USER << EOF
 SET CLIENT_ENCODING TO utf8;
 DO \$\$
