@@ -25,17 +25,18 @@ FROM node:16-alpine as source
 WORKDIR /app
 COPY src ./src
 # Prepare files necessary for development and building
-COPY package.json yarn.lock tsconfig.json openapi.yaml knexfile.ts ./
+COPY package.json yarn.lock tsconfig.json openapi.yaml knexfile.ts docker-entrypoint.sh ./
 COPY migrations ./migrations
 COPY seeds ./seeds
 COPY --from=dependencies /app/node_modules ./node_modules
 COPY --from=openapi-build /app/build ./src/generated/build
 RUN yarn build
-CMD yarn deploy
+CMD API_ENV=development ./docker-entrypoint.sh
 
 FROM node:16-alpine as production
 WORKDIR /app
-COPY package.json openapi.yaml ./
+COPY package.json openapi.yaml docker-entrypoint.sh ./
 COPY --from=dependencies /app/node_modules ./node_modules
 COPY --from=source /app/build ./build
-CMD yarn start-prod
+#CMD yarn start-prod, ./ means execucion,dont write sh
+CMD API_ENV=production ./docker-entrypoint.sh

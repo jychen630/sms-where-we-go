@@ -1,12 +1,12 @@
 version: '3.9'
 
 services:
-  db:
+  db-dev:
     build:
       context: ./backend
       dockerfile: db.Dockerfile
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - pgdata-dev:/var/lib/postgresql/data
     restart: always
     ports:
       - 5432:5432
@@ -18,12 +18,31 @@ services:
       WWG_USER: wwgadmin
       SEARCH_PATH: wwg,public
 
+  db-prod:
+    build:
+      context: ./backend
+      dockerfile: db.Dockerfile
+    volumes:
+      - pgdata-prod:/var/lib/postgresql/data
+    restart: always
+    ports:
+      - 5432:5432
+    secrets:
+      - pg_password
+    environment:
+      POSTGRES_DB: wwg_base
+      POSTGRES_PASSWORD: postgres
+      WWG_USER: wwgadmin
+      SEARCH_PATH: wwg,public
+
   web-prod:
     build: ./frontend
     ports:
       - 5000:5000
     depends_on:
       - api-prod
+    secrets:
+      - mapbox_token
 
   web-dev:
     build:
@@ -36,6 +55,8 @@ services:
       - wwgclient:/usr/local/lib/wwgclient/
     depends_on:
       - api-dev
+    secrets:
+      - mapbox_token
     environment:
       CHOKIDAR_USEPOLLING: true
 
@@ -44,12 +65,17 @@ services:
       context: ./backend
       dockerfile: api.Dockerfile
     depends_on:
-      - db
+      - db-prod
     secrets:
       - amap_token
       - pg_password
+      - express_session_secret
     ports:
       - 8080:8080
+    environment:
+      - PGHOST=db-prod
+      - PGUSER=wwgadmin
+      - PGDBNAME=wwg_base
 
   api-dev:
     build:
@@ -62,15 +88,21 @@ services:
       - ./backend/src:/app/src/
       - wwgclient:/app/src/generated/
     depends_on:
-      - db
+      - db-dev
     secrets:
       - amap_token
       - pg_password
+      - express_session_secret
     ports:
       - 8080:8080
+    environment:
+      - PGHOST=db-dev
+      - PGUSER=wwgadmin
+      - PGDBNAME=development
 
 volumes:
-  pgdata:
+  pgdata-prod:
+  pgdata-dev:
   wwgclient:
 
 secrets:
@@ -80,3 +112,9 @@ secrets:
   amap_token:
     file:
       secrets/amap_token
+  mapbox_token:
+    file:
+      secrets/mapbox_token
+  express_session_secret:
+    file:
+      secrets/express_session_secret

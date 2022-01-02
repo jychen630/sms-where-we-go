@@ -17,7 +17,7 @@ export const pg = knex(pgOptions);
 dotenv.config();
 app.use(
     session({
-        secret: process.env.SECRET as string,
+        secret: process.env.EXPRESS_SESSION_SECRET as string,
         resave: false,
         saveUninitialized: false,
         cookie: {

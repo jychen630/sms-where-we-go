@@ -26,9 +26,9 @@ yarn patch-package
 
 
 echo "[setup] Setting up secret files..."
-mkdir ../secrets
+mkdir -p ../secrets
 cd ../secrets
-touch amap_token pg_password
+touch amap_token pg_password mapbox_token express_session_secret
 
 cd ../backend
 echo "[setup] Running yarn load to prepare the types and test data..."
