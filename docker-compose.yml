@@ -89,8 +89,6 @@ services:
       - ./backend/seeds:/app/seeds
       - ./backend/src:/app/src/
       - wwgclient:/app/src/generated/
-    depends_on:
-      - db-dev
     secrets:
       - amap_token
       - pg_password
