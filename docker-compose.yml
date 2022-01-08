@@ -24,7 +24,6 @@ services:
       dockerfile: db.Dockerfile
     volumes:
       - pgdata-prod:/var/lib/postgresql/data
-    restart: always
     ports:
       - 5432:5432
     secrets:
@@ -36,6 +35,7 @@ services:
       SEARCH_PATH: wwg,public
 
   web-prod:
+    image: pig208/sms-where-we-go-web:latest
     build: ./frontend
     ports:
       - 5000:5000
@@ -61,6 +61,7 @@ services:
       CHOKIDAR_USEPOLLING: true
 
   api-prod:
+    image: pig208/sms-where-we-go-api:latest
     build:
       context: ./backend
       dockerfile: api.Dockerfile
