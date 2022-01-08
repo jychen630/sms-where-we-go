@@ -79,6 +79,7 @@ services:
       - PGDBNAME=wwg_base
 
   api-dev:
+    image: pig208/sms-where-we-go-api:dev-latest
     build:
       context: ./backend
       dockerfile: api.Dockerfile
