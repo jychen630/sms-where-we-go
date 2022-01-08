@@ -1,3 +1,5 @@
+#!/bin/sh
+
 set -e
 
 # set up api environmental varible from secret files

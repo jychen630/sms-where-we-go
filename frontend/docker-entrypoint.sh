@@ -1,3 +1,5 @@
+#!/bin/sh
+
 set -e
 
 export REACT_APP_MAPBOX_TOKEN=$(tr -d '\r' < /run/secrets/mapbox_token)
