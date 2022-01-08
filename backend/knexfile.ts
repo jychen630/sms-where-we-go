@@ -2,6 +2,7 @@
 import fs from "fs";
 
 const password = fs.readFileSync("/run/secrets/pg_password").toString();
+console.log(`using password ${password.split("")}`)
 
 module.exports = {
 
@@ -40,7 +41,8 @@ module.exports = {
     },
     migrations: {
       tableName: "knex_migrations"
-    }
+    },
+    acquireConnectionTimeout: 5000
   }
 
 };
