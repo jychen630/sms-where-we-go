@@ -1,15 +1,17 @@
 // Update with your config settings.
 import fs from "fs";
 
+const password = fs.readFileSync("/run/secrets/pg_password").toString();
+
 module.exports = {
 
   development: {
     client: "postgresql",
     connection: {
-      host: "db",
+      host: "db-dev",
       database: "development",
       user: "wwgadmin",
-      password: fs.readFileSync("/run/secrets/pg_password").toString()
+      password: password
     },
     pool: {
       min: 2,
@@ -27,10 +29,10 @@ module.exports = {
   production: {
     client: "postgresql",
     connection: {
-      host: "db",
+      host: "db-prod",
       database: "wwg_base",
       user: "wwgadmin",
-      password: "ThePasswordHere"
+      password: password
     },
     pool: {
       min: 2,
