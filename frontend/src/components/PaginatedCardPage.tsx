@@ -90,7 +90,7 @@ const PaginatedBox = <T extends unknown>({
     const { items } = useData<T, PaginatedQuery>({
         query: query,
         item(value, index) {
-            return <ItemContainer key={index}>{props.item(value, index)}</ItemContainer>;
+            return <ItemContainer key={query.offset + index}>{props.item(value, query.offset + index)}</ItemContainer>;
         },
         dataHandler: wrappedDataHandler,
         onFetch: handleDataFetch,

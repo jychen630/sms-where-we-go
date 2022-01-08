@@ -21,7 +21,7 @@ const Users = () => {
         setVisible(false);
     };
 
-    const StudentItem = (student: Student) => {
+    const StudentItem = (student: Student, index: number) => {
         return (
             <List.Item
                 key={index}
