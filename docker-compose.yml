@@ -58,7 +58,7 @@ services:
     secrets:
       - mapbox_token
     environment:
-      CHOKIDAR_USEPOLLING: true
+      - CHOKIDAR_USEPOLLING=true
 
   api-prod:
     image: pig208/sms-where-we-go-api:latest
