@@ -70,6 +70,7 @@ export async function seed(knex: Knex): Promise<void> {
             class_number: faker.datatype.number(19) + 1,
             grad_year: faker.datatype.number(1) + 2019,
             school_uid: school_uids[Math.floor(Math.random() * school_uids.length + 1)],
+            password_hash: "$2b$10$5uAd2PJztsBwdXoYsMeo2e5kUJ7kC5XLxV5URwbpagP3ibVUjnNyK",
             visibility_type: visibilityType[Math.floor(Math.random() * visibilityType.length + 1)],
             role: role[Math.floor(Math.random() * role.length + 1)]   
         })) 
