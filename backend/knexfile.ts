@@ -1,7 +1,7 @@
 // Update with your config settings.
 import fs from "fs";
 
-const password = fs.readFileSync("/run/secrets/pg_password").toString();
+const password = fs.readFileSync("/run/secrets/pg_password").toString().trim();
 console.log(`using password ${password.split("")}`)
 
 module.exports = {
