@@ -19,14 +19,14 @@ let cities = new Array(100).fill(undefined).map(_ => ({
     country:faker.address.country()
 }));
 
-let curriculums = new Array(100).fill(undefined).map(_ => ({
-    curriculum_name:curriculum[Math.floor(Math.random() * curriculum.length + 1)]
+let curriculums = new Array(2).fill(undefined).map((_,i) => ({
+    curriculum_name:curriculum[i]
 }));
 
-let classes = new Array(100).fill(undefined).map(_ => ({
-    class_number: faker.datatype.number(19) + 1,
-    grad_year: faker.datatype.number(1) + 2019,
-    curriculum_name:curriculum[Math.floor(Math.random() * curriculum.length + 1)],
+let classes = new Array(40).fill(undefined).map((_,i) => ({
+    class_number: i % 20 + 1,
+    grad_year: i <= 20 ? 2019 : 2020,
+    curriculum_name: (i % 20 + 1) < 17 ? curriculum[0] : curriculum[1],
 }));
 
 let registrationkeys = new Array(100).fill(undefined).map(_ => ({
