@@ -39,7 +39,7 @@ services:
     build:
       context: ./frontend
       args:
-        API_HOST: "https:\/\/www.wherewego.cn/v1"
+        API_HOST: "http:\\/\\/www.wherewego.cn\\/v1"
     ports:
       - 5000:5000
     depends_on:
@@ -52,7 +52,7 @@ services:
       context: ./frontend
       target: development
       args:
-        API_HOST: "http:\/\/localhost:8080"
+        API_HOST: "http:\\/\\/localhost:8080"
     ports:
       - 3000:3000
     volumes:
