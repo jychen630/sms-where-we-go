@@ -36,7 +36,10 @@ services:
 
   web-prod:
     image: pig208/sms-where-we-go-web:latest
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        API_HOST: "https:\/\/www.wherewego.cn/v1"
     ports:
       - 5000:5000
     depends_on:
@@ -48,6 +51,8 @@ services:
     build:
       context: ./frontend
       target: development
+      args:
+        API_HOST: "http:\/\/localhost:8080"
     ports:
       - 3000:3000
     volumes:
