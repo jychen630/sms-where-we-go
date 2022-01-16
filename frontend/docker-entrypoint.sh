@@ -11,7 +11,7 @@ then
         yarn start
 elif [ $WEB_ENV = production ]
 then 
-    serve -s . -l tcp://0.0.0.0
+    serve -s . -l tcp://0.0.0.0:5000
 else  
     echo "Error: WEB_ENV is invalid" && exit 1
 fi
