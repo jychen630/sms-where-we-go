@@ -13,10 +13,18 @@ let phoneNumber = faker.phone.phoneNumberFormat();
 let visibilityType = ["private", "class", "curriculum", "year", "students",]
 let role = ['student','class','curriculum','year','system']
 
+function pick(array) {
+    return array[Math.floor(Math.random() * array.length)]; 
+}
+
+let countries = new Array(20).fill(undefined)
+    .map(_ => faker.address.country())
+    .filter(country=>country.length<40);
+
 let cities = new Array(100).fill(undefined).map(_ => ({
     city:faker.address.city(), 
     state_province:faker.address.state(),
-    country:faker.address.country()
+    country:pick(countries)
 }));
 
 let curriculums = new Array(2).fill(undefined).map((_,i) => ({
