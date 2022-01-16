@@ -1,7 +1,7 @@
 import { notification } from "antd";
 import { TFunction } from "react-i18next";
 import React from "react";
-import { ApiError, Result } from "wwg-api";
+import { ApiError, OpenAPI, Result } from "wwg-api";
 
 type ProcessedError = Result & { requireLogin: boolean };
 /**
@@ -79,3 +79,5 @@ export const createNotifyError = (
 export type HasChildren<T = {}> = T & { children: React.ReactNode };
 // Reference: https://stackoverflow.com/a/49889856/11612399
 export type ThenType<T> = T extends PromiseLike<infer U> ? U : T;
+
+export const isDemo = OpenAPI.BASE.includes("demo");

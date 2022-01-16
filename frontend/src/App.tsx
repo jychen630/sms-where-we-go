@@ -22,6 +22,7 @@ import FeedbackPage from "./pages/FeedbackPage";
 import FeedbackForm from "./components/FeedbackForm";
 import AboutPage from "./pages/AboutPage";
 import { notification } from "antd";
+import { isDemo } from "./api/utils";
 
 OpenAPI.WITH_CREDENTIALS = true;
 OpenAPI.TOKEN = "";
@@ -84,7 +85,7 @@ function App() {
         <AuthProvider value={authProvider}>
             <Router>
                 <Switch>
-                    {(process.env.NODE_ENV === "development" || OpenAPI.BASE.includes("demo")) && (
+                    {(process.env.NODE_ENV === "development" || isDemo) && (
                         <Route path="/dev-login">
                             <CardPage title="Where We Go 调试登录">
                                 <DevLoginForm />
