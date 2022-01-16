@@ -47,6 +47,19 @@ services:
     secrets:
       - mapbox_token
 
+  web-demo:
+    image: pig208/sms-where-we-go-web:demo
+    build:
+      context: ./frontend
+      args:
+        API_HOST: "http:\\/\\/demo.wherewego.cn\\/v1"
+    ports:
+      - 5000:5000
+    depends_on:
+      - api-prod
+    secrets:
+      - mapbox_token
+
   web-dev:
     build:
       context: ./frontend
