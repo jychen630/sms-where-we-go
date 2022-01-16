@@ -86,7 +86,7 @@
 }
 
 .info-bar-hidden > .info-bar > .info-bar-content {
-    width: 240px;
+    width: 260px;
     transform: translateX(-100%);
 }
 
