@@ -8,7 +8,7 @@ FROM dependencies as source
 WORKDIR /app
 COPY public ./public
 COPY src ./src
-COPY craco.config.js tsconfig.json docker-entrypoint.sh ./
+COPY craco*.js tsconfig.json docker-entrypoint.sh ./
 
 FROM source as development
 WORKDIR /app
