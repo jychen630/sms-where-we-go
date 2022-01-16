@@ -6,12 +6,11 @@ export REACT_APP_MAPBOX_TOKEN=$(tr -d '\r' < /run/secrets/mapbox_token)
 
 if [ $WEB_ENV = development ]
 then 
-    yarn --cwd /usr/local/lib/wwgclient link && \
-        yarn link wwg-api && \
-        yarn start
+    yarn --cwd /usr/local/lib/wwgclient link && yarn link wwg-api
+    exec yarn start
 elif [ $WEB_ENV = production ]
 then 
-    serve -s . -l tcp://0.0.0.0:5000
+    exec serve -s . -l tcp://0.0.0.0:5000
 else  
     echo "Error: WEB_ENV is invalid" && exit 1
 fi

@@ -31,7 +31,8 @@ COPY seeds ./seeds
 COPY --from=dependencies /app/node_modules ./node_modules
 COPY --from=openapi-build /app/build ./src/generated/build
 RUN yarn build
-CMD API_ENV=development ./docker-entrypoint.sh
+ENV API_ENV=development
+CMD [ "./docker-entrypoint.sh" ]
 
 FROM node:16-alpine as production
 WORKDIR /app
@@ -39,4 +40,5 @@ COPY package.json openapi.yaml docker-entrypoint.sh ./
 COPY --from=dependencies /app/node_modules ./node_modules
 COPY --from=source /app/build ./build
 #CMD yarn start-prod, ./ means execucion,dont write sh
-CMD API_ENV=production ./docker-entrypoint.sh
+ENV API_ENV=production
+CMD [ "./docker-entrypoint.sh" ]

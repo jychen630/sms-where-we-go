@@ -11,10 +11,10 @@ export PGPASSWORD=$(tr -d '\r' < /run/secrets/pg_password)
 if [ $API_ENV = development ]
 then
     yarn knex migrate:latest
-    yarn deploy
+    exec yarn deploy
 elif [ $API_ENV = production ]
 then 
-    yarn start-prod
+    exec yarn start-prod
 else  
     echo "Error: API_ENV is invalid" && exit 1
 fi

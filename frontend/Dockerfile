@@ -14,7 +14,8 @@ FROM source as development
 WORKDIR /app
 # We mounted the dev version of wwg-api from a volume on this directory
 # and use yarn link to create a symbolic link
-CMD WEB_ENV=development ./docker-entrypoint.sh
+ENV WEB_ENV=development
+CMD [ "./docker-entrypoint.sh" ]
 
 FROM source as build
 WORKDIR /app
@@ -31,4 +32,5 @@ COPY --from=build /app/build ./
 RUN yarn global add serve \
     && yarn cache clean
 EXPOSE 5000/tcp
-CMD WEB_ENV=production ./docker-entrypoint.sh
+ENV WEB_ENV=production
+CMD [ "./docker-entrypoint.sh" ]
