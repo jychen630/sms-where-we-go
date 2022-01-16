@@ -18,7 +18,7 @@ import {
 import { useState } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import { Result, Service } from "wwg-api";
-import { createNotifyError, handleApiError } from "../api/utils";
+import { createNotifyError, handleApiError, isDemo } from "../api/utils";
 
 import PrivacyPolicy from "./PrivacyPolicy";
 import SchoolSearchTool from "./SchoolSearchTool";
@@ -290,7 +290,8 @@ const RegistrationForm = () => {
                                     );
                                 } else if (
                                     !!value &&
-                                    !value.match(phonePattern)
+                                    !value.match(phonePattern) &&
+                                    !isDemo
                                 ) {
                                     return Promise.reject("请正确填写电话号码");
                                 } else {

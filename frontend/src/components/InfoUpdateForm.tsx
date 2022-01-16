@@ -27,7 +27,7 @@ import {
 } from "wwg-api";
 import { useAuth } from "../api/auth";
 import { useDict } from "../api/hooks";
-import { handleApiError, ThenType } from "../api/utils";
+import { handleApiError, isDemo, ThenType } from "../api/utils";
 import { emailPattern, phonePattern } from "./RegistrationForm";
 import SchoolSearchTool, { QuerySchoolResult } from "./SchoolSearchTool";
 
@@ -41,14 +41,14 @@ const InfoUpdateForm = ({
     showRoleOptions?: boolean;
     getStudent: () => Promise<
         | Partial<
-              Student &
-                  StudentVerbose &
-                  School & {
-                      role?: Role;
-                      visibility?: Visibility;
-                      field_visibility?: StudentFieldsVisibility;
-                  }
-          >
+            Student &
+            StudentVerbose &
+            School & {
+                role?: Role;
+                visibility?: Visibility;
+                field_visibility?: StudentFieldsVisibility;
+            }
+        >
         | undefined
     >;
 }) => {
@@ -212,9 +212,8 @@ const InfoUpdateForm = ({
                     handleApiError(err).then((res) => {
                         notification.error({
                             message: "错误",
-                            description: `未能更新学生数据。错误信息：${
-                                res.message ?? "未知错误"
-                            }`,
+                            description: `未能更新学生数据。错误信息：${res.message ?? "未知错误"
+                                }`,
                         });
                     });
                 })
@@ -282,7 +281,8 @@ const InfoUpdateForm = ({
                                     );
                                 } else if (
                                     !!value &&
-                                    !value.match(phonePattern)
+                                    !value.match(phonePattern) &&
+                                    !isDemo
                                 ) {
                                     return Promise.reject("请正确填写电话号码");
                                 } else {

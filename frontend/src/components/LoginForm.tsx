@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useHistory, useLocation } from "react-router-dom";
 import { Result, Service } from "wwg-api";
 import { useAuth } from "../api/auth";
-import { createNotifyError, handleApiError } from "../api/utils";
+import { createNotifyError, handleApiError, isDemo } from "../api/utils";
 
 // constants
 const phonePattern =
@@ -49,9 +49,9 @@ const LoginForm = () => {
                         });
                         const dest =
                             typeof location.state === "object" &&
-                            location.state !== null &&
-                            "pathname" in location.state &&
-                            (location.state as any).pathname !== "login"
+                                location.state !== null &&
+                                "pathname" in location.state &&
+                                (location.state as any).pathname !== "login"
                                 ? (location.state as any).pathname
                                 : "/map";
                         setTimeout(() => history.push(dest), 1500);
@@ -89,7 +89,8 @@ const LoginForm = () => {
                                 if (
                                     !!value &&
                                     !value.match(phonePattern) &&
-                                    !value.match(emailPattern)
+                                    !value.match(emailPattern) &&
+                                    !isDemo
                                 ) {
                                     return Promise.reject(
                                         "请正确填写电话号码或者邮箱"
