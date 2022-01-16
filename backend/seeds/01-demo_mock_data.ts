@@ -11,27 +11,27 @@ let registrationKey = faker.random.alphaNumeric(14);
 let curriculum = ["domestic", "international"];
 let phoneNumber = faker.phone.phoneNumberFormat();
 let visibilityType = ["private", "class", "curriculum", "year", "students",]
-let role = ['student','class','curriculum','year','system']
+let role = ['student', 'class', 'curriculum', 'year', 'system']
 
-function pick(array) {
-    return array[Math.floor(Math.random() * array.length)]; 
+function pick(array: any[]) {
+    return array[Math.floor(Math.random() * array.length)];
 }
 
 let countries = new Array(20).fill(undefined)
     .map(_ => faker.address.country())
-    .filter(country=>country.length<40);
+    .filter(country => country.length < 40);
 
 let cities = new Array(100).fill(undefined).map(_ => ({
-    city:faker.address.city(), 
-    state_province:faker.address.state(),
-    country:pick(countries)
+    city: faker.address.city(),
+    state_province: faker.address.state(),
+    country: pick(countries)
 }));
 
-let curriculums = new Array(2).fill(undefined).map((_,i) => ({
-    curriculum_name:curriculum[i]
+let curriculums = new Array(2).fill(undefined).map((_, i) => ({
+    curriculum_name: curriculum[i]
 }));
 
-let classes = new Array(40).fill(undefined).map((_,i) => ({
+let classes = new Array(40).fill(undefined).map((_, i) => ({
     class_number: i % 20 + 1,
     grad_year: i <= 20 ? 2019 : 2020,
     curriculum_name: (i % 20 + 1) < 17 ? curriculum[0] : curriculum[1],
@@ -65,7 +65,7 @@ export async function seed(knex: Knex): Promise<void> {
             longitude: faker.address.latitude(),
             city_uid: city_uids[Math.floor(Math.random() * city_uids.length + 1)],
         }))
-        ).returning("school_uid");
+    ).returning("school_uid");
 
     await knex("wwg.curriculum").insert(curriculums);
 
@@ -80,8 +80,8 @@ export async function seed(knex: Knex): Promise<void> {
             school_uid: school_uids[Math.floor(Math.random() * school_uids.length + 1)],
             password_hash: "$2b$10$5uAd2PJztsBwdXoYsMeo2e5kUJ7kC5XLxV5URwbpagP3ibVUjnNyK",
             visibility_type: visibilityType[Math.floor(Math.random() * visibilityType.length + 1)],
-            role: role[Math.floor(Math.random() * role.length + 1)]   
-        })) 
+            role: role[Math.floor(Math.random() * role.length + 1)]
+        }))
     );
 
     await knex("wwg.registration_key").insert(registrationkeys);
