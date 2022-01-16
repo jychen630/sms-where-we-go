@@ -46,7 +46,7 @@ export const post: Operation = async (req, res) => {
     const data = parseBody<typeof Service.postDevLogin>(req);
     const logger = ServerLogger.getLogger("postDevLogin");
 
-    if (process.env.NODE_ENV !== "development") {
+    if (process.env.NODE_ENV !== "development" && !!!process.env.DEMO) {
         res.status(404).send();
         return;
     }
