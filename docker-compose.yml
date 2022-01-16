@@ -28,6 +28,7 @@ services:
       - 5432:5432
     secrets:
       - pg_password
+    restart: always
     environment:
       POSTGRES_DB: wwg_base
       POSTGRES_PASSWORD: postgres
@@ -40,6 +41,7 @@ services:
       context: ./frontend
       args:
         API_HOST: "http:\\/\\/www.wherewego.cn\\/v1"
+    restart: always
     ports:
       - 5000:5000
     depends_on:
@@ -78,6 +80,7 @@ services:
       - express_session_secret
     ports:
       - 8080:8080
+    restart: always
     environment:
       - PGHOST=db-prod
       - PGUSER=wwgadmin
