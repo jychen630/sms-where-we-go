@@ -1,0 +1,10 @@
+#!/bin/sh
+set -ex
+
+if [ ! -z "$*" ];
+then
+    docker-compose -f docker-compose.yml -f docker-compose.demo.yml $*
+else
+    echo No compose arguments supplied
+    exit
+fi
