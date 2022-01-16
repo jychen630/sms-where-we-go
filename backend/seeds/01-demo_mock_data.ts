@@ -95,18 +95,21 @@ export async function seed(knex: Knex): Promise<void> {
 
 
     // Demo user profile
-    const demo_city_uid = await knex("wwg.city").insert({
+    const demo_city_uid = await knex("wwg.city").insert([{
         city: 'Yew Nork City',
         state_province: 'Demo',
         country: 'Nacirema',
-    }).returning("city_uid");
+    }]).returning("city_uid");
 
-    const demo_school_uid = await knex("wwg.school").insert({   
+    console.log(demo_city_uid);
+    console.log(typeof(demo_city_uid));
+
+    const demo_school_uid = await knex("wwg.school").insert([{   
         name: "Yew Nork University",
         longitude: "73.9965",
         latitude: "40.7295",
-        city_uid: demo_city_uid,        
-    }).returning("school_uid")
+        city_uid: demo_city_uid[0],        
+    }]).returning("school_uid")
 
     await knex("wwg.student").insert([{
         name: "Demo Chen",
@@ -115,7 +118,7 @@ export async function seed(knex: Knex): Promise<void> {
         major: "Undecided",
         class_number: 13,
         grad_year: 2020,
-        school_uid: demo_school_uid,
+        school_uid: demo_school_uid[0],
         password_hash: "$2b$10$5uAd2PJztsBwdXoYsMeo2e5kUJ7kC5XLxV5URwbpagP3ibVUjnNyK",
         visibility_type: "students",
         role: "system"
