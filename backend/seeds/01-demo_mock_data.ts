@@ -1,5 +1,5 @@
 import { Knex } from "knex";
-import faker, { random } from "faker";
+import faker, { fake, random } from "faker";
 
 let city = faker.address.city();
 let long = faker.address.longitude();
@@ -39,10 +39,13 @@ let classes = new Array(40).fill(undefined).map((_, i) => ({
 
 let registrationkeys = new Array(100).fill(undefined).map(_ => ({
     registration_key: faker.random.alphaNumeric(14),
-    expiration_date: new Date("2022").toISOString(),
+    expiration_date: new Date("2023").toISOString(),
     class_number: faker.datatype.number(19) + 1,
     grad_year: faker.datatype.number(1) + 2019,
 }))
+
+let demo_username = 'demo';
+let demo_pw = 'demopw';
 
 
 export async function seed(knex: Knex): Promise<void> {
@@ -56,6 +59,8 @@ export async function seed(knex: Knex): Promise<void> {
 
 
     // Inserts seed entries
+
+    // Faker user info
     const city_uids = await knex("wwg.city").insert(cities).returning("city_uid");
 
     const school_uids = await knex("wwg.school").insert(
@@ -63,7 +68,7 @@ export async function seed(knex: Knex): Promise<void> {
             name: `${faker.address.city()} State University`,
             latitude: faker.address.longitude(),
             longitude: faker.address.latitude(),
-            city_uid: city_uids[Math.floor(Math.random() * city_uids.length + 1)],
+            city_uid: pick(city_uids),
         }))
     ).returning("school_uid");
 
@@ -75,15 +80,51 @@ export async function seed(knex: Knex): Promise<void> {
         new Array(100).fill(undefined).map(_ => ({
             name: faker.name.findName(),
             phone_number: faker.phone.phoneNumberFormat(),
+            email:faker.internet.email(),
+            major:"Undecided",
             class_number: faker.datatype.number(19) + 1,
             grad_year: faker.datatype.number(1) + 2019,
-            school_uid: school_uids[Math.floor(Math.random() * school_uids.length + 1)],
+            school_uid: pick(school_uids),
             password_hash: "$2b$10$5uAd2PJztsBwdXoYsMeo2e5kUJ7kC5XLxV5URwbpagP3ibVUjnNyK",
-            visibility_type: visibilityType[Math.floor(Math.random() * visibilityType.length + 1)],
-            role: role[Math.floor(Math.random() * role.length + 1)]
+            visibility_type: pick(visibilityType),
+            role: pick(role)
         }))
     );
 
     await knex("wwg.registration_key").insert(registrationkeys);
 
+
+    // Demo user profile
+    const demo_city_uid = await knex("wwg.city").insert({
+        city: 'Yew Nork City',
+        state_province: 'Demo',
+        country: 'Nacirema',
+    }).returning("city_uid");
+
+    const demo_school_uid = await knex("wwg.school").insert({   
+        name: "Yew Nork University",
+        longitude: "73.9965",
+        latitude: "40.7295",
+        city_uid: demo_city_uid,        
+    }).returning("school_uid")
+
+    await knex("wwg.student").insert([{
+        name: "Demo Chen",
+        phone_number: "929-888-9999",
+        email: "jychen630@wherewego.cn",
+        major: "Undecided",
+        class_number: 13,
+        grad_year: 2020,
+        school_uid: demo_school_uid,
+        password_hash: "$2b$10$5uAd2PJztsBwdXoYsMeo2e5kUJ7kC5XLxV5URwbpagP3ibVUjnNyK",
+        visibility_type: "students",
+        role: "system"
+    }])
+
+    await knex("wwg.registration_key").insert({
+        registration_key: "demoregkey2022",
+        expiration_date: new Date("2023").toISOString(),
+        class_number: 13,
+        grad_year: 2020,
+    })
 };
