@@ -33,7 +33,7 @@ let curriculums = new Array(2).fill(undefined).map((_, i) => ({
 
 let classes = new Array(40).fill(undefined).map((_, i) => ({
     class_number: i % 20 + 1,
-    grad_year: i <= 20 ? 2019 : 2020,
+    grad_year: i < 20 ? 2019 : 2020,
     curriculum_name: (i % 20 + 1) < 17 ? curriculum[0] : curriculum[1],
 }));
 
