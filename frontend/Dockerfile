@@ -19,7 +19,7 @@ CMD WEB_ENV=development ./docker-entrypoint.sh
 FROM source as build
 WORKDIR /app
 ARG API_HOST="http:\/\/localhost:8080\/v1"
-RUN sed -i "s/BASE: '.*'/BASE: '${API_HOST}'/" node_modules/wwg-api/core/OpenAPI.ts
+RUN sed -i "s/BASE: '.*'/BASE: '${API_HOST}'/" node_modules/wwg-api/build/core/OpenAPI.js
 RUN yarn build
 
 # In the final build, we only keep
