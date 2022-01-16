@@ -15,7 +15,7 @@ import { Service } from "../generated";
 export const get: Operation = (req, res) => {
     const logger = ServerLogger.getLogger("getDevLogin");
 
-    if (process.env.NODE_ENV !== "development") {
+    if (process.env.NODE_ENV !== "development" && !!!process.env.DEMO) {
         res.status(404).send();
         return;
     }

@@ -1,0 +1,15 @@
+version: '3.9'
+
+services:
+  web-prod:
+    image: pig208/sms-where-we-go-web:demo
+    build:
+      context: ./frontend
+      args:
+        API_HOST: "http:\\/\\/demo.wherewego.cn:8080\\/v1"
+    environment:
+      - DEMO=1
+
+  api-prod:
+    environment:
+      - DEMO=1

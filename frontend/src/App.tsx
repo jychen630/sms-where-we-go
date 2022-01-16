@@ -84,7 +84,7 @@ function App() {
         <AuthProvider value={authProvider}>
             <Router>
                 <Switch>
-                    {process.env.NODE_ENV === "development" && (
+                    {(process.env.NODE_ENV === "development" || OpenAPI.BASE.includes("demo")) && (
                         <Route path="/dev-login">
                             <CardPage title="Where We Go 调试登录">
                                 <DevLoginForm />

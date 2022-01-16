@@ -34,6 +34,7 @@ app.use(
             "http://localhost:3000",
             "http://localhost:5000",
             "http://47.106.186.142:5000",
+            "http://demo.wherewego.cn:5000",
         ],
     })
 );
