@@ -6,6 +6,7 @@ services:
       context: ./nginx
     volumes:
       - ./nginx/templates-dev:/etc/nginx/templates
+      - ./nginx/cert:/etc/nginx/cert
     environment:
       - NGINX_HOST=localhost
       - WEB_HOST=web-dev
@@ -21,12 +22,12 @@ services:
     build:
       context: ./nginx
     volumes:
-      - ./templates:/etc/nginx/templates
+      - ./nginx/templates:/etc/nginx/templates
+      - ./nginx/cert:/etc/nginx/cert
     environment:
       - NGINX_HOST=www.wherewego.cn
       - WEB_HOST=web-prod
       - API_HOST=api-prod
-    restart: always
     depends_on:
       - api-prod
       - web-prod
@@ -73,7 +74,7 @@ services:
     build:
       context: ./frontend
       args:
-        API_HOST: "http:\\/\\/www.wherewego.cn\\/v1"
+        API_HOST: "https:\\/\\/www.wherewego.cn\\/v1"
     restart: always
     ports:
       - 5000:5000

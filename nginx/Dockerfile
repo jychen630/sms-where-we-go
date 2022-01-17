@@ -1,2 +1,3 @@
 FROM nginx:1.21
 EXPOSE 80
+EXPOSE 443
