@@ -33,7 +33,7 @@ const Schools = () => {
             .then((res) => {
                 if (res.result === Result.result.SUCCESS) {
                     notification.success({
-                        message: "成功",
+                        message: t("成功"),
                         description: `已移除学校 ${school.school_name} (uid: ${school.uid})`,
                     });
                 } else {
@@ -55,12 +55,12 @@ const Schools = () => {
                 <>
                     <InfoList {...value} />
                     <Button onClick={() => handleDelete(value)} danger>
-                        删除
+                        {t("删除")}
                     </Button>
                 </>
             )}
         >
-            <Card title="添加学校">
+            <Card title={t("添加学校")}>
                 <AddSchoolForm />
             </Card>
         </PaginatedBox>

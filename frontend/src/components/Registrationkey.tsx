@@ -49,8 +49,8 @@ const RegistrationKeyForm = (props: {
                     err,
                     createNotifyError(
                         t,
-                        "失败",
-                        "未能获取可用班级",
+                        t("失败"),
+                        t("未能获取可用班级"),
                         (err) =>
                             err.requireLogin &&
                             setTimeout(
@@ -95,7 +95,7 @@ const RegistrationKeyForm = (props: {
                                 err,
                                 createNotifyError(
                                     t,
-                                    "失败",
+                                    "Error",
                                     `未能添加${class_.grad_year}届 ${class_.class_number}的注册码`
                                 )
                             )
@@ -104,10 +104,10 @@ const RegistrationKeyForm = (props: {
             ).then((res) => {
                 if (registrationKeys.length > 0) {
                     notification.success({
-                        message: "成功",
+                        message: t("成功"),
                         description: (
                             <>
-                                <p>已成功创建注册码:</p>
+                                <p>{t("已成功创建注册码")}:</p>
                                 <p>
                                     {registrationKeys
                                         .map(
@@ -128,7 +128,7 @@ const RegistrationKeyForm = (props: {
 
     return (
         <Form form={props.form} onFinish={handleFinish}>
-            <Form.Item name="classes" label="选择班级">
+            <Form.Item name="classes" label={t("选择班级")}>
                 <Select disabled={classes.length === 0} mode="multiple">
                     {classes.map((value, index) => (
                         <Select.Option
@@ -185,8 +185,8 @@ const RegistrationKey = () => {
                 </Button>
                 <Switch
                     defaultChecked={notExpired}
-                    checkedChildren="未过期"
-                    unCheckedChildren="全部"
+                    checkedChildren={t("未过期")}
+                    unCheckedChildren={t("全部")}
                     onChange={(val) => setNotExpired(val)}
                     style={{ display: "block" }}
                 ></Switch>
@@ -197,8 +197,8 @@ const RegistrationKey = () => {
                         key={index}
                         actions={[
                             <Switch
-                                checkedChildren="已激活"
-                                unCheckedChildren="已禁用"
+                                checkedChildren={t("已激活")}
+                                unCheckedChildren={t("已禁用")}
                                 defaultChecked={value.activated}
                                 onChange={(checked) => {
                                     Service.updateRegistrationKey({
@@ -232,13 +232,13 @@ const RegistrationKey = () => {
                             description={
                                 <>
                                     <p>
-                                        <ClockCircleOutlined /> 过期时间:{" "}
+                                        <ClockCircleOutlined /> {t("过期时间")}:{" "}
                                         {new Date(
                                             value.expiration_date ?? ""
                                         ).toLocaleString()}
                                     </p>
                                     <p>
-                                        <PieChartOutlined /> 适用范围:{" "}
+                                        <PieChartOutlined /> {t("适用范围")}:{" "}
                                         {value.class_number}/{value.grad_year} [
                                         {t(value.curriculum ?? "")}]
                                     </p>

@@ -50,7 +50,7 @@ const RegistrationForm = () => {
     const [PrivacyModal, showPrivacyModal] = useModal({
         content: <PrivacyPolicy />,
         modalProps: {
-            title: "用户隐私协议",
+            title: t("用户隐私协议"),
             footer: null,
         },
     });
@@ -77,7 +77,7 @@ const RegistrationForm = () => {
                     ) {
                         setRegInfo({
                             curriculum:
-                                res.curriculum === "gaokao" ? "高考" : "出国",
+                                t(res.curriculum),
                             classNumber: res.class_number,
                             gradYear: res.grad_year,
                             expDate: new Date(res.expiration_date ?? "-1"),
@@ -86,16 +86,16 @@ const RegistrationForm = () => {
                     return Promise.resolve();
                 } else {
                     if (res.message === "The registration key is invalid") {
-                        return Promise.reject("该注册码不可用");
+                        return Promise.reject(t("该注册码不可用"));
                     } else {
                         console.error(res.message);
-                        return Promise.reject("获取注册码失败");
+                        return Promise.reject(t("获取注册码失败"));
                     }
                 }
             })
             .catch((err) =>
                 handleApiError(err).then((res) =>
-                    Promise.reject("该注册码不可用" ?? "验证失败，请联系管理员")
+                    Promise.reject(t("该注册码不可用" ?? t("验证失败，请联系管理员")))
                 )
             );
     };
@@ -113,10 +113,10 @@ const RegistrationForm = () => {
             .then((res) => {
                 if (res.result === Result.result.SUCCESS) {
                     notification.success({
-                        message: "注册成功",
+                        message: t("注册成功"),
                         description: (
                             <Space>
-                                即将前往登录页面 <Spin />
+                                {t("即将前往登录页面")} <Spin />
                             </Space>
                         ),
                         duration: 1.5,
@@ -142,17 +142,17 @@ const RegistrationForm = () => {
             >
                 <Form.Item
                     name="registration_key"
-                    label="注册码"
-                    tooltip="为了保障用户隐私安全，注册需要使用注册码；注册码请向班级管理员索取"
+                    label={t("注册码")}
+                    tooltip={t("为了保障用户隐私安全，注册需要使用注册码；注册码请向班级管理员索取")}
                     validateFirst
                     rules={[
                         {
                             required: true,
-                            message: "注册码不能为空",
+                            message: t("注册码不能为空"),
                         },
                         {
                             len: 14,
-                            message: "注册码长度必须为14位",
+                            message: t("注册码长度必须为14位"),
                         },
                         ({ getFieldError }) => ({
                             validator(_, value) {
@@ -164,7 +164,7 @@ const RegistrationForm = () => {
                     required
                 >
                     <Input
-                        placeholder="14位注册码"
+                        placeholder={t("14位注册码")}
                         onChange={() => {
                             setRegInfo(undefined);
                         }}
@@ -174,33 +174,33 @@ const RegistrationForm = () => {
                     <Collapse.Panel
                         header={
                             <>
-                                注册码信息 <InfoCircleOutlined />
+                                {t("注册码信息")} <InfoCircleOutlined />
                             </>
                         }
                         key={"1"}
                     >
                         <div>
-                            毕业年份:{" "}
+                            {t("毕业年份")}:{" "}
                             <Text type="success" strong>
-                                {regInfo?.gradYear ?? "暂无"}
+                                {regInfo?.gradYear ?? t("暂无")}
                             </Text>
                         </div>
                         <div>
-                            班级:{" "}
+                            {t("班级")}:{" "}
                             <Text type="success" strong>
-                                {regInfo?.classNumber ?? "暂无"}
+                                {regInfo?.classNumber ?? t("暂无")}
                             </Text>
                         </div>
                         <div>
-                            方向:{" "}
+                            {t("方向")}:{" "}
                             <Text type="success" strong>
-                                {regInfo?.curriculum ?? "暂无"}
+                                {regInfo?.curriculum ?? t("暂无")}
                             </Text>
                         </div>
                         <div>
                             <Tooltip
                                 placement="bottom"
-                                title="为了安全性，注册码将会在创建后一段时间过期"
+                                title={t("为了安全性，注册码将会在创建后一段时间过期")}
                             >
                                 <span className="underdotted">过期时间</span>
                             </Tooltip>
@@ -212,7 +212,7 @@ const RegistrationForm = () => {
                                         <FieldTimeOutlined />
                                     </Space>
                                 ) : (
-                                    "暂无"
+                                    t("暂无")
                                 )}
                             </Text>
                         </div>
@@ -220,42 +220,42 @@ const RegistrationForm = () => {
                 </Collapse>
                 <Form.Item
                     name="name"
-                    label="姓名"
+                    label={t("姓名")}
                     required
                     rules={[
                         {
                             required: true,
-                            message: "姓名不能为空",
+                            message: t("姓名不能为空"),
                         },
                     ]}
                 >
-                    <Input placeholder="中文姓名" />
+                    <Input placeholder={t("中文姓名")} />
                 </Form.Item>
                 <Form.Item
                     name="password"
-                    label="密码"
-                    tooltip="您的密码将会通过bcrypt加密存储，客户端与服务器的所有通讯通过https协议完成"
+                    label={t("密码")}
+                    tooltip={t("您的密码将会通过bcrypt加密存储，客户端与服务器的所有通讯通过https协议完成")}
                     required
                     rules={[
                         {
                             required: true,
-                            message: "密码不能为空",
+                            message: t("密码不能为空"),
                         },
                     ]}
                 >
                     <Input.Password
-                        placeholder="请输入密码"
+                        placeholder={t("请输入密码")}
                         autoComplete="new-password"
                     />
                 </Form.Item>
                 <Form.Item
                     name="confirm"
-                    label="确认密码"
+                    label={t("确认密码")}
                     dependencies={["password"]}
                     rules={[
                         {
                             required: true,
-                            message: "请确认密码",
+                            message: t("请确认密码"),
                         },
                         ({ getFieldValue }) => ({
                             validator(_, value) {
@@ -264,7 +264,7 @@ const RegistrationForm = () => {
                                     return Promise.resolve();
                                 } else {
                                     return Promise.reject(
-                                        "两次输入的密码不一致"
+                                        t("两次输入的密码不一致")
                                     );
                                 }
                             },
@@ -273,40 +273,40 @@ const RegistrationForm = () => {
                     required
                 >
                     <Input.Password
-                        placeholder="请再次输入密码"
+                        placeholder={t("请再次输入密码")}
                         autoComplete="new-password"
                     />
                 </Form.Item>
                 <Form.Item
                     name="phone_number"
-                    label="电话号码"
+                    label={t("电话号码")}
                     rules={[
                         ({ getFieldValue }) => ({
                             validator(_, value) {
                                 const email = getFieldValue("email");
                                 if (!!!email && !!!value) {
                                     return Promise.reject(
-                                        "请在电话号码和邮箱中至少填写一项"
+                                        t("请在电话号码和邮箱中至少填写一项")
                                     );
                                 } else if (
                                     !!value &&
                                     !value.match(phonePattern) &&
                                     !isDemo
                                 ) {
-                                    return Promise.reject("请正确填写电话号码");
+                                    return Promise.reject(t("请正确填写电话号码"));
                                 } else {
                                     return Promise.resolve();
                                 }
                             },
                         }),
                     ]}
-                    tooltip="电话号码和邮箱请至少填写一项，两者都将能够作为登录的凭证"
+                    tooltip={t("电话号码和邮箱请至少填写一项，两者都将能够作为登录的凭证")}
                 >
-                    <Input placeholder="请输入电话号码" />
+                    <Input placeholder={t("请输入电话号码")} />
                 </Form.Item>
                 <Form.Item
                     name="email"
-                    label="邮箱"
+                    label={t("邮箱")}
                     rules={[
                         ({ getFieldValue }) => ({
                             validator(_, value) {
@@ -314,13 +314,13 @@ const RegistrationForm = () => {
                                     getFieldValue("phone_number");
                                 if (!!!phoneNumber && !!!value) {
                                     return Promise.reject(
-                                        "请在电话号码和邮箱中至少填写一项"
+                                        t("请在电话号码和邮箱中至少填写一项")
                                     );
                                 } else if (
                                     !!value &&
                                     !value.match(emailPattern)
                                 ) {
-                                    return Promise.reject("请正确填写邮箱");
+                                    return Promise.reject(t("请正确填写邮箱"));
                                 } else {
                                     return Promise.resolve();
                                 }
@@ -328,12 +328,12 @@ const RegistrationForm = () => {
                         }),
                     ]}
                 >
-                    <Input placeholder="请输入邮箱" />
+                    <Input placeholder={t("请输入邮箱")} />
                 </Form.Item>
                 <Form.Item
                     name="wxid"
                     label="微信ID"
-                    tooltip="若已填写微信所绑定的电话号码，或无微信ID，此项可不填"
+                    tooltip={t("若已填写微信所绑定的电话号码，或无微信ID，此项可不填")}
                 >
                     <Input placeholder="微信唯一ID (如 asdasdkl202122skwmrt)" />
                 </Form.Item>
@@ -341,25 +341,25 @@ const RegistrationForm = () => {
                     name="school_uid"
                     label={
                         <>
-                            去向院校 (找不到的院校可在右侧{" "}
+                            {t("去向院校 (找不到的院校可在右侧")}{" "}
                             <PlusCircleOutlined
                                 style={{ paddingLeft: 2, paddingRight: 2 }}
                             />{" "}
-                            添加)
+                            {t("添加")})
                         </>
                     }
-                    tooltip="没有找到你的学校？点击右方 + 来添加一个学校。若目前未定去向，此项可不填。海外院校请输入英文名"
+                    tooltip={t("没有找到你的学校？点击右方 + 来添加一个学校。若目前未定去向，此项可不填。海外院校请输入英文名")}
                 >
                     <SchoolSearchTool
                         schoolUid={schoolUid}
                         setSchoolUid={setSchoolUid}
                     />
                 </Form.Item>
-                <Form.Item name="department" label="学院">
-                    <Input placeholder="请输入你的学院名称" />
+                <Form.Item name="department" label={t("学院")}>
+                    <Input placeholder={t("请输入你的学院名称")} />
                 </Form.Item>
-                <Form.Item name="major" label="专业">
-                    <Input placeholder="请输入你的专业名称" />
+                <Form.Item name="major" label={t("专业")}>
+                    <Input placeholder={t("请输入你的专业名称")} />
                 </Form.Item>
                 <Form.Item
                     name="grant"
@@ -372,7 +372,7 @@ const RegistrationForm = () => {
                                     return Promise.resolve();
                                 } else {
                                     return Promise.reject(
-                                        "请勾选同意用户隐私协议"
+                                        t("请勾选同意用户隐私协议")
                                     );
                                 }
                             },
@@ -380,29 +380,29 @@ const RegistrationForm = () => {
                     ]}
                 >
                     <Checkbox>
-                        勾选即代表您同意
+                        {t("勾选即代表您同意")}
                         <Button
                             type="link"
                             style={{ padding: "1px" }}
                             onClick={showPrivacyModal}
                         >
-                            用户隐私协议
+                            {t("用户隐私协议")}
                         </Button>
                     </Checkbox>
                 </Form.Item>
                 <Form.Item>
                     <Space wrap>
                         <Button type="primary" htmlType="submit">
-                            注册
+                            {t("注册")}
                         </Button>
                         <Button onClick={() => history.push("/login")}>
-                            切换到登录
+                            {t("切换到登录")}
                         </Button>
                         <Button
                             type="link"
                             onClick={() => history.push("/public-feedback")}
                         >
-                            无法注册？点此反馈
+                            {t("无法注册？点此反馈")}
                         </Button>
                     </Space>
                 </Form.Item>

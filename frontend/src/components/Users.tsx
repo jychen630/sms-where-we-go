@@ -73,8 +73,8 @@ const Users = () => {
                     err,
                     createNotifyError(
                         t,
-                        "错误",
-                        "未能获取学生数据"
+                        t("错误"),
+                        t("未能获取学生数据")
                     )
                 );
                 return [];
@@ -89,8 +89,8 @@ const Users = () => {
                     err,
                     createNotifyError(
                         t,
-                        "错误",
-                        "未能获取学生数据"
+                        t("错误"),
+                        t("未能获取学生数据")
                     )
                 )
             );
@@ -107,11 +107,11 @@ const Users = () => {
                 item={StudentItem}
                 dataHandler={fetchStudent}
             >
-                学生列表
+                {t("学生列表")}
             </PaginatedBox>
         </List>
             <Modal
-                title="编辑学生信息：" //{value.name}
+                title={t("编辑学生信息：")} //{value.name}
                 visible={visible}
                 okText={<></>}
                 cancelText={t("Close")}

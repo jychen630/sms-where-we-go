@@ -51,10 +51,10 @@ const useSearchCity: () => [() => JSX.Element, number] = () => {
                         {value.city_uid === cityUid && <CheckCircleFilled />}
                     </Button>
                 )}
-                placeholder="输入城市名 (已收录国内大部分城市)"
+                placeholder={t("输入城市名 (已收录国内大部分城市)")}
             />
         );
-    }, [cityUid, fetchCity]);
+    }, [t, cityUid, fetchCity]);
 
     return [renderSearchTool, cityUid];
 };

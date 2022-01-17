@@ -48,7 +48,7 @@ const Classes = () => {
             .catch((err) =>
                 handleApiError(
                     err,
-                    createNotifyError(t, t("Error"), "未能获取可用班级")
+                    createNotifyError(t, "Error", "未能获取可用班级")
                 )
             );
     }, [t, setClasses]);
@@ -96,7 +96,7 @@ const Classes = () => {
                 .then((_) => {
                     if (errors.length > 0) return Promise.reject();
                     notification.success({
-                        message: "成功",
+                        message: t("成功"),
                         description: `已添加${successes.join(", ")} ${t(
                             data.curriculum
                         )}`,
@@ -106,10 +106,10 @@ const Classes = () => {
                 })
                 .catch((_) => {
                     notification.error({
-                        message: "失败",
+                        message: t("失败"),
                         description: (
                             <>
-                                未能创建部分班级
+                                {t("未能创建部分班级")}
                                 <ul>
                                     {errors.map((error) => (
                                         <li>{error}</li>
@@ -133,7 +133,7 @@ const Classes = () => {
             .then((res) => {
                 if (res.result === Result.result.SUCCESS) {
                     notification.success({
-                        message: "成功",
+                        message: t("成功"),
                         description: `已移除${gradYear}届 ${classNumber}班`,
                         duration: 1,
                     });
@@ -170,7 +170,7 @@ const Classes = () => {
                     }
                     danger
                 >
-                    删除
+                    {t("删除")}
                 </Button>
             </Space>
         )
@@ -179,26 +179,26 @@ const Classes = () => {
     return (
         <>
             <Divider>添加班级</Divider>
-            <Form form={form} title="添加班级" onFinish={handleFinish}>
+            <Form form={form} title={t("添加班级")} onFinish={handleFinish}>
                 <Form.Item
                     name="grad_year"
-                    label="毕业年份"
+                    label={t("毕业年份")}
                     required
                     rules={[
                         {
                             required: true,
-                            message: "毕业年份为必填项",
+                            message: t("毕业年份为必填项"),
                         },
                         {
                             len: 4,
-                            message: "请正确填写毕业年份",
+                            message: t("请正确填写毕业年份"),
                         },
                     ]}
                 >
                     {auth.role === Role.SYSTEM ? (
                         <Input
                             type="number"
-                            placeholder="请输入毕业年份"
+                            placeholder={t("请输入毕业年份")}
                         ></Input>
                     ) : (
                         <Select disabled defaultActiveFirstOption>
@@ -215,7 +215,7 @@ const Classes = () => {
                     auth.role === Role.SYSTEM ? (
                     <Form.Item
                         name="class_number"
-                        label="班级号码"
+                        label={t("班级号码")}
                         rules={[
                             ({ getFieldsValue }) => ({
                                 transform: (val) => {
@@ -234,7 +234,7 @@ const Classes = () => {
                                     upper = parseInt(val["class_number_upper"]);
                                     if (isNaN(lower) || isNaN(upper)) {
                                         return Promise.reject(
-                                            "班级区间必须为整数"
+                                            t("班级区间必须为整数")
                                         );
                                     }
                                     if (
@@ -244,12 +244,12 @@ const Classes = () => {
                                         upper > 99
                                     ) {
                                         return Promise.reject(
-                                            "班级区间必须为 1~99 的整数"
+                                            t("班级区间必须为 1~99 的整数")
                                         );
                                     }
                                     if (lower > upper) {
                                         return Promise.reject(
-                                            "班级上限不能小于下限"
+                                            t("班级上限不能小于下限")
                                         );
                                     }
                                     return Promise.resolve();
@@ -264,7 +264,7 @@ const Classes = () => {
                                 <Input
                                     type="number"
                                     style={{ width: 100 }}
-                                    placeholder="下限"
+                                    placeholder={t("下限")}
                                 ></Input>
                             </Form.Item>
                             <Input
@@ -278,13 +278,13 @@ const Classes = () => {
                                 <Input
                                     type="number"
                                     style={{ width: 100 }}
-                                    placeholder="上限"
+                                    placeholder={t("上限")}
                                 ></Input>
                             </Form.Item>
                         </Input.Group>
                     </Form.Item>
                 ) : (
-                    <Form.Item name="class_number" label="班级号码" required>
+                    <Form.Item name="class_number" label={t("班级号码")} required>
                         <Select disabled defaultActiveFirstOption>
                             {auth.classNumber && (
                                 <Select.Option value={auth.classNumber}>
@@ -296,12 +296,12 @@ const Classes = () => {
                 )}
                 <Form.Item
                     name="curriculum"
-                    label="体系"
+                    label={t("体系")}
                     required
                     rules={[
                         {
                             required: true,
-                            message: "体系为必填项",
+                            message: t("体系为必填项"),
                         },
                     ]}
                 >
@@ -329,7 +329,7 @@ const Classes = () => {
                     htmlType="submit"
                     disabled={auth.role === Role.CLASS}
                 >
-                    提交
+                    {t("提交")}
                 </Button>
             </Form>
             <PaginatedBox

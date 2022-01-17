@@ -4,6 +4,7 @@ import { Button } from "antd";
 import SearchTool from "./SearchTool";
 import { School, Student, StudentVerbose } from "wwg-api";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 type StudentSearchResult = {
     index: number;
@@ -23,12 +24,13 @@ const StudentSearchTool = ({
     onSelect: (props: StudentSearchResult) => void;
     hasCoordinate?: boolean;
 }) => {
+    const [t] = useTranslation();
     const [current, setCurrent] = useState<StudentSearchResult | undefined>();
     const [cached, setCached] = useState<StudentSearchResult[] | undefined>();
     const [cachedKeyword, setCachedKeyword] = useState("");
     return (
         <SearchTool
-            placeholder="请输入搜索关键词"
+            placeholder={t("请输入搜索关键词")}
             searchLimit={5}
             dataHandler={(props) => {
                 if (cached !== undefined && props.value === cachedKeyword) {
@@ -39,15 +41,15 @@ const StudentSearchTool = ({
                 const result =
                     (hasCoordinate
                         ? data.filter(
-                              (
-                                  data
-                              ): data is {
-                                  longitude: number;
-                                  latitude: number;
-                              } & MapItem =>
-                                  data.latitude !== undefined &&
-                                  data.longitude !== undefined
-                          )
+                            (
+                                data
+                            ): data is {
+                                longitude: number;
+                                latitude: number;
+                            } & MapItem =>
+                                data.latitude !== undefined &&
+                                data.longitude !== undefined
+                        )
                         : data
                     )
                         .flatMap((raw) => {
@@ -62,9 +64,9 @@ const StudentSearchTool = ({
                                         !!!raw.longitude || !!!raw.latitude
                                             ? undefined
                                             : ([
-                                                  raw.longitude,
-                                                  raw.latitude,
-                                              ] as const),
+                                                raw.longitude,
+                                                raw.latitude,
+                                            ] as const),
                                 })) ?? []
                             );
                         })
@@ -107,9 +109,9 @@ const StudentSearchTool = ({
                                                 );
                                             return similarity > accu.similarity
                                                 ? {
-                                                      similarity: similarity,
-                                                      keyword: val.toString(),
-                                                  }
+                                                    similarity: similarity,
+                                                    keyword: val.toString(),
+                                                }
                                                 : accu;
                                         } else {
                                             return accu;

@@ -36,13 +36,13 @@ const LoginForm = () => {
                             await auth.update();
                         } catch (err) {
                             console.error(err);
-                            return Promise.reject("连接失败");
+                            return Promise.reject(t("连接失败"));
                         }
                         notification.success({
-                            message: "登录成功",
+                            message: t("登录成功"),
                             description: (
                                 <Space>
-                                    加载中 <Spin />
+                                    {t("加载中")} <Spin />
                                 </Space>
                             ),
                             duration: 1,
@@ -75,14 +75,14 @@ const LoginForm = () => {
             <Form form={form} layout="vertical" onFinish={validateLogin}>
                 <Form.Item
                     name="identifier" //or uid?
-                    label="手机号/邮箱"
-                    tooltip="注册时填写的手机号或邮箱，任选一种即可"
+                    label={t("手机号/邮箱")}
+                    tooltip={t("注册时填写的手机号或邮箱，任选一种即可")}
                     required
                     hasFeedback
                     rules={[
                         {
                             required: true,
-                            message: "手机号/邮箱不能为空",
+                            message: t("手机号/邮箱不能为空"),
                         },
                         {
                             validator(_, value) {
@@ -93,7 +93,7 @@ const LoginForm = () => {
                                     !isDemo
                                 ) {
                                     return Promise.reject(
-                                        "请正确填写电话号码或者邮箱"
+                                        t("请正确填写电话号码或者邮箱")
                                     );
                                 } else {
                                     return Promise.resolve();
@@ -106,30 +106,30 @@ const LoginForm = () => {
                 </Form.Item>
                 <Form.Item
                     name="password"
-                    label="密码"
+                    label={t("密码")}
                     required
                     rules={[
                         {
                             required: true,
-                            message: "密码不能为空",
+                            message: t("密码不能为空"),
                         },
                     ]}
                 >
-                    <Input.Password placeholder="请输入密码" />
+                    <Input.Password placeholder={t("请输入密码")} />
                 </Form.Item>
                 <Form.Item>
                     <Space wrap>
                         <Button type="primary" htmlType="submit">
-                            登录
+                            {t("登录")}
                         </Button>
                         <Button onClick={() => history.push("/register")}>
-                            切换到注册
+                            {t("切换到注册")}
                         </Button>
                         <Button
                             type="link"
                             onClick={() => history.push("/public-feedback")}
                         >
-                            无法登录？点此反馈
+                            {t("无法登录？点此反馈")}
                         </Button>
                     </Space>
                 </Form.Item>

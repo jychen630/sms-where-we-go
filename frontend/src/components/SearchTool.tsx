@@ -3,6 +3,7 @@ import { Button, Collapse, Empty, Input, Row, Space, Spin } from "antd";
 import { SearchProps } from "antd/lib/input";
 import throttle from "lodash/throttle";
 import React, { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { DataHandlerProps, PaginatedQuery } from "../api/hooks";
 
 export type SearchToolProps<T> = {
@@ -22,14 +23,16 @@ const SearchTool = <T extends unknown>({
     initialValue,
     inputRef,
     searchLimit = 5,
-    EmptyPlaceholder = () => <Empty description="无数据" />,
+    EmptyPlaceholder = undefined,
     searchProps,
 }: SearchToolProps<T>) => {
+    const [t] = useTranslation();
     const [value, setValue] = useState("");
     const [collapsed, setCollapsed] = useState(false);
     const [offset, setOffset] = useState(0);
     const [loading, setLoading] = useState(false);
     const [resultList, setResultList] = useState<T[]>([]);
+    const DefaultPlaceHolder = () => <Empty description={t("无数据")} />;
 
     const search = useCallback(
         throttle(
@@ -120,7 +123,7 @@ const SearchTool = <T extends unknown>({
                     key={0}
                     header={
                         <Space>
-                            匹配结果
+                            {t("匹配结果")}
                             {loading && (
                                 <Spin indicator={<LoadingOutlined />} />
                             )}
@@ -128,7 +131,7 @@ const SearchTool = <T extends unknown>({
                     }
                     className="collapse-panel"
                 >
-                    {resultList.length === 0 && <EmptyPlaceholder />}
+                    {resultList.length === 0 && EmptyPlaceholder ? <EmptyPlaceholder /> : <DefaultPlaceHolder />}
 
                     {resultList.map((value, index) => {
                         return <Row key={index}>{item(value, index)}</Row>;
@@ -147,7 +150,7 @@ const SearchTool = <T extends unknown>({
                             disabled={loading}
                             block
                         >
-                            加载更多
+                            {t("加载更多")}
                         </Button>
                     )}
                 </Collapse.Panel>

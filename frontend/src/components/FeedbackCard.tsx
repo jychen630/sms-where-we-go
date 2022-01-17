@@ -47,7 +47,7 @@ const FeedbackCard = (props: FeedbackVerbose & { adminView: boolean }) => {
                 .catch((err) =>
                     handleApiError(
                         err,
-                        createNotifyError(t, t("Error"), "未能更新反馈状态")
+                        createNotifyError(t, "Error", "未能更新反馈状态")
                     )
                 );
         },
@@ -61,7 +61,7 @@ const FeedbackCard = (props: FeedbackVerbose & { adminView: boolean }) => {
                     type="ghost"
                     onClick={() => handleUpdateState("pending")}
                 >
-                    <Loading3QuartersOutlined /> 标记为处理中
+                    <Loading3QuartersOutlined /> {t("标记为处理中")}
                 </Button>
             );
         } else if (props.status === "pending") {
@@ -71,18 +71,18 @@ const FeedbackCard = (props: FeedbackVerbose & { adminView: boolean }) => {
                     onClick={() => handleUpdateState("resolved")}
                 >
                     <CheckCircleOutlined />
-                    标记为解决
+                    {t("标记为解决")}
                 </Button>
             );
         } else {
             return (
                 <Button disabled>
                     <CloseCircleOutlined />
-                    关闭
+                    {t("关闭")}
                 </Button>
             );
         }
-    }, [props.status, handleUpdateState]);
+    }, [t, props.status, handleUpdateState]);
 
     const handleSendComment = useCallback(
         (data) => {
@@ -100,7 +100,7 @@ const FeedbackCard = (props: FeedbackVerbose & { adminView: boolean }) => {
                 .catch((err) =>
                     handleApiError(
                         err,
-                        createNotifyError(t, t("Error"), "发送评论失败")
+                        createNotifyError(t, "Error", "发送评论失败")
                     )
                 );
         },
@@ -109,12 +109,12 @@ const FeedbackCard = (props: FeedbackVerbose & { adminView: boolean }) => {
 
     return (
         <Card>
-            <Optional content={props.feedback_uid} label="反馈码" />
+            <Optional content={props.feedback_uid} label={t("反馈码")} />
             <Optional
                 content={`${props.grad_year}届 ${props.class_number}班`}
                 dependencies={[props.grad_year, props.class_number]}
                 label={t("Class")}
-                nullAlt={<h3>公开反馈 (对所有管理员可见)</h3>}
+                nullAlt={<h3>{t("公开反馈 (对所有管理员可见")})</h3>}
             />
             <Optional content={props.name} label={t("Name")} />
             <Optional content={props.phone_number} label={t("Phone Number")} />
@@ -124,7 +124,7 @@ const FeedbackCard = (props: FeedbackVerbose & { adminView: boolean }) => {
             <Optional content={props.title} label={t("Title")} />
             <Optional content={props.content} label={t("Content")} />
             <Collapse ghost>
-                <Collapse.Panel header="留言" key={0}>
+                <Collapse.Panel header={t("留言")} key={0}>
                     {props.comments.length !== 0 ? (
                         <div
                             style={{
@@ -139,11 +139,11 @@ const FeedbackCard = (props: FeedbackVerbose & { adminView: boolean }) => {
                             ))}
                         </div>
                     ) : (
-                        <Empty description="无数据" />
+                        <Empty description={t("无数据")} />
                     )}
                     <Divider />
                     <ComposeBox
-                        sendBtnLabel="添加评论"
+                        sendBtnLabel={t("添加评论")}
                         onSent={handleSendComment}
                     />
                 </Collapse.Panel>

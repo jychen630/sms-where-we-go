@@ -18,6 +18,7 @@ import {
 } from "antd";
 import { useEffect } from "react";
 import { useCallback, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Coordinate, Result, Service } from "wwg-api";
 import useSearchCity from "../api/citySearchTool";
 import { PaginatedQuery } from "../api/hooks";
@@ -41,6 +42,7 @@ enum Provider {
 }
 
 const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
+    const [t] = useTranslation();
     const [page, setPage] = useState(0);
     const [form] = Form.useForm<Values>();
     const [renderSearchTool, cityUid] = useSearchCity();
@@ -51,8 +53,8 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
     const handleFinish = (data: Values) => {
         if (data.longitude === undefined || data.latitude === undefined) {
             notification.error({
-                message: "错误",
-                description: "坐标不能为空",
+                message: t("错误"),
+                description: t("坐标不能为空"),
                 duration: 1.5,
             });
             return;
@@ -60,15 +62,15 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
         Service.postSchool(
             currentTab === "select"
                 ? {
-                      ...data,
-                      city_uid: cityUid,
-                  }
+                    ...data,
+                    city_uid: cityUid,
+                }
                 : data
         )
             .then((res) => {
                 if (res.result === Result.result.SUCCESS) {
                     notification.success({
-                        message: "添加成功",
+                        message: t("添加成功"),
                         description: (
                             <>
                                 已添加{data.school_name} (uid {res.school_uid})
@@ -83,8 +85,8 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
             .catch((err) =>
                 handleApiError(err).then((res) => {
                     notification.error({
-                        message: "添加学校失败",
-                        description: res.message ?? "添加学校时发生未知错误",
+                        message: t("添加学校失败"),
+                        description: res.message ?? t("添加学校时发生未知错误"),
                     });
                 })
             );
@@ -102,14 +104,14 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                 students: [
                     {
                         uid: 0,
-                        name: "示例学生",
+                        name: t("示例学生"),
                         class_number: 2,
                         grad_year: 2020,
                     },
                 ],
                 longitude: location?.longitude,
                 latitude: location?.latitude,
-                school_name: location?.name ?? "示例学校",
+                school_name: location?.name ?? t("示例学校"),
                 city: location?.city ?? "",
             },
         ];
@@ -139,16 +141,16 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
             <div style={page !== 0 ? { display: "none" } : {}}>
                 <Form.Item
                     name="school_name"
-                    label="学校名"
+                    label={t("学校名")}
                     required
                     rules={[
                         {
                             required: true,
-                            message: "请填写学校名称 (海外大学请填写英文名)",
+                            message: t("请填写学校名称 (海外大学请填写英文名)"),
                         },
                     ]}
                 >
-                    <Input placeholder="学校的正式名称（非缩写，昵称）" />
+                    <Input placeholder={t("学校的正式名称（非缩写，昵称）")} />
                 </Form.Item>
                 <Tabs
                     defaultActiveKey="select"
@@ -156,7 +158,7 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                         setCurrentTab(key);
                     }}
                 >
-                    <Tabs.TabPane key="select" tab="选择城市">
+                    <Tabs.TabPane key="select" tab={t("选择城市")}>
                         {renderSearchTool()}
                     </Tabs.TabPane>
                     <Tabs.TabPane
@@ -165,14 +167,14 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                     >
                         <Form.Item
                             name="city"
-                            label="城市"
+                            label={t("城市")}
                             required
                             rules={[
                                 {
                                     validator(_, value) {
                                         if (!!!value && currentTab === "add") {
                                             return Promise.reject(
-                                                "学校所在的城市不能为空"
+                                                t("学校所在的城市不能为空")
                                             );
                                         }
                                         return Promise.resolve();
@@ -184,20 +186,20 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                         </Form.Item>
                         <Form.Item
                             name="school_state_province"
-                            label="省份/州/郡"
+                            label={t("省份/州/郡")}
                         >
                             <Input placeholder="学校所在的省份，州或郡 (海外地区请填写英文)" />
                         </Form.Item>
                         <Form.Item
                             name="school_country"
-                            label="国家"
+                            label={t("国家")}
                             required
                             rules={[
                                 {
                                     validator(_, value) {
                                         if (!!!value && currentTab === "add") {
                                             return Promise.reject(
-                                                "学校所在的国家不能为空"
+                                                t("学校所在的国家不能为空")
                                             );
                                         }
                                         return Promise.resolve();
@@ -215,8 +217,8 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                         onClick={() => {
                             if (currentTab === "select" && cityUid === -1) {
                                 notification.error({
-                                    message: "错误",
-                                    description: "城市不能为空",
+                                    message: t("错误"),
+                                    description: t("城市不能为空"),
                                     duration: 1.5,
                                 });
                                 return;
@@ -230,35 +232,35 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                             });
                         }}
                     >
-                        下一步
+                        {t("下一步")}
                     </Button>
                 </Form.Item>
             </div>
             <div style={page !== 1 ? { display: "none" } : {}}>
                 <Divider>坐标</Divider>
                 <p>
-                    为了使得你添加的学校能够在地图上显示，我们需要录入学校的坐标
+                    {t("为了使得你添加的学校能够在地图上显示，我们需要录入学校的坐标")}
                 </p>
                 <p>
-                    你可以使用搜索功能自动填入学校的坐标，也可以在其他网站上查询后手动输入
+                    {t("你可以使用搜索功能自动填入学校的坐标，也可以在其他网站上查询后手动输入")}
                 </p>
                 <Space>
                     <Form.Item
                         name="longitude"
-                        label="经度"
+                        label={t("经度")}
                         validateFirst
                         rules={[
                             {
                                 type: "number",
-                                message: "经度必须为数字",
+                                message: t("经度必须为数字"),
                                 transform: (val) => Number.parseFloat(val),
                             },
-                            { required: true, message: "经度不能为空" },
+                            { required: true, message: t("经度不能为空") },
                             {
                                 validator(_, val) {
                                     if (val > 180 || val < -180) {
                                         return Promise.reject(
-                                            "经度必须在-180和180之间"
+                                            t("经度必须在-180和180之间")
                                         );
                                     } else {
                                         return Promise.resolve();
@@ -271,20 +273,20 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                     </Form.Item>
                     <Form.Item
                         name="latitude"
-                        label="纬度"
+                        label={t("纬度")}
                         validateFirst
                         rules={[
                             {
                                 type: "number",
-                                message: "纬度必须为数字",
+                                message: t("纬度必须为数字"),
                                 transform: (val) => Number.parseFloat(val),
                             },
-                            { required: true, message: "纬度不能为空" },
+                            { required: true, message: t("纬度不能为空") },
                             {
                                 validator(_, val) {
                                     if (val > 90 || val < -90) {
                                         return Promise.reject(
-                                            "纬度必须在-90和90之间"
+                                            t("纬度必须在-90和90之间")
                                         );
                                     } else {
                                         return Promise.resolve();
@@ -296,7 +298,7 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                         <Input type="number" placeholder="纬度，如 22.5514" />
                     </Form.Item>
                 </Space>
-                <h3>搜索 & 预览</h3>
+                <h3>{t("搜索 & 预览")}</h3>
                 <Map
                     initialZoom={8}
                     getData={mockStudentData}
@@ -305,9 +307,9 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                     startingCoordinate={
                         !!location?.latitude && !!location.longitude
                             ? {
-                                  longitude: location.longitude,
-                                  latitude: location.latitude - 0.005,
-                              }
+                                longitude: location.longitude,
+                                latitude: location.latitude - 0.005,
+                            }
                             : undefined
                     }
                     responsive
@@ -341,10 +343,10 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                         />
                     </Card>
                 )}
-                <Form.Item label="搜索范围">
+                <Form.Item label={t("搜索范围")}>
                     <Switch
-                        checkedChildren="国际"
-                        unCheckedChildren="仅国内"
+                        checkedChildren={t("国际")}
+                        unCheckedChildren={t("仅国内")}
                         onChange={(checked) => {
                             setProvider(
                                 checked ? Provider.MAPBOX : Provider.AMAP
@@ -354,7 +356,7 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                 </Form.Item>
                 <SearchTool
                     initialValue={form.getFieldValue("school_name")}
-                    placeholder="输入学校名称"
+                    placeholder={t("输入学校名称")}
                     dataHandler={getPreview}
                     searchLimit={1}
                     item={(value, index) => (
@@ -367,7 +369,7 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                             onClick={() => setLocation(value)}
                             type={
                                 value.name === location?.name &&
-                                value.address === location?.address
+                                    value.address === location?.address
                                     ? "primary"
                                     : "text"
                             }
@@ -389,12 +391,12 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                 <p>或者手动搜索坐标：</p>
                 <p>
                     <a href="https://lbs.amap.com/tools/picker" target="new">
-                        使用高德地图
+                        {t("使用高德地图")}
                     </a>
                 </p>
                 <p>
                     <a href="https://www.google.com/maps" target="new">
-                        使用 Google Maps (需要科学上网)
+                        {t("使用 Google Maps (需要科学上网")})
                     </a>
                 </p>
                 <Form.Item>
@@ -405,11 +407,11 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                                 setPage(0);
                             }}
                         >
-                            上一步
+                            {t("上一步")}
                         </Button>
                         `
                         <Button type="primary" htmlType="submit">
-                            添加
+                            {t("添加")}
                         </Button>
                     </Space>
                 </Form.Item>

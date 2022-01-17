@@ -151,8 +151,8 @@ const InfoUpdateForm = ({
                         onChange={(val) => {
                             updateFieldVisibility(name, val);
                         }}
-                        checkedChildren="已公开"
-                        unCheckedChildren="已隐藏"
+                        checkedChildren={t("已公开")}
+                        unCheckedChildren={t("已隐藏")}
                     />
                 ),
             };
@@ -199,8 +199,8 @@ const InfoUpdateForm = ({
                 .then((res) => {
                     if (res.result === Result.result.SUCCESS) {
                         notification.success({
-                            message: "成功",
-                            description: "数据已保存",
+                            message: t("成功"),
+                            description: t("数据已保存"),
                             duration: 0.5,
                         });
                         setFields(undefined);
@@ -211,7 +211,7 @@ const InfoUpdateForm = ({
                 .catch((err) => {
                     handleApiError(err).then((res) => {
                         notification.error({
-                            message: "错误",
+                            message: t("错误"),
                             description: `未能更新学生数据。错误信息：${res.message ?? "未知错误"
                                 }`,
                         });
@@ -247,12 +247,12 @@ const InfoUpdateForm = ({
     return (
         <>
             <Form form={form} onFinish={handleFinished} layout="vertical">
-                <Divider>更新个人信息</Divider>
+                <Divider>{t("更新个人信息")}</Divider>
                 <Alert
                     message={
                         <Space>
                             <WarningOutlined />
-                            注意：你的任何改动在<b>保存后</b>才会生效
+                            {t("注意：你的任何改动在<b>保存后</b>才会生效")}
                         </Space>
                     }
                 />
@@ -262,45 +262,45 @@ const InfoUpdateForm = ({
                     rules={[
                         {
                             required: true,
-                            message: "姓名不能为空",
+                            message: t("姓名不能为空"),
                         },
                     ]}
                 >
-                    <Input placeholder="中文姓名" />
+                    <Input placeholder={t("中文姓名")} />
                 </Item>
                 <Form.Item
                     name="phone_number"
-                    label="电话号码"
+                    label={t("电话号码")}
                     rules={[
                         ({ getFieldValue }) => ({
                             validator(_, value) {
                                 const email = getFieldValue("email");
                                 if (!!!email && !!!value) {
                                     return Promise.reject(
-                                        "请在电话号码和邮箱中至少填写一项"
+                                        t("请在电话号码和邮箱中至少填写一项")
                                     );
                                 } else if (
                                     !!value &&
                                     !value.match(phonePattern) &&
                                     !isDemo
                                 ) {
-                                    return Promise.reject("请正确填写电话号码");
+                                    return Promise.reject(t("请正确填写电话号码"));
                                 } else {
                                     return Promise.resolve();
                                 }
                             },
                         }),
                     ]}
-                    tooltip="电话号码和邮箱请至少填写一项，两者都将能够作为登录的凭证"
+                    tooltip={t("电话号码和邮箱请至少填写一项，两者都将能够作为登录的凭证")}
                 >
                     <Input
-                        placeholder="请输入电话号码"
+                        placeholder={t("请输入电话号码")}
                         {...createToggleSuffix("phone_number")}
                     />
                 </Form.Item>
                 <Form.Item
                     name="email"
-                    label="邮箱"
+                    label={t("邮箱")}
                     rules={[
                         ({ getFieldValue }) => ({
                             validator(_, value) {
@@ -308,13 +308,13 @@ const InfoUpdateForm = ({
                                     getFieldValue("phone_number");
                                 if (!!!phoneNumber && !!!value) {
                                     return Promise.reject(
-                                        "请在电话号码和邮箱中至少填写一项"
+                                        t("请在电话号码和邮箱中至少填写一项")
                                     );
                                 } else if (
                                     !!value &&
                                     !value.match(emailPattern)
                                 ) {
-                                    return Promise.reject("请正确填写邮箱");
+                                    return Promise.reject(t("请正确填写邮箱"));
                                 } else {
                                     return Promise.resolve();
                                 }
@@ -323,14 +323,14 @@ const InfoUpdateForm = ({
                     ]}
                 >
                     <Input
-                        placeholder="请输入邮箱"
+                        placeholder={t("请输入邮箱")}
                         {...createToggleSuffix("email")}
                     />
                 </Form.Item>
                 <Form.Item
                     name="wxid"
                     label="微信ID"
-                    tooltip="若已填写微信所绑定的电话号码，或无微信ID，此项可不填"
+                    tooltip={t("若已填写微信所绑定的电话号码，或无微信ID，此项可不填")}
                 >
                     <Input
                         placeholder="微信唯一ID (如 asdasdkl202122skwmrt)"
@@ -339,8 +339,8 @@ const InfoUpdateForm = ({
                 </Form.Item>
                 <Form.Item
                     name="school_uid"
-                    label="去向院校"
-                    tooltip="没有找到你的学校？点击右方 + 来添加一个学校。若目前未定去向，此项可不填。海外院校请输入英文名"
+                    label={t("去向院校")}
+                    tooltip={t("没有找到你的学校？点击右方 + 来添加一个学校。若目前未定去向，此项可不填。海外院校请输入英文名")}
                 >
                     <SchoolSearchTool
                         schoolUid={schoolUid}
@@ -352,21 +352,21 @@ const InfoUpdateForm = ({
                 </Form.Item>
                 {currentSchool && (
                     <>
-                        <Form.Item label="国家">
+                        <Form.Item label={t("国家")}>
                             <Input
                                 value={currentSchool?.school_country}
                                 disabled
                                 {...createToggleSuffix("school_country")}
                             />
                         </Form.Item>
-                        <Form.Item label="省/州/郡">
+                        <Form.Item label={t("省/州/郡")}>
                             <Input
                                 value={currentSchool?.school_state_province}
                                 disabled
                                 {...createToggleSuffix("school_state_province")}
                             />
                         </Form.Item>
-                        <Form.Item label="城市">
+                        <Form.Item label={t("城市")}>
                             <Input
                                 value={currentSchool?.city}
                                 disabled
@@ -375,21 +375,21 @@ const InfoUpdateForm = ({
                         </Form.Item>
                     </>
                 )}
-                <Form.Item name="department" label="学院">
+                <Form.Item name="department" label={t("学院")}>
                     <Input
-                        placeholder="请输入你的学院名称"
+                        placeholder={t("请输入你的学院名称")}
                         {...createToggleSuffix("department")}
                     />
                 </Form.Item>
-                <Form.Item name="major" label="专业">
+                <Form.Item name="major" label={t("专业")}>
                     <Input
-                        placeholder="请输入你的专业名称"
+                        placeholder={t("请输入你的专业名称")}
                         {...createToggleSuffix("major")}
                     />
                 </Form.Item>
                 <Form.Item
                     name="visibility"
-                    label="隐私设置"
+                    label={t("隐私设置")}
                     tooltip={t(
                         "This setting determines the scope of users who can access your personal information (admin users excluded)"
                     )}
@@ -410,7 +410,7 @@ const InfoUpdateForm = ({
                 {showRoleOptions && role !== undefined && (
                     <Form.Item
                         name="role"
-                        label="权限设置"
+                        label={t("权限设置")}
                         tooltip={t(
                             "This setting determines the scope of users who can access your personal information (admin users excluded)"
                         )}
@@ -434,7 +434,7 @@ const InfoUpdateForm = ({
                         <Form.Item name="class_number" label={t("Class")}>
                             <InputNumber
                                 min={1}
-                                placeholder="请输入要变更的班级号码"
+                                placeholder={t("请输入要变更的班级号码")}
                             ></InputNumber>
                         </Form.Item>
                         <Form.Item
@@ -443,7 +443,7 @@ const InfoUpdateForm = ({
                         >
                             <InputNumber
                                 min={2019}
-                                placeholder="请输入要变更的毕业年份"
+                                placeholder={t("请输入要变更的毕业年份")}
                             ></InputNumber>
                         </Form.Item>
                     </>
@@ -451,7 +451,7 @@ const InfoUpdateForm = ({
                 <Form.Item>
                     <Space>
                         <Button type="primary" htmlType="submit">
-                            保存更改
+                            {t("保存更改")}
                         </Button>
                         <Button onClick={handleReset}>重置</Button>
                     </Space>

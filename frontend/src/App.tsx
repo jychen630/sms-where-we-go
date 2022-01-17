@@ -23,10 +23,12 @@ import FeedbackForm from "./components/FeedbackForm";
 import AboutPage from "./pages/AboutPage";
 import { notification } from "antd";
 import { isDemo } from "./api/utils";
+import { useTranslation } from "react-i18next";
 
 OpenAPI.WITH_CREDENTIALS = true;
 OpenAPI.TOKEN = "";
 function App() {
+    const [t] = useTranslation();
     const authProvider = useAuthProvider();
     const [FeedbackModal, showFeedback] = useModal({
         content: (
@@ -43,7 +45,7 @@ function App() {
                     ，给我们 Star，提 Issue 或者 PR，感谢你的支持！
                 </p>
                 <Collapse ghost>
-                    <Collapse.Panel key="feedback" header="添加反馈">
+                    <Collapse.Panel key="feedback" header={t("添加反馈")}>
                         <FeedbackForm isPublic={false} />
                     </Collapse.Panel>
                 </Collapse>
@@ -53,9 +55,9 @@ function App() {
             window.localStorage.setItem("feedback", "hidden");
         },
         modalProps: {
-            title: "你的想法对 SMS Where We Go 很重要",
-            okText: "不再显示",
-            cancelText: "下次再说",
+            title: t("你的想法对 SMS Where We Go 很重要"),
+            okText: t("不再显示"),
+            cancelText: t("下次再说"),
         },
     });
     useEffect(() => {
@@ -75,8 +77,8 @@ function App() {
                 // else, it's likely that something goes wrong with the server.
                 if (e.status !== 401) {
                     notification.error({
-                        message: "错误",
-                        description: "连接到服务器时出现问题",
+                        message: t("错误"),
+                        description: t("连接到服务器时出现问题"),
                     });
                 }
             });
@@ -87,18 +89,18 @@ function App() {
                 <Switch>
                     {(process.env.NODE_ENV === "development" || isDemo) && (
                         <Route path="/dev-login">
-                            <CardPage title="Where We Go 调试登录">
+                            <CardPage title={t("Where We Go 调试登录")}>
                                 <DevLoginForm />
                             </CardPage>
                         </Route>
                     )}
                     <Route path="/login">
-                        <CardPage title="Where We Go 登录">
+                        <CardPage title={t("Where We Go 登录")}>
                             <LoginForm />
                         </CardPage>
                     </Route>
                     <Route path="/register">
-                        <CardPage title="Where We Go 注册">
+                        <CardPage title={t("Where We Go 注册")}>
                             <RegistrationForm />
                         </CardPage>
                     </Route>
@@ -106,7 +108,7 @@ function App() {
                         <FeedbackPage />
                     </Route>
                     <Route path="/public-feedback">
-                        <CardPage title="提交反馈">
+                        <CardPage title={t("提交反馈")}>
                             <FeedbackForm isPublic />
                         </CardPage>
                     </Route>

@@ -37,7 +37,7 @@ const FeedbackForm = ({
     const [SuccessModal, showModal] = useModal({
         content: (
             <>
-                你的反馈码
+                {t("你的反馈码")}
                 <p
                     style={{
                         textAlign: "center",
@@ -47,20 +47,20 @@ const FeedbackForm = ({
                 >
                     {feedbackUid}
                 </p>
-                <p>请复制保留以备参考</p>
+                <p>{t("请复制保留以备参考")}</p>
                 {!isPublic && (
                     <p>
-                        你也可以在 反馈-查看 一栏查看你过往的反馈信息及处理结果
+                        {t("你也可以在 反馈-查看 一栏查看你过往的反馈信息及处理结果")}
                     </p>
                 )}
                 {form.getFieldValue("email") !== undefined ||
-                form.getFieldValue("phone_number") !== undefined ? (
+                    form.getFieldValue("phone_number") !== undefined ? (
                     <p>
-                        我们会通过你留下的电话号码或电子邮箱，尽快联系告知处理结果
+                        {t("我们会通过你留下的电话号码或电子邮箱，尽快联系告知处理结果")}
                     </p>
                 ) : (
                     <p>
-                        由于你未填写电话号码或电子邮箱，我们将不会主动进行联系
+                        {t("由于你未填写电话号码或电子邮箱，我们将不会主动进行联系")}
                     </p>
                 )}
             </>
@@ -84,14 +84,14 @@ const FeedbackForm = ({
                     form.resetFields();
                     cb && cb();
                     notification.success({
-                        message: "成功",
-                        description: "你的反馈已提交，管理员将会尽快处理",
+                        message: t("成功"),
+                        description: t("你的反馈已提交，管理员将会尽快处理"),
                     });
                 })
                 .catch((err) =>
                     handleApiError(
                         err,
-                        createNotifyError(t, t("Error"), "未能提交反馈")
+                        createNotifyError(t, "Error", "未能提交反馈")
                     )
                 );
         },
@@ -103,23 +103,23 @@ const FeedbackForm = ({
             <Form form={form} onFinish={handleSubmit}>
                 {isPublic && (
                     <>
-                        <Form.Item name="name" label="姓名">
+                        <Form.Item name="name" label={t("姓名")}>
                             <Input placeholder="请输入你的姓名 (选填)" />
                         </Form.Item>
                         <Divider>联系方式 (若无需回复可不填)</Divider>
-                        <Form.Item name="email" label="邮箱">
+                        <Form.Item name="email" label={t("邮箱")}>
                             <Input placeholder="请输入你的邮箱 (选填)" />
                         </Form.Item>
-                        <Form.Item name="phone_number" label="电话号码">
+                        <Form.Item name="phone_number" label={t("电话号码")}>
                             <Input placeholder="请输入你的电话号码 (选填)" />
                         </Form.Item>
-                        <Form.Item name="class_number" label="班级号码">
+                        <Form.Item name="class_number" label={t("班级号码")}>
                             <InputNumber
                                 min={1}
                                 placeholder="请输入你的班级号码 (如高三 (3)班请填3) (选填)"
                             />
                         </Form.Item>
-                        <Form.Item name="grad_year" label="毕业年份">
+                        <Form.Item name="grad_year" label={t("毕业年份")}>
                             <InputNumber
                                 min={2019}
                                 placeholder="请输入你的毕业年份 (如2021) (选填)"
@@ -130,8 +130,8 @@ const FeedbackForm = ({
                 <Divider>反馈</Divider>
                 <Form.Item
                     name="reason"
-                    label="反馈原因"
-                    rules={[{ required: true, message: "请选择反馈原因" }]}
+                    label={t("反馈原因")}
+                    rules={[{ required: true, message: t("请选择反馈原因") }]}
                     required
                 >
                     <Select>
@@ -142,19 +142,19 @@ const FeedbackForm = ({
                         ))}
                     </Select>
                 </Form.Item>
-                <Form.Item name="title" label="标题">
+                <Form.Item name="title" label={t("标题")}>
                     <Input placeholder="反馈信息的标题 (选填)" />
                 </Form.Item>
-                <Form.Item name="content" label="备注">
+                <Form.Item name="content" label={t("备注")}>
                     <Input.TextArea placeholder="对标题和反馈原因的补充信息 (选填)" />
                 </Form.Item>
                 <Space>
                     <Button type="primary" htmlType="submit">
-                        提交
+                        {t("提交")}
                     </Button>
                     {!!feedbackUid && (
                         <Button type="default" onClick={showModal}>
-                            显示反馈码
+                            {t("显示反馈码")}
                         </Button>
                     )}
                 </Space>

@@ -9,6 +9,7 @@ import {
 } from "@ant-design/icons";
 import { Layout, Menu, Space } from "antd";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router";
 import { Role } from "wwg-api";
 import { useAuth } from "../api/auth";
@@ -31,6 +32,7 @@ const AppPage = ({
     activeKey: menuOptions;
     children: React.ReactNode;
 }) => {
+    const [t] = useTranslation();
     const { role, logout } = useAuth();
     const history = useHistory();
 
@@ -44,12 +46,12 @@ const AppPage = ({
                 >
                     <Menu.Item key="map" onClick={() => history.push("/map")}>
                         <Space>
-                            <CompassOutlined /> 地图
+                            <CompassOutlined /> {t("地图")}
                         </Space>
                     </Menu.Item>
                     <Menu.Item key="list" onClick={() => history.push("/list")}>
                         <Space>
-                            <BarsOutlined /> 列表
+                            <BarsOutlined /> {t("列表")}
                         </Space>
                     </Menu.Item>
                     <Menu.Item
@@ -57,7 +59,7 @@ const AppPage = ({
                         onClick={() => history.push("/user")}
                     >
                         <Space>
-                            <SettingOutlined /> 设置
+                            <SettingOutlined /> {t("设置")}
                         </Space>
                     </Menu.Item>
                     <Menu.Item
@@ -65,7 +67,7 @@ const AppPage = ({
                         onClick={() => history.push("/feedback")}
                     >
                         <Space>
-                            <RadarChartOutlined /> 反馈
+                            <RadarChartOutlined /> {t("反馈")}
                         </Space>
                     </Menu.Item>
                     {!!role && role !== Role.STUDENT && (
@@ -74,7 +76,7 @@ const AppPage = ({
                             onClick={() => history.push("/admin")}
                         >
                             <Space>
-                                <ControlOutlined /> 管理
+                                <ControlOutlined /> {t("管理")}
                             </Space>
                         </Menu.Item>
                     )}
@@ -83,7 +85,7 @@ const AppPage = ({
                         onClick={() => history.push("/about")}
                     >
                         <Space>
-                            <InfoCircleOutlined /> 关于
+                            <InfoCircleOutlined /> {t("关于")}
                         </Space>
                     </Menu.Item>
                     <Menu.Item
@@ -94,7 +96,7 @@ const AppPage = ({
                         }}
                     >
                         <Space>
-                            <LogoutOutlined /> 登出
+                            <LogoutOutlined /> {t("登出")}
                         </Space>
                     </Menu.Item>
                 </Menu>

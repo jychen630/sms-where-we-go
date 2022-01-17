@@ -42,11 +42,11 @@ const createFilter = ({
     return {
         onFilter: filters
             ? (value: string | number | boolean, record: any) => {
-                  return (
-                      !!record[dataIndex ?? key] &&
-                      value.toString() === record[dataIndex ?? key]
-                  );
-              }
+                return (
+                    !!record[dataIndex ?? key] &&
+                    value.toString() === record[dataIndex ?? key]
+                );
+            }
             : undefined,
         filters: filters?.map((val) => ({ text: val, value: val })),
         key: key,
@@ -162,7 +162,7 @@ const ListPage = () => {
                                         />
                                     </Form.Item>
                                     {!isMobile && (
-                                        <Form.Item label="禁用提示框">
+                                        <Form.Item label={t("禁用提示框")}>
                                             <Switch
                                                 onChange={(value) =>
                                                     setPopupDisabled(value)
@@ -219,59 +219,59 @@ const ListPage = () => {
                             <Tabs.TabPane tab="列表" key={VIEW_MODE.TABLE}>
                                 <Table
                                     locale={{
-                                        filterConfirm: "确定",
-                                        filterReset: "重置",
+                                        filterConfirm: t("确定"),
+                                        filterReset: t("重置"),
                                     }}
                                     scroll={{ x: isMobile ? 1000 : 1200 }}
                                     columns={[
                                         {
-                                            title: "姓名",
+                                            title: t("姓名"),
                                             key: "name",
                                             dataIndex: "name",
                                         },
                                         createFilter({
-                                            title: "学校",
+                                            title: t("学校"),
                                             key: "school_name",
                                             filters: filters.school_name,
                                         }),
                                         createFilter({
-                                            title: "班级",
+                                            title: t("班级"),
                                             key: "class",
                                             dataIndex: "class_",
                                             filters: filters.class_,
                                         }),
                                         createFilter({
-                                            title: "体系",
+                                            title: t("体系"),
                                             key: "curriculum",
                                             dataIndex: "curriculumLocale",
                                             filters: filters.curriculumLocale,
                                         }),
                                         createFilter({
-                                            title: "城市",
+                                            title: t("城市"),
                                             key: "city",
                                             filters: filters.city,
                                         }),
                                         createFilter({
-                                            title: "省/州/郡",
+                                            title: t("省/州/郡"),
                                             key: "state_province",
                                             dataIndex: "school_state_province",
                                             filters:
                                                 filters.school_state_province,
                                         }),
                                         createFilter({
-                                            title: "国家",
+                                            title: t("国家"),
                                             key: "country",
                                             dataIndex: "school_country",
                                             filters: filters.school_country,
                                         }),
                                         createFilter({
-                                            title: "学院",
+                                            title: t("学院"),
                                             key: "department",
                                             dataIndex: "department",
                                             filters: filters.department,
                                         }),
                                         createFilter({
-                                            title: "专业",
+                                            title: t("专业"),
                                             key: "major",
                                             dataIndex: "major",
                                             filters: filters.major,

@@ -26,7 +26,7 @@ const Feedbacks = ({
             .catch((err) =>
                 handleApiError(
                     err,
-                    createNotifyError(t, t("Error"), "未能获取反馈列表")
+                    createNotifyError(t, "Error", "未能获取反馈列表")
                 )
             );
     }, [t, adminView, setFeedbacks]);
@@ -53,8 +53,8 @@ const Feedbacks = ({
             <Space direction="vertical" style={{ width: "100%" }}>
                 <Switch
                     defaultChecked={pendingOnly}
-                    checkedChildren="仅未处理项"
-                    unCheckedChildren="所有项"
+                    checkedChildren={t("仅未处理项")}
+                    unCheckedChildren={t("所有项")}
                     onChange={(val) => setPendingOnly(val)}
                 ></Switch>
                 {feedbacks.length > 0 ? (
@@ -76,7 +76,7 @@ const Feedbacks = ({
                             )
                     )
                 ) : (
-                    <Empty description="无历史反馈" />
+                    <Empty description={t("无历史反馈")} />
                 )}
             </Space>
         </>

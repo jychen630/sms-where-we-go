@@ -56,7 +56,7 @@ const UserPage = () => {
     const deleteAccount = useCallback(async () => {
         if (auth.studentUid === undefined) {
             notification.error({
-                message: "失败",
+                message: t("失败"),
                 description: t("This user is invalid, please login again"),
             });
             return;
@@ -65,8 +65,8 @@ const UserPage = () => {
             .then((res) => {
                 if (res.result === Result.result.SUCCESS) {
                     notification.success({
-                        message: "成功",
-                        description: "你的账户已经从系统中移除",
+                        message: t("成功"),
+                        description: t("你的账户已经从系统中移除"),
                     });
                     history.push("/login");
                 } else {
@@ -124,7 +124,7 @@ const UserPage = () => {
             <Modal
                 visible={showModal}
                 okType="danger"
-                okText="确认删除"
+                okText={t("确认删除")}
                 onOk={() => {
                     setShowModal(false);
                     deleteAccount();

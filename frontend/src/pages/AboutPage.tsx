@@ -17,7 +17,7 @@ const AboutPage = () => {
     const [PrivacyModal, showModal] = useModal({
         content: <PrivacyPolicy />,
         modalProps: {
-            title: "用户隐私协议",
+            title: t("用户隐私协议"),
             footer: null,
         },
     });

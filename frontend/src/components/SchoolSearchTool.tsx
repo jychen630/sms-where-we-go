@@ -74,7 +74,7 @@ const SchoolSearchTool = ({
                         err,
                         createNotifyError(
                             t,
-                            t("Error"),
+                            "Error",
                             `ID 为 ${schoolUid} 的学校不存在或者已被删除`
                         )
                     )
@@ -91,11 +91,9 @@ const SchoolSearchTool = ({
                         item={(value, index) => (
                             <Tooltip
                                 key={value.uid}
-                                title={`[uid: ${value.uid}] ${
-                                    value.school_country ?? "无"
-                                }/${value.school_state_province ?? "无"}/${
-                                    value.city ?? "无"
-                                }`}
+                                title={`[uid: ${value.uid}] ${value.school_country ?? t("无")
+                                    }/${value.school_state_province ?? t("无")}/${value.city ?? t("无")
+                                    }`}
                             >
                                 <Button
                                     onClick={() => {
@@ -128,14 +126,14 @@ const SchoolSearchTool = ({
                                     }}
                                     block
                                 >
-                                    清空
+                                    {t("清空")}
                                 </Button>
                             ) : (
-                                <Empty description="无数据" />
+                                <Empty description={t("无数据")} />
                             );
                         }}
                         initialValue={schoolUid !== -1 ? initialValue : ""}
-                        placeholder="输入学校名称"
+                        placeholder={t("输入学校名称")}
                         searchProps={searchProps}
                     />
                 </Col>
@@ -150,7 +148,7 @@ const SchoolSearchTool = ({
                 </Col>
             </Row>
             <Modal
-                title="添加学校"
+                title={t("添加学校")}
                 visible={showSchoolModal}
                 onCancel={() => setShowSchoolModal(false)}
                 footer={null}

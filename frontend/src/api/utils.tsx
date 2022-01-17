@@ -62,7 +62,7 @@ export const createNotifyError = (
      */
     return (props) => {
         notification.error({
-            message: title,
+            message: title && t ? t(title) : title,
             description: (
                 <>
                     {errorMsg && <p>{errorMsg}</p>}

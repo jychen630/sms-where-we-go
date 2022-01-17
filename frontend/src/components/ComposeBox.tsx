@@ -1,4 +1,5 @@
 import { Button, Checkbox, Form, Input } from "antd";
+import { useTranslation } from "react-i18next";
 
 type Values = { message: string; anonymous: boolean };
 export type ComposeBoxProps = {
@@ -6,6 +7,7 @@ export type ComposeBoxProps = {
     onSent?: (data: Values) => void;
 };
 const ComposeBox = ({ sendBtnLabel, onSent }: ComposeBoxProps) => {
+    const [t] = useTranslation();
     const [form] = Form.useForm<Values>();
     return (
         <Form
@@ -18,21 +20,21 @@ const ComposeBox = ({ sendBtnLabel, onSent }: ComposeBoxProps) => {
         >
             <Form.Item
                 name="message"
-                label="消息"
+                label={t("消息")}
                 rules={[
                     {
                         required: true,
-                        message: "发送内容不能为空",
+                        message: t("发送内容不能为空"),
                     },
                 ]}
             >
-                <Input.TextArea placeholder="在此处编辑消息" />
+                <Input.TextArea placeholder={t("在此处编辑消息")} />
             </Form.Item>
             <Button type="primary" htmlType="submit">
-                {sendBtnLabel ?? "发送"}
+                {sendBtnLabel ?? t("发送")}
             </Button>
             <Form.Item name="anonymous" valuePropName="checked">
-                <Checkbox>匿名</Checkbox>
+                <Checkbox>{t("匿名")}</Checkbox>
             </Form.Item>
         </Form>
     );

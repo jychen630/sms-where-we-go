@@ -55,7 +55,7 @@ const DevLoginForm = () => {
                     {users.map((value) => (
                         <Select.Option key={value.uid} value={value.uid}>
                             {value.name} <Badge>{value.uid}</Badge>
-                            <p>权限: {t(value.role.toUpperCase())}</p>
+                            <p>{t("权限")}: {t(value.role.toUpperCase())}</p>
                         </Select.Option>
                     ))}
                 </Select>
