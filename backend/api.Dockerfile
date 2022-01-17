@@ -9,15 +9,16 @@ RUN yarn
 # Apply patches
 COPY patches ./patches
 RUN yarn patch-package
+# Generate the client package
+COPY openapi.yaml ./
+RUN yarn generate
 
 FROM node:16-alpine as openapi-build
 WORKDIR /app
 COPY src/generated/package.json src/generated/yarn.lock ./
 RUN yarn
-COPY src/generated/index.ts src/generated/tsconfig.json ./
-COPY src/generated/core ./core
-COPY src/generated/models ./models
-COPY src/generated/services ./services
+COPY --from=dependencies /app/src/generated ./
+COPY src/generated/package.json src/generated/tsconfig.json ./
 RUN yarn tsc -b
 
 # This prepares for build and is used as the target for development environment
@@ -38,6 +39,7 @@ FROM node:16-alpine as production
 WORKDIR /app
 COPY package.json openapi.yaml docker-entrypoint.sh ./
 COPY --from=dependencies /app/node_modules ./node_modules
+COPY --from=openapi-build /app/build ./src/generated/build
 COPY --from=source /app/build ./build
 #CMD yarn start-prod, ./ means execucion,dont write sh
 ENV API_ENV=production
