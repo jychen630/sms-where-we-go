@@ -20,7 +20,7 @@ const Schools = () => {
                 .catch((err) => {
                     handleApiError(
                         err,
-                        createNotifyError(t, "错误", "未能获取学校")
+                        createNotifyError(t("Error"), t("未能获取学校"))
                     );
                     return [];
                 });
@@ -34,7 +34,10 @@ const Schools = () => {
                 if (res.result === Result.result.SUCCESS) {
                     notification.success({
                         message: t("成功"),
-                        description: `已移除学校 ${school.school_name} (uid: ${school.uid})`,
+                        description: t("REMOVE SCHOOL SUCCESS", {
+                            schooName: school.school_name,
+                            schoolUid: school.uid
+                        }),
                     });
                 } else {
                     return Promise.reject(res.message);
@@ -43,7 +46,7 @@ const Schools = () => {
             .catch((err) =>
                 handleApiError(
                     err,
-                    createNotifyError(t, "错误", "未能移除学校")
+                    createNotifyError(t("Error"), t("未能移除学校"))
                 )
             );
     };

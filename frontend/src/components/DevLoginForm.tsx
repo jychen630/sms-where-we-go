@@ -23,7 +23,6 @@ const DevLoginForm = () => {
                 handleApiError(
                     err,
                     createNotifyError(
-                        t,
                         t("Error"),
                         t("Failed to fetch available users")
                     )
@@ -40,7 +39,6 @@ const DevLoginForm = () => {
                 handleApiError(
                     err,
                     createNotifyError(
-                        t,
                         t("Error"),
                         t("Failed to login as dev")
                     )

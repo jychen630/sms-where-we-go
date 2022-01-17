@@ -128,7 +128,7 @@ const RegistrationForm = () => {
                 }
             })
             .catch((err) =>
-                handleApiError(err, createNotifyError(t, "注册失败"))
+                handleApiError(err, createNotifyError(t("注册失败")))
             );
     };
 
@@ -279,7 +279,7 @@ const RegistrationForm = () => {
                 </Form.Item>
                 <Form.Item
                     name="phone_number"
-                    label={t("电话号码")}
+                    label={t("Phone Number")}
                     rules={[
                         ({ getFieldValue }) => ({
                             validator(_, value) {
@@ -306,7 +306,7 @@ const RegistrationForm = () => {
                 </Form.Item>
                 <Form.Item
                     name="email"
-                    label={t("邮箱")}
+                    label={t("Email")}
                     rules={[
                         ({ getFieldValue }) => ({
                             validator(_, value) {
@@ -332,7 +332,7 @@ const RegistrationForm = () => {
                 </Form.Item>
                 <Form.Item
                     name="wxid"
-                    label="微信ID"
+                    label={t("微信ID")}
                     tooltip={t("若已填写微信所绑定的电话号码，或无微信ID，此项可不填")}
                 >
                     <Input placeholder={t("WECHAT ID TOOLTIP", { exampleId: "asdasdkl202122skwmrt" })} />
@@ -341,11 +341,11 @@ const RegistrationForm = () => {
                     name="school_uid"
                     label={
                         <>
-                            {t("去向院校 (找不到的院校可在右侧")}{" "}
+                            {t("REG SCHOOL TOOLTIP (")}{" "}
                             <PlusCircleOutlined
                                 style={{ paddingLeft: 2, paddingRight: 2 }}
                             />{" "}
-                            {t("添加")})
+                            {t("REG SCHOOL TOOLTIP )")}
                         </>
                     }
                     tooltip={t("ADD SCHOOL TOOLTIP")}

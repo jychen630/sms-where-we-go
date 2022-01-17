@@ -74,7 +74,7 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                         message: t("ADD SCHOOL SUCCESS"),
                         description: (
                             <>
-                                已添加{data.school_name} (uid {res.school_uid})
+                                {t("Added")} {data.school_name} (uid {res.school_uid})
                             </>
                         ),
                     });
@@ -218,7 +218,7 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                         onClick={() => {
                             if (currentTab === "select" && cityUid === -1) {
                                 notification.error({
-                                    message: t("错误"),
+                                    message: t("Error"),
                                     description: t("城市不能为空"),
                                     duration: 1.5,
                                 });

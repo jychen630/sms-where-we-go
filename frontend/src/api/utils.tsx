@@ -1,8 +1,12 @@
 import { notification } from "antd";
-import { TFunction } from "react-i18next";
 import React from "react";
 import { ApiError, OpenAPI, Result } from "wwg-api";
 import i18n from "../i18n";
+
+
+const errIsValid = (err: unknown): err is Partial<ApiError> => {
+    return typeof err === "object" && err !== null;
+}
 
 type ProcessedError = Result & { requireLogin: boolean };
 /**
@@ -11,7 +15,7 @@ type ProcessedError = Result & { requireLogin: boolean };
  * @returns
  */
 export const handleApiError = async (
-    err: ApiError | string | undefined,
+    err: ApiError | string | undefined | unknown,
     cb?: (props: ProcessedError) => void
 ): Promise<ProcessedError> => {
     let requireLogin = false;
@@ -26,7 +30,7 @@ export const handleApiError = async (
             message: err,
             requireLogin: requireLogin,
         };
-    } else if (err === undefined) {
+    } else if (err === undefined || !errIsValid(err)) {
         error = {
             result: Result.result.ERROR,
             message: i18n.t("发生了未知错误"),
@@ -50,7 +54,6 @@ export const handleApiError = async (
 };
 
 export const createNotifyError = (
-    t?: TFunction<"translation">,
     title?: string,
     errorMsg?: string,
     cb?: (err: ProcessedError) => void
@@ -63,13 +66,11 @@ export const createNotifyError = (
      */
     return (props) => {
         notification.error({
-            message: title && t ? t(title) : title,
+            message: title,
             description: (
                 <>
                     {errorMsg && <p>{errorMsg}</p>}
-                    {props.message && (
-                        <p>{t ? t(props.message) : props.message}</p>
-                    )}
+                    {props.message}
                 </>
             ),
         });

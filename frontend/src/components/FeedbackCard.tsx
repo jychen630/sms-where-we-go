@@ -47,7 +47,7 @@ const FeedbackCard = (props: FeedbackVerbose & { adminView: boolean }) => {
                 .catch((err) =>
                     handleApiError(
                         err,
-                        createNotifyError(t, "Error", "未能更新反馈状态")
+                        createNotifyError(t("Error"), t("未能更新反馈状态"))
                     )
                 );
         },
@@ -100,7 +100,7 @@ const FeedbackCard = (props: FeedbackVerbose & { adminView: boolean }) => {
                 .catch((err) =>
                     handleApiError(
                         err,
-                        createNotifyError(t, "Error", "发送评论失败")
+                        createNotifyError(t("Error"), t("发送评论失败"))
                     )
                 );
         },

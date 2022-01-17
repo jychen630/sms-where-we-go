@@ -29,7 +29,7 @@ const PasswordResetForm = ({ studentUid }: { studentUid?: number }) => {
                 .catch((err) =>
                     handleApiError(
                         err,
-                        createNotifyError(t, "失败", "更改密码失败")
+                        createNotifyError(t("Error"), t("更改密码失败"))
                     )
                 );
         },

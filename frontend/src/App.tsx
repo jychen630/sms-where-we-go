@@ -77,7 +77,7 @@ function App() {
                 // else, it's likely that something goes wrong with the server.
                 if (e.status !== 401) {
                     notification.error({
-                        message: t("错误"),
+                        message: t("Error"),
                         description: t("连接到服务器时出现问题"),
                     });
                 }

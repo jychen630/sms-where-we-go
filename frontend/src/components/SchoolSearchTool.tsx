@@ -73,9 +73,10 @@ const SchoolSearchTool = ({
                     handleApiError(
                         err,
                         createNotifyError(
-                            t,
-                            "Error",
-                            `ID 为 ${schoolUid} 的学校不存在或者已被删除`
+                            t("Error"),
+                            t("REMOVE SCHOOL FAILURE", {
+                                schoolUid: schoolUid
+                            })
                         )
                     )
                 );

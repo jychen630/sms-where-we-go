@@ -48,8 +48,7 @@ const RegistrationKeyForm = (props: {
                 handleApiError(
                     err,
                     createNotifyError(
-                        t,
-                        t("失败"),
+                        t("Error"),
                         t("未能获取可用班级"),
                         (err) =>
                             err.requireLogin &&
@@ -94,9 +93,11 @@ const RegistrationKeyForm = (props: {
                             handleApiError(
                                 err,
                                 createNotifyError(
-                                    t,
-                                    "Error",
-                                    `未能添加${class_.grad_year}届 ${class_.class_number}的注册码`
+                                    t("Error"),
+                                    t("ADD REGKEY FAILURE", {
+                                        gradYear: class_.grad_year,
+                                        classNumber: class_.class_number
+                                    })
                                 )
                             )
                         );
@@ -163,7 +164,7 @@ const RegistrationKey = () => {
             .catch((err) =>
                 handleApiError(
                     err,
-                    createNotifyError(t, "失败", "未能获取注册码")
+                    createNotifyError(t("Error"), t("未能获取注册码"))
                 )
             );
     }, [t, notExpired]);
@@ -188,7 +189,7 @@ const RegistrationKey = () => {
         <>
             <Space direction="vertical">
                 <Button onClick={showModal}>
-                    <PlusOutlined /> 添加注册码
+                    <PlusOutlined /> {t("添加注册码")}
                 </Button>
                 <Switch
                     defaultChecked={notExpired}
@@ -227,7 +228,7 @@ const RegistrationKey = () => {
                                         .catch((err) =>
                                             handleApiError(
                                                 err,
-                                                createNotifyError(t, "错误")
+                                                createNotifyError(t("Error"))
                                             )
                                         );
                                 }}

@@ -22,9 +22,8 @@ const MapPage = () => {
                 handleApiError(
                     err,
                     createNotifyError(
-                        t,
-                        "错误",
-                        "未能获取地图数据",
+                        t("Error"),
+                        t("未能获取地图数据"),
                         (err) =>
                             err.requireLogin &&
                             setTimeout(

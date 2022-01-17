@@ -100,8 +100,7 @@ const ListPage = () => {
                 handleApiError(
                     err,
                     createNotifyError(
-                        t,
-                        "错误",
+                        t("Error"),
                         undefined,
                         (err) =>
                             err.requireLogin &&

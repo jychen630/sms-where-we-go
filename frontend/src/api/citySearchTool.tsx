@@ -30,7 +30,7 @@ const useSearchCity: () => [() => JSX.Element, number] = () => {
             } catch (err) {
                 handleApiError(
                     err,
-                    createNotifyError(t, "错误", "获取城市列表失败")
+                    createNotifyError(t("Error"), t("获取城市列表失败"))
                 );
             }
         },

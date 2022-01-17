@@ -48,7 +48,7 @@ const Classes = () => {
             .catch((err) =>
                 handleApiError(
                     err,
-                    createNotifyError(t, "Error", "未能获取可用班级")
+                    createNotifyError(t("Error"), t("未能获取可用班级"))
                 )
             );
     }, [t, setClasses]);
@@ -106,7 +106,7 @@ const Classes = () => {
                 })
                 .catch((_) => {
                     notification.error({
-                        message: t("失败"),
+                        message: t("Error"),
                         description: (
                             <>
                                 {t("未能创建部分班级")}
@@ -134,7 +134,7 @@ const Classes = () => {
                 if (res.result === Result.result.SUCCESS) {
                     notification.success({
                         message: t("成功"),
-                        description: t("CLASS SPECIFIC", { gradYear: gradYear, classNumber: classNumber }),
+                        description: t("DELETED CLASS SPECIFIC", { gradYear: gradYear, classNumber: classNumber }),
                         duration: 1,
                     });
                     fetchClasses();
@@ -145,7 +145,7 @@ const Classes = () => {
             .catch((err) =>
                 handleApiError(
                     err,
-                    createNotifyError(t, "错误", "班级删除失败")
+                    createNotifyError(t("Error"), t("班级删除失败"))
                 )
             );
     };

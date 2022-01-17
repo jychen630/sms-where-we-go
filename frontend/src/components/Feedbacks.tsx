@@ -26,7 +26,7 @@ const Feedbacks = ({
             .catch((err) =>
                 handleApiError(
                     err,
-                    createNotifyError(t, "Error", "未能获取反馈列表")
+                    createNotifyError(t("Error"), t("未能获取反馈列表"))
                 )
             );
     }, [t, adminView, setFeedbacks]);

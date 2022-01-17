@@ -39,15 +39,15 @@ const AboutPage = () => {
             category: t("Links"),
             isBlocks: true,
             items: [
-                <Button
+                <><Button
                     size="large"
                     type="link"
                     icon={<GithubOutlined />}
                     target="_blank"
                     href="https://github.com/AcKindle3/sms-where-we-go"
                 >
-                    {t("GITHUB WELCOME TOOLTIP")}
-                </Button>,
+                    GitHub
+                </Button><p>{t("GITHUB WELCOME TOOLTIP")}</p></>,
             ],
         },
         {

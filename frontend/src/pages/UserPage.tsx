@@ -35,12 +35,11 @@ const UserPage = () => {
             } else {
                 return;
             }
-        } catch (err) {
+        } catch (err: any) {
             handleApiError(
                 err,
                 createNotifyError(
-                    t,
-                    "错误",
+                    t("Error"),
                     undefined,
                     (err) =>
                         err.requireLogin &&
@@ -56,7 +55,7 @@ const UserPage = () => {
     const deleteAccount = useCallback(async () => {
         if (auth.studentUid === undefined) {
             notification.error({
-                message: t("失败"),
+                message: t("Error"),
                 description: t("This user is invalid, please login again"),
             });
             return;
@@ -76,7 +75,7 @@ const UserPage = () => {
             .catch((err) => {
                 handleApiError(
                     err,
-                    createNotifyError(t, "失败", "未能将你的账户移除")
+                    createNotifyError(t("Error"), t("未能将你的账户移除"))
                 );
             });
     }, [t, history, auth.studentUid]);

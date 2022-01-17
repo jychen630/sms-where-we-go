@@ -72,8 +72,7 @@ const Users = () => {
                 handleApiError(
                     err,
                     createNotifyError(
-                        t,
-                        t("错误"),
+                        t("Error"),
                         t("未能获取学生数据")
                     )
                 );
@@ -88,8 +87,7 @@ const Users = () => {
                 handleApiError(
                     err,
                     createNotifyError(
-                        t,
-                        t("错误"),
+                        t("Error"),
                         t("未能获取学生数据")
                     )
                 )

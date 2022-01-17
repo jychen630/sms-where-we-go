@@ -211,7 +211,7 @@ const InfoUpdateForm = ({
                 .catch((err) => {
                     handleApiError(err).then((res) => {
                         notification.error({
-                            message: t("错误"),
+                            message: t("Error"),
                             description: t("UPDATE STUDENT INFO FAILURE", {
                                 message: res.message ?? t("ERR UNKNOWN"),
                             }),

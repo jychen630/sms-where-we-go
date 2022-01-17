@@ -91,7 +91,7 @@ const FeedbackForm = ({
                 .catch((err) =>
                     handleApiError(
                         err,
-                        createNotifyError(t, "Error", "未能提交反馈")
+                        createNotifyError(t("Error"), t("未能提交反馈"))
                     )
                 );
         },
@@ -103,26 +103,26 @@ const FeedbackForm = ({
             <Form form={form} onFinish={handleSubmit}>
                 {isPublic && (
                     <>
-                        <Form.Item name="name" label={t("姓名")}>
-                            <Input placeholder="请输入你的姓名 (选填)" />
+                        <Form.Item name="name" label={t("Name")}>
+                            <Input placeholder={t("请输入你的姓名 (选填)")} />
                         </Form.Item>
-                        <Divider>联系方式 (若无需回复可不填)</Divider>
-                        <Form.Item name="email" label={t("邮箱")}>
-                            <Input placeholder="请输入你的邮箱 (选填)" />
+                        <Divider>{t("联系方式 (若无需回复可不填)")}</Divider>
+                        <Form.Item name="email" label={t("Email")}>
+                            <Input placeholder={t("请输入你的邮箱 (选填)")} />
                         </Form.Item>
-                        <Form.Item name="phone_number" label={t("电话号码")}>
-                            <Input placeholder="请输入你的电话号码 (选填)" />
+                        <Form.Item name="phone_number" label={t("Phone Number")}>
+                            <Input placeholder={t("请输入你的电话号码 (选填)")} />
                         </Form.Item>
                         <Form.Item name="class_number" label={t("班级号码")}>
                             <InputNumber
                                 min={1}
-                                placeholder="请输入你的班级号码 (如高三 (3)班请填3) (选填)"
+                                placeholder={t("请输入你的班级号码 (如高三 (3)班请填3) (选填)")}
                             />
                         </Form.Item>
                         <Form.Item name="grad_year" label={t("毕业年份")}>
                             <InputNumber
                                 min={2019}
-                                placeholder="请输入你的毕业年份 (如2021) (选填)"
+                                placeholder={t("请输入你的毕业年份 (如2021) (选填)")}
                             />
                         </Form.Item>
                     </>

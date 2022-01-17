@@ -64,7 +64,7 @@ const LoginForm = () => {
                     }
                 })
                 .catch((err) =>
-                    handleApiError(err, createNotifyError(t, "Login Failure"))
+                    handleApiError(err, createNotifyError(t("Login Failure")))
                 );
         },
         [t, auth, history, location]
