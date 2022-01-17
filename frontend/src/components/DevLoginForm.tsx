@@ -9,7 +9,7 @@ import { createNotifyError, handleApiError, ThenType } from "../api/utils";
 type Values = { uid: number };
 const DevLoginForm = () => {
     const [t] = useTranslation();
-    const { devLogin } = useAuth();
+    const { devLogin, studentUid } = useAuth();
     const history = useHistory();
     const [form] = Form.useForm<Values>();
     const [users, setUsers] = useState<
@@ -30,11 +30,12 @@ const DevLoginForm = () => {
             );
     }, [t, setUsers]);
 
+    useEffect(() => {
+        if (studentUid !== undefined) history.push("/map");
+    }, [history, studentUid]);
+
     const handleFinish = (data: Values) => {
         devLogin(data.uid)
-            .then(() => {
-                history.push("/map");
-            })
             .catch((err) =>
                 handleApiError(
                     err,

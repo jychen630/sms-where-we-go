@@ -90,7 +90,8 @@ const LoginForm = () => {
                                     !!value &&
                                     !value.match(phonePattern) &&
                                     !value.match(emailPattern) &&
-                                    !isDemo
+                                    !isDemo &&
+                                    process.env.NODE_ENV !== "development"
                                 ) {
                                     return Promise.reject(
                                         t("FILL IN CORRECTLY")
