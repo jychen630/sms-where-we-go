@@ -202,7 +202,7 @@ const RegistrationForm = () => {
                                 placement="bottom"
                                 title={t("为了安全性，注册码将会在创建后一段时间过期")}
                             >
-                                <span className="underdotted">过期时间</span>
+                                <span className="underdotted">{t("过期时间")}</span>
                             </Tooltip>
                             :{" "}
                             <Text type="success" strong>
@@ -335,7 +335,7 @@ const RegistrationForm = () => {
                     label="微信ID"
                     tooltip={t("若已填写微信所绑定的电话号码，或无微信ID，此项可不填")}
                 >
-                    <Input placeholder="微信唯一ID (如 asdasdkl202122skwmrt)" />
+                    <Input placeholder={t("WECHAT ID TOOLTIP", { exampleId: "asdasdkl202122skwmrt" })} />
                 </Form.Item>
                 <Form.Item
                     name="school_uid"
@@ -348,7 +348,7 @@ const RegistrationForm = () => {
                             {t("添加")})
                         </>
                     }
-                    tooltip={t("没有找到你的学校？点击右方 + 来添加一个学校。若目前未定去向，此项可不填。海外院校请输入英文名")}
+                    tooltip={t("ADD SCHOOL TOOLTIP")}
                 >
                     <SchoolSearchTool
                         schoolUid={schoolUid}

@@ -70,7 +70,7 @@ const InfoList = (props: StudentInfo & { hideName?: boolean }) => {
             <Optional
                 content={
                     !!props.grad_year && !!props.class_number
-                        ? props.grad_year + "届" + props.class_number + "班"
+                        ? t("CLASS SPECIFIC", { gradYear: props.grad_year, classNumber: props.class_number })
                         : ""
                 }
                 icon={<HomeFilled />}

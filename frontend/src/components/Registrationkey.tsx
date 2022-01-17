@@ -112,7 +112,11 @@ const RegistrationKeyForm = (props: {
                                     {registrationKeys
                                         .map(
                                             (val) =>
-                                                `${val.registrationKey} (${val.gradYear}届 ${val.classNumber}班)`
+                                                t("REGKEY CREATION", {
+                                                    registrationKey: val.registrationKey,
+                                                    gradYear: val.gradYear,
+                                                    classNumber: val.classNumber
+                                                })
                                         )
                                         .join(",")}
                                 </p>
@@ -135,7 +139,10 @@ const RegistrationKeyForm = (props: {
                             key={index}
                             value={JSON.stringify(value)}
                         >
-                            {value.grad_year}届 {value.class_number}班
+                            {t("CLASS SPECIFIC", {
+                                gradYear: value.grad_year,
+                                classNumber: value.class_number
+                            })}
                         </Select.Option>
                     ))}
                 </Select>

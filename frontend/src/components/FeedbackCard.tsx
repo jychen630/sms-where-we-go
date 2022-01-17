@@ -111,10 +111,10 @@ const FeedbackCard = (props: FeedbackVerbose & { adminView: boolean }) => {
         <Card>
             <Optional content={props.feedback_uid} label={t("反馈码")} />
             <Optional
-                content={`${props.grad_year}届 ${props.class_number}班`}
+                content={t("CLASS SPECIFIC", { gradYear: props.grad_year, classNumber: props.class_number })}
                 dependencies={[props.grad_year, props.class_number]}
                 label={t("Class")}
-                nullAlt={<h3>{t("公开反馈 (对所有管理员可见")})</h3>}
+                nullAlt={<h3>{t("PUBLIC FEEDBACK TITLE")})</h3>}
             />
             <Optional content={props.name} label={t("Name")} />
             <Optional content={props.phone_number} label={t("Phone Number")} />

@@ -127,7 +127,7 @@ const FeedbackForm = ({
                         </Form.Item>
                     </>
                 )}
-                <Divider>反馈</Divider>
+                <Divider>{t("反馈")}</Divider>
                 <Form.Item
                     name="reason"
                     label={t("反馈原因")}
@@ -143,10 +143,10 @@ const FeedbackForm = ({
                     </Select>
                 </Form.Item>
                 <Form.Item name="title" label={t("标题")}>
-                    <Input placeholder="反馈信息的标题 (选填)" />
+                    <Input placeholder={t("反馈信息的标题 (选填)")} />
                 </Form.Item>
                 <Form.Item name="content" label={t("备注")}>
-                    <Input.TextArea placeholder="对标题和反馈原因的补充信息 (选填)" />
+                    <Input.TextArea placeholder={t("对标题和反馈原因的补充信息 (选填)")} />
                 </Form.Item>
                 <Space>
                     <Button type="primary" htmlType="submit">

@@ -69,7 +69,10 @@ const ListPage = () => {
 
     const studentsData = students.map((val, index) => ({
         key: index,
-        class_: `${val.grad_year}届 ${val.class_number}班`,
+        class_: t("CLASS SPECIFIC", {
+            gradYear: val.grad_year,
+            classNumber: val.class_number
+        }),
         curriculumLocale: t(val.curriculum ?? ""),
         ...val,
     }));
@@ -216,7 +219,7 @@ const ListPage = () => {
                                         ))}
                                 </Space>
                             </Tabs.TabPane>
-                            <Tabs.TabPane tab="列表" key={VIEW_MODE.TABLE}>
+                            <Tabs.TabPane tab={t("列表")} key={VIEW_MODE.TABLE}>
                                 <Table
                                     locale={{
                                         filterConfirm: t("确定"),

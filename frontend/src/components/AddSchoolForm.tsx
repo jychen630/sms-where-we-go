@@ -86,7 +86,7 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
             .catch((err) =>
                 handleApiError(err).then((res) => {
                     notification.error({
-                        message: t("Fail to add the school"),
+                        message: t("Failed to add the school"),
                         description: res.message ?? t("ERROR ADD SCHOOL"),
                     });
                 })
@@ -116,7 +116,7 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                 city: location?.city ?? "",
             },
         ];
-    }, [location]);
+    }, [t, location]);
 
     const getPreview = useCallback(
         async (props: PaginatedQuery): Promise<Location[]> => {
@@ -151,7 +151,7 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                         },
                     ]}
                 >
-                    <Input placeholder={t("Fill in the official school name")}/>
+                    <Input placeholder={t("Fill in the official school name")} />
                 </Form.Item>
                 <Tabs
                     defaultActiveKey="select"
@@ -164,7 +164,7 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                     </Tabs.TabPane>
                     <Tabs.TabPane
                         key="add"
-                        tab="添加城市 (国外/国内未收录地区)"
+                        tab={t("添加城市 (国外/国内未收录地区)")}
                     >
                         <Form.Item
                             name="city"
@@ -183,13 +183,13 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                                 },
                             ]}
                         >
-                            <Input placeholder="学校所在的城市 (海外地区请填写英文)" />
+                            <Input placeholder={t("学校所在的城市 (海外地区请填写英文)")} />
                         </Form.Item>
                         <Form.Item
                             name="school_state_province"
                             label={t("省份/州/郡")}
                         >
-                            <Input placeholder="学校所在的省份，州或郡 (海外地区请填写英文)" />
+                            <Input placeholder={t("学校所在的省份，州或郡 (海外地区请填写英文)")} />
                         </Form.Item>
                         <Form.Item
                             name="school_country"
@@ -208,7 +208,7 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                                 },
                             ]}
                         >
-                            <Input placeholder="学校的所在的国家 (海外地区请填写英文)" />
+                            <Input placeholder={t("学校的所在的国家 (海外地区请填写英文)")} />
                         </Form.Item>
                     </Tabs.TabPane>
                 </Tabs>
@@ -270,7 +270,7 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                             },
                         ]}
                     >
-                        <Input type="number" placeholder="经度，如 114.1216" />
+                        <Input type="number" placeholder={t("LONGITUDE PLACEHOLDER", { exampleValue: 114.1216 })} />
                     </Form.Item>
                     <Form.Item
                         name="latitude"
@@ -296,7 +296,7 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                             },
                         ]}
                     >
-                        <Input type="number" placeholder="纬度，如 22.5514" />
+                        <Input type="number" placeholder={t("LATITUDE PLACEHOLDER", { exampleValue: 22.5514 })} />
                     </Form.Item>
                 </Space>
                 <h3>{t("搜索 & 预览")}</h3>
@@ -389,7 +389,7 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                         </Button>
                     )}
                 />
-                <p>或者手动搜索坐标：</p>
+                <p>{t("或者手动搜索坐标")}</p>
                 <p>
                     <a href="https://lbs.amap.com/tools/picker" target="new">
                         {t("使用高德地图")}
@@ -397,7 +397,7 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                 </p>
                 <p>
                     <a href="https://www.google.com/maps" target="new">
-                        {t("使用 Google Maps (需要科学上网")})
+                        {t("使用 Google Maps (需要科学上网)")})
                     </a>
                 </p>
                 <Form.Item>

@@ -157,7 +157,7 @@ const InfoUpdateForm = ({
                 ),
             };
         },
-        [fieldVisibility, updateFieldVisibility]
+        [t, fieldVisibility, updateFieldVisibility]
     );
 
     const initialize = useCallback(() => {
@@ -212,8 +212,9 @@ const InfoUpdateForm = ({
                     handleApiError(err).then((res) => {
                         notification.error({
                             message: t("错误"),
-                            description: `未能更新学生数据。错误信息：${res.message ?? "未知错误"
-                                }`,
+                            description: t("UPDATE STUDENT INFO FAILURE", {
+                                message: res.message ?? t("ERR UNKNOWN"),
+                            }),
                         });
                     });
                 })
@@ -252,13 +253,13 @@ const InfoUpdateForm = ({
                     message={
                         <Space>
                             <WarningOutlined />
-                            {t("注意：你的任何改动在<b>保存后</b>才会生效")}
+                            {t("SAVE WARNING TIP")}
                         </Space>
                     }
                 />
                 <Item
                     name="name"
-                    label={t("name")}
+                    label={t("Name")}
                     rules={[
                         {
                             required: true,
@@ -270,7 +271,7 @@ const InfoUpdateForm = ({
                 </Item>
                 <Form.Item
                     name="phone_number"
-                    label={t("电话号码")}
+                    label={t("Phone Number")}
                     rules={[
                         ({ getFieldValue }) => ({
                             validator(_, value) {
@@ -329,18 +330,18 @@ const InfoUpdateForm = ({
                 </Form.Item>
                 <Form.Item
                     name="wxid"
-                    label="微信ID"
+                    label={t("微信ID")}
                     tooltip={t("若已填写微信所绑定的电话号码，或无微信ID，此项可不填")}
                 >
                     <Input
-                        placeholder="微信唯一ID (如 asdasdkl202122skwmrt)"
+                        placeholder={t("WECHAT ID TOOLTIP", { exampleId: "asdasdkl202122skwmrt" })}
                         {...createToggleSuffix("wxid")}
                     />
                 </Form.Item>
                 <Form.Item
                     name="school_uid"
                     label={t("去向院校")}
-                    tooltip={t("没有找到你的学校？点击右方 + 来添加一个学校。若目前未定去向，此项可不填。海外院校请输入英文名")}
+                    tooltip={t("ADD SCHOOL TOOLTIP")}
                 >
                     <SchoolSearchTool
                         schoolUid={schoolUid}
@@ -453,7 +454,7 @@ const InfoUpdateForm = ({
                         <Button type="primary" htmlType="submit">
                             {t("保存更改")}
                         </Button>
-                        <Button onClick={handleReset}>重置</Button>
+                        <Button onClick={handleReset}>{t("重置")}</Button>
                     </Space>
                 </Form.Item>
             </Form>

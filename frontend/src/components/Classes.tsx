@@ -79,7 +79,7 @@ const Classes = () => {
                         .then((res) => {
                             if (res.result === Result.result.SUCCESS) {
                                 successes.push(
-                                    `${data.grad_year}届 ${lower + index}班`
+                                    t("CLASS SPECIFIC", { gradYear: data.grad_year, classNumber: lower + index })
                                 );
                                 return Promise.resolve();
                             } else {
@@ -134,7 +134,7 @@ const Classes = () => {
                 if (res.result === Result.result.SUCCESS) {
                     notification.success({
                         message: t("成功"),
-                        description: `已移除${gradYear}届 ${classNumber}班`,
+                        description: t("CLASS SPECIFIC", { gradYear: gradYear, classNumber: classNumber }),
                         duration: 1,
                     });
                     fetchClasses();

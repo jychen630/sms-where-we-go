@@ -46,7 +46,7 @@ const AboutPage = () => {
                     target="_blank"
                     href="https://github.com/AcKindle3/sms-where-we-go"
                 >
-                    欢迎各位star, 提issue和PR
+                    {t("GITHUB WELCOME TOOLTIP")}
                 </Button>,
             ],
         },
@@ -58,7 +58,7 @@ const AboutPage = () => {
                     onClick={showModal}
                     icon={<BookOutlined />}
                 >
-                    用户隐私协议
+                    {t("用户隐私协议")}
                 </Button>,
             ],
         },

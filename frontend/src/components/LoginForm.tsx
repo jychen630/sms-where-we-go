@@ -123,7 +123,7 @@ const LoginForm = () => {
                             {t("Login")}
                         </Button>
                         <Button onClick={() => history.push("/register")}>
-                            {t("To sign up")}
+                            {t("SWITCH SIGN UP")}
                         </Button>
                         <Button
                             type="link"

@@ -15,7 +15,7 @@ import { useCallback } from "react";
 import StudentSearchTool from "./StudentSearchTool";
 import MapControl from "./MapControl";
 
-mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_TOKEN as string;
+mapboxgl.accessToken = "pk.eyJ1IjoiYWNraW5kbGUzIiwiYSI6ImNrYzYzcWFnOTA5bjQycnRlY2t4OWxlMWUifQ.a3wwi4cHq1sHakuoT9Bo0w";
 
 export type MapItem = School & { students?: (Student & StudentVerbose)[] };
 
