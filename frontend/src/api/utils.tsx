@@ -2,6 +2,7 @@ import { notification } from "antd";
 import { TFunction } from "react-i18next";
 import React from "react";
 import { ApiError, OpenAPI, Result } from "wwg-api";
+import i18n from "../i18n";
 
 type ProcessedError = Result & { requireLogin: boolean };
 /**
@@ -16,7 +17,7 @@ export const handleApiError = async (
     let requireLogin = false;
     let error = {
         result: Result.result.ERROR,
-        message: "发生了未知错误",
+        message: i18n.t("发生了未知错误"),
         requireLogin: requireLogin,
     };
     if (typeof err === "string") {
@@ -28,7 +29,7 @@ export const handleApiError = async (
     } else if (err === undefined) {
         error = {
             result: Result.result.ERROR,
-            message: "发生了未知错误",
+            message: i18n.t("发生了未知错误"),
             requireLogin: requireLogin,
         };
     } else {
@@ -39,7 +40,7 @@ export const handleApiError = async (
         if (!!err.body) {
             error = {
                 result: err.body.result ?? Result.result.ERROR,
-                message: err.body.message ?? "发生了未知错误",
+                message: err.body.message ?? i18n.t("发生了未知错误"),
                 requireLogin: requireLogin,
             };
         }

@@ -320,9 +320,8 @@ export default function Map({
             </Modal>
             {!modalMode && !responsive && (
                 <div
-                    className={`info-bar-container${
-                        infoBarHidden ? " info-bar-hidden" : ""
-                    }`}
+                    className={`info-bar-container${infoBarHidden ? " info-bar-hidden" : ""
+                        }`}
                 >
                     <div className="info-bar">
                         <LeftCircleOutlined
