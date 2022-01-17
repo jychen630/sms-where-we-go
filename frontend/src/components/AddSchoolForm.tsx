@@ -28,6 +28,7 @@ import { Optional } from "./InfoList";
 import Map, { MapItem } from "./Map";
 import SearchTool from "./SearchTool";
 
+
 type Values = Parameters<typeof Service.postSchool>[0];
 
 type Location = Coordinate & {
@@ -53,8 +54,8 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
     const handleFinish = (data: Values) => {
         if (data.longitude === undefined || data.latitude === undefined) {
             notification.error({
-                message: t("错误"),
-                description: t("坐标不能为空"),
+                message: t("Error"),
+                description: t("Coordinates required"),
                 duration: 1.5,
             });
             return;
@@ -70,7 +71,7 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
             .then((res) => {
                 if (res.result === Result.result.SUCCESS) {
                     notification.success({
-                        message: t("添加成功"),
+                        message: t("ADD SCHOOL SUCCESS"),
                         description: (
                             <>
                                 已添加{data.school_name} (uid {res.school_uid})
@@ -85,8 +86,8 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
             .catch((err) =>
                 handleApiError(err).then((res) => {
                     notification.error({
-                        message: t("添加学校失败"),
-                        description: res.message ?? t("添加学校时发生未知错误"),
+                        message: t("Fail to add the school"),
+                        description: res.message ?? t("ERROR ADD SCHOOL"),
                     });
                 })
             );
@@ -104,14 +105,14 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                 students: [
                     {
                         uid: 0,
-                        name: t("示例学生"),
+                        name: t("Sample student"),
                         class_number: 2,
                         grad_year: 2020,
                     },
                 ],
                 longitude: location?.longitude,
                 latitude: location?.latitude,
-                school_name: location?.name ?? t("示例学校"),
+                school_name: location?.name ?? t("Sample school"),
                 city: location?.city ?? "",
             },
         ];
@@ -141,16 +142,16 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
             <div style={page !== 0 ? { display: "none" } : {}}>
                 <Form.Item
                     name="school_name"
-                    label={t("学校名")}
+                    label={t("School name")}
                     required
                     rules={[
                         {
                             required: true,
-                            message: t("请填写学校名称 (海外大学请填写英文名)"),
+                            message: t("Fill in the official school name"),
                         },
                     ]}
                 >
-                    <Input placeholder={t("学校的正式名称（非缩写，昵称）")} />
+                    <Input placeholder={t("Fill in the official school name")}/>
                 </Form.Item>
                 <Tabs
                     defaultActiveKey="select"
@@ -158,7 +159,7 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                         setCurrentTab(key);
                     }}
                 >
-                    <Tabs.TabPane key="select" tab={t("选择城市")}>
+                    <Tabs.TabPane key="select" tab={t("Select city")}>
                         {renderSearchTool()}
                     </Tabs.TabPane>
                     <Tabs.TabPane

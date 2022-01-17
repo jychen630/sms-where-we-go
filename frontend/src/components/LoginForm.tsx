@@ -36,13 +36,13 @@ const LoginForm = () => {
                             await auth.update();
                         } catch (err) {
                             console.error(err);
-                            return Promise.reject(t("连接失败"));
+                            return Promise.reject(t("Connection Failure"));
                         }
                         notification.success({
-                            message: t("登录成功"),
+                            message: t("Login Success"),
                             description: (
                                 <Space>
-                                    {t("加载中")} <Spin />
+                                    {t("Loading")} <Spin />
                                 </Space>
                             ),
                             duration: 1,
@@ -64,7 +64,7 @@ const LoginForm = () => {
                     }
                 })
                 .catch((err) =>
-                    handleApiError(err, createNotifyError(t, "登录失败"))
+                    handleApiError(err, createNotifyError(t, "Login Failure"))
                 );
         },
         [t, auth, history, location]
@@ -75,14 +75,14 @@ const LoginForm = () => {
             <Form form={form} layout="vertical" onFinish={validateLogin}>
                 <Form.Item
                     name="identifier" //or uid?
-                    label={t("手机号/邮箱")}
-                    tooltip={t("注册时填写的手机号或邮箱，任选一种即可")}
+                    label={t("phone number/email")}
+                    tooltip={t("REGISTRATION METHOD TIP")}
                     required
                     hasFeedback
                     rules={[
                         {
                             required: true,
-                            message: t("手机号/邮箱不能为空"),
+                            message: t("EMPTY IDENTIFIER"),
                         },
                         {
                             validator(_, value) {
@@ -93,7 +93,7 @@ const LoginForm = () => {
                                     !isDemo
                                 ) {
                                     return Promise.reject(
-                                        t("请正确填写电话号码或者邮箱")
+                                        t("FILL IN CORRECTLY")
                                     );
                                 } else {
                                     return Promise.resolve();
@@ -102,34 +102,34 @@ const LoginForm = () => {
                         },
                     ]}
                 >
-                    <Input placeholder="e.g: 13666666660" />
+                    <Input placeholder="e.g: 9298889999" />
                 </Form.Item>
                 <Form.Item
                     name="password"
-                    label={t("密码")}
+                    label={t("Password")}
                     required
                     rules={[
                         {
                             required: true,
-                            message: t("密码不能为空"),
+                            message: t("EMPTY PW"),
                         },
                     ]}
                 >
-                    <Input.Password placeholder={t("请输入密码")} />
+                    <Input.Password placeholder={t("ENTER PW")} />
                 </Form.Item>
                 <Form.Item>
                     <Space wrap>
                         <Button type="primary" htmlType="submit">
-                            {t("登录")}
+                            {t("Login")}
                         </Button>
                         <Button onClick={() => history.push("/register")}>
-                            {t("切换到注册")}
+                            {t("To sign up")}
                         </Button>
                         <Button
                             type="link"
                             onClick={() => history.push("/public-feedback")}
                         >
-                            {t("无法登录？点此反馈")}
+                            {t("LOGIN FEEDBACK")}
                         </Button>
                     </Space>
                 </Form.Item>
