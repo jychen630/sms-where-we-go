@@ -467,12 +467,7 @@ paths:
                                                 enum: [false]
                                             identifier:
                                                 description: The identifier of the username, which can be the uid, phone number or email
-                                                oneOf:
-                                                    - type: string
-                                                      format: email
-                                                      example: test@asd.com
-                                                    - type: string
-                                                      example: 18912341234
+                                                type: string
                                       - type: object
                                         required:
                                             - identifier
