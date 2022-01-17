@@ -257,21 +257,18 @@ export class ServerLogger {
             typeof who === "number"
                 ? `uid ${who}`
                 : typeof who === "string"
-                ? who
-                : `${who.name} (uid: ${who.student_uid}${formatPrivilege(
-                      who
-                  )})`;
-        let message = `${student}${
-            hasException ? " attemped to " : " "
-        }${action(hasException)}${
-            !!target
-                ? ` ${
-                      typeof target === "string"
-                          ? target
-                          : formatPrivilege(target)
-                  }`
+                    ? who
+                    : `${who.name} (uid: ${who.student_uid}${formatPrivilege(
+                        who
+                    )})`;
+        let message = `${student}${hasException ? " attemped to " : " "
+            }${action(hasException)}${!!target
+                ? ` ${typeof target === "string"
+                    ? target
+                    : formatPrivilege(target)
+                }`
                 : ""
-        }`;
+            }`;
         if (hasException) {
             message = message.concat(` but ${exception}`);
         }

@@ -110,16 +110,16 @@ export const get: Operation = async (req, res) => {
         .then((result) => {
             const schools = result.map(
                 (v) =>
-                    ({
-                        uid: v.uid,
-                        school_name: v.name,
-                        school_country: v.country,
-                        school_state_province: v.state_province,
-                        city: v.city,
-                        latitude: v.latitude,
-                        longitude: v.longitude,
-                        matched_alias: data.school_name ? v.alias : undefined,
-                    } as apiSchool)
+                ({
+                    uid: v.uid,
+                    school_name: v.name,
+                    school_country: v.country,
+                    school_state_province: v.state_province,
+                    city: v.city,
+                    latitude: v.latitude,
+                    longitude: v.longitude,
+                    matched_alias: data.school_name ? v.alias : undefined,
+                } as apiSchool)
             );
 
             logger.logComposed(
@@ -208,14 +208,13 @@ export const post: Operation = async (req, res) => {
 export const DELETE: Operation = (req, res) => {
     const data = parseBody<typeof Service.deleteSchool>(req);
     const logger = ServerLogger.getLogger("school.post");
-    sendSuccess(res);
 
     if (!validateLogin(req, res, logger)) return;
 
     getSelf(req, res, logger).then((self) => {
         if (!validateAdmin(res, self, logger)) return;
 
-        pg.delete()
+        pg("school").delete()
             .where("school_uid", data.school_uid)
             .then((result) => {
                 if (result === 0) {
