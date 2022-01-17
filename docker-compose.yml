@@ -2,6 +2,7 @@ version: '3.9'
 
 services:
   nginx-dev:
+    image: pig208/sms-where-we-go-nginx:dev-latest
     build:
       context: ./nginx
     volumes:
@@ -36,6 +37,7 @@ services:
       - 443:443
 
   db-dev:
+    image: pig208/sms-where-we-go-db:dev-latest
     build:
       context: ./backend
       dockerfile: db.Dockerfile
@@ -53,6 +55,7 @@ services:
       SEARCH_PATH: wwg,public
 
   db-prod:
+    image: pig208/sms-where-we-go-db:latest
     build:
       context: ./backend
       dockerfile: db.Dockerfile
@@ -84,6 +87,7 @@ services:
       - mapbox_token
 
   web-dev:
+    image: pig208/sms-where-we-go-web:dev-latest
     build:
       context: ./frontend
       target: development
