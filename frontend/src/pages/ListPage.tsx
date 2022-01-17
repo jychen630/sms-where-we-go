@@ -147,15 +147,15 @@ const ListPage = () => {
                             }
                             onChange={() => setButtonMode((btn) => !btn)}
                         >
-                            <Tabs.TabPane tab="名片" key={VIEW_MODE.BUTTONS}>
+                            <Tabs.TabPane tab={t("名片")} key={VIEW_MODE.BUTTONS}>
                                 <Form
                                     layout={
                                         isMobile ? "vertical" : "horizontal"
                                     }
                                 >
-                                    <Form.Item label="搜索">
+                                    <Form.Item label={t("搜索")}>
                                         <Input.Search
-                                            placeholder="输入学生姓名"
+                                            placeholder={t("输入学生姓名")}
                                             onSearch={(value) =>
                                                 setSearchString(value)
                                             }
