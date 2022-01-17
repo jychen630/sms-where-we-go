@@ -1,6 +1,39 @@
 version: '3.9'
 
 services:
+  nginx-dev:
+    build:
+      context: ./nginx
+    volumes:
+      - ./nginx/templates-dev:/etc/nginx/templates
+    environment:
+      - NGINX_HOST=localhost
+      - WEB_HOST=web-dev
+      - API_HOST=api-dev
+    depends_on:
+      - api-dev
+      - web-dev
+    ports:
+      - 80:80
+
+  nginx-prod:
+    image: pig208/sms-where-we-go-nginx:latest
+    build:
+      context: ./nginx
+    volumes:
+      - ./templates:/etc/nginx/templates
+    environment:
+      - NGINX_HOST=www.wherewego.cn
+      - WEB_HOST=web-prod
+      - API_HOST=api-prod
+    restart: always
+    depends_on:
+      - api-prod
+      - web-prod
+    ports:
+      - 80:80
+      - 443:443
+
   db-dev:
     build:
       context: ./backend
@@ -54,7 +87,7 @@ services:
       context: ./frontend
       target: development
       args:
-        API_HOST: "http:\\/\\/localhost:8080"
+        API_HOST: "http:\\/\\/localhost/v1"
     ports:
       - 3000:3000
     volumes:
@@ -62,6 +95,7 @@ services:
       - wwgclient:/usr/local/lib/wwgclient/
     depends_on:
       - api-dev
+      - db-dev
     secrets:
       - mapbox_token
     environment:
