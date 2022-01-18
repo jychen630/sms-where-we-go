@@ -10,7 +10,7 @@ import { CheckCircleFilled } from "@ant-design/icons";
 const useSearchCity: () => [() => JSX.Element, number] = () => {
     const [t] = useTranslation();
     const [cityUid, setCityUid] = useState(-1);
-    console.log("asd");
+
     const fetchCity = useCallback(
         async (props: PaginatedQuery) => {
             try {

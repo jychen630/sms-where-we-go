@@ -15,6 +15,7 @@ import {
     Tabs,
     notification,
     Switch,
+    InputNumber,
 } from "antd";
 import { useEffect } from "react";
 import { useCallback, useState } from "react";
@@ -270,7 +271,7 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                             },
                         ]}
                     >
-                        <Input type="number" placeholder={t("LONGITUDE PLACEHOLDER", { exampleValue: 114.1216 })} />
+                        <InputNumber type="number" placeholder={t("LONGITUDE PLACEHOLDER", { exampleValue: 114.1216 })} />
                     </Form.Item>
                     <Form.Item
                         name="latitude"
@@ -296,7 +297,7 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                             },
                         ]}
                     >
-                        <Input type="number" placeholder={t("LATITUDE PLACEHOLDER", { exampleValue: 22.5514 })} />
+                        <InputNumber type="number" placeholder={t("LATITUDE PLACEHOLDER", { exampleValue: 22.5514 })} />
                     </Form.Item>
                 </Space>
                 <h3>{t("搜索 & 预览")}</h3>
@@ -397,7 +398,7 @@ const AddSchoolForm = (props: { cb?: (schoolUid: number) => void }) => {
                 </p>
                 <p>
                     <a href="https://www.google.com/maps" target="new">
-                        {t("使用 Google Maps (需要科学上网)")})
+                        {t("使用 Google Maps (需要科学上网)")}
                     </a>
                 </p>
                 <Form.Item>

@@ -131,7 +131,7 @@ const SearchTool = <T extends unknown>({
                     }
                     className="collapse-panel"
                 >
-                    {resultList.length === 0 && EmptyPlaceholder ? <EmptyPlaceholder /> : <DefaultPlaceHolder />}
+                    {resultList.length === 0 && (EmptyPlaceholder ? <EmptyPlaceholder /> : <DefaultPlaceHolder />)}
 
                     {resultList.map((value, index) => {
                         return <Row key={index}>{item(value, index)}</Row>;
