@@ -301,8 +301,8 @@
             "REMOVE CLASS SUCCESS": "Remove {{classNumber}}",
             "SENT AT": "Sent at {{sentTime}} by {{senderName}}",
             "SWITCH DEV LOGIN": "Switch to dev login",
-            "DEMO REGKEY": "Demo registration key {{registrationkey}}",
-            "DEMO USER": "Demo user - Email:{{email}} password:{{password}}",
+            "DEMO REGKEY": "Demo registration key {{registrationKey}}",
+            "DEMO USER": "Demo user - Email: {{email}} Password: {{password}}",
             "用户隐私协议": "Privacy Agreement",
             "PRIVACY AGREEMENT VERSIONED": "Privacy Agreement {{version}}",
             "深圳中学学生去向网站": "Student Contact Map",
@@ -446,8 +446,8 @@
             "REGKEY CREATION": "{{registrationKey}} ($t(CLASS SPECIFIC, { \"classNumber\": {{classNumber}}, \"gradYear\": {{gradYear}} }))",
             "SENT AT": "{{senderName}} 发送于 {{sentTime}}",
             "SWITCH DEV LOGIN": "切换到测试登录",
-            "DEMO REGKEY": "演示用注册码: {{registrationkey}}",
-            "DEMO USER": "演示用账号 - 邮箱:{{email}} 密码:{{password}}",
+            "DEMO REGKEY": "演示用注册码: {{registrationKey}}",
+            "DEMO USER": "演示用账号 - 邮箱: {{email}} 密码: {{password}}",
             "Privacy Agreement Update Time": "本协议最后更新于 {{lastUpdateTime}} (本地时间)。",
             "PRIVACY AGREEMENT VERSIONED": "用户隐私协议 {{version}}"
         }

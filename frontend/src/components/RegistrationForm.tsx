@@ -140,6 +140,9 @@ const RegistrationForm = () => {
                 onFinish={handleFinish}
                 scrollToFirstError
             >
+                {isDemo && <p>{t("DEMO REGKEY", {
+                    registrationKey: "demoregkey2022"
+                })}</p>}
                 <Form.Item
                     name="registration_key"
                     label={t("注册码")}
@@ -170,9 +173,6 @@ const RegistrationForm = () => {
                         }}
                     />
                 </Form.Item>
-                {isDemo && <p>{t("DEMO REGKEY", {
-                    registrationKey: "demoregkey2022"
-                })}</p>}
                 <Collapse defaultActiveKey={"1"} ghost>
                     <Collapse.Panel
                         header={
