@@ -73,6 +73,10 @@ const LoginForm = () => {
     return (
         <>
             <Form form={form} layout="vertical" onFinish={validateLogin}>
+                {isDemo && <p>{t("DEMO USER", {
+                    email: "jychen630@wherewego.cn",
+                    password: "asd"
+                })}</p>}
                 <Form.Item
                     name="identifier" //or uid?
                     label={t("phone number/email")}
@@ -132,6 +136,12 @@ const LoginForm = () => {
                         >
                             {t("LOGIN FEEDBACK")}
                         </Button>
+                        {(process.env.NODE_ENV === "development" || isDemo) && <Button
+                            type="link"
+                            onClick={() => history.push("/dev-login")}
+                        >
+                            {t("SWITCH DEV LOGIN")}
+                        </Button>}
                     </Space>
                 </Form.Item>
             </Form>

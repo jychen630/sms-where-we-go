@@ -170,6 +170,9 @@ const RegistrationForm = () => {
                         }}
                     />
                 </Form.Item>
+                {isDemo && <p>{t("DEMO REGKEY", {
+                    registrationKey: "demoregkey2022"
+                })}</p>}
                 <Collapse defaultActiveKey={"1"} ghost>
                     <Collapse.Panel
                         header={

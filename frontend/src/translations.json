@@ -322,7 +322,10 @@
             "REGKEY CREATION": "{{registrationKey}} ($t(CLASS SPECIFIC, { \"classNumber\": {{classNumber}}, \"gradYear\": {{gradYear}} }))",
             "UPDATE STUDENT INFO FAILURE": "Failed to update student info. Error message: {{message}}",
             "REMOVE CLASS SUCCESS": "Remove {{classNumber}}",
-            "SENT AT": "Sent at {{sentTime}} by {{senderName}}"
+            "SENT AT": "Sent at {{sentTime}} by {{senderName}}",
+            "SWITCH DEV LOGIN": "Switch to dev login",
+            "DEMO REGKEY": "Demo registration key {{registrationkey}}",
+            "DEMO USER": "Demo user - Email:{{email}} password:{{password}}"
         }
     },
     "zh-CN": {
@@ -440,7 +443,10 @@
             "REMOVE SCHOOL SUCCESS": "已移除学校 {{schoolName}} (uid: {{schoolUid}})",
             "DELETED CLASS SPECIFIC": "已删除 $t(CLASS SPECIFIC, { \"classNumber\": {{classNumber}}, \"gradYear\": {{gradYear}} })",
             "REGKEY CREATION": "{{registrationKey}} ($t(CLASS SPECIFIC, { \"classNumber\": {{classNumber}}, \"gradYear\": {{gradYear}} }))",
-            "SENT AT": "{{senderName}} 发送于 {{sentTime}}"
+            "SENT AT": "{{senderName}} 发送于 {{sentTime}}",
+            "SWITCH DEV LOGIN": "切换到测试登录",
+            "DEMO REGKEY": "演示用注册码: {{registrationkey}}",
+            "DEMO USER": "演示用账号 - 邮箱:{{email}} 密码:{{password}}"
         }
     }
 }
