@@ -73,6 +73,7 @@ export async function seed(knex: Knex): Promise<void> {
     await knex("wwg.student").del();
     await knex("wwg.class").del();
     await knex("wwg.curriculum").del();
+    await knex("wwg.school_alias").del();
     await knex("wwg.school").del();
     await knex("wwg.city").del();
 
@@ -86,7 +87,7 @@ export async function seed(knex: Knex): Promise<void> {
         city_uid: (city_objs.find(c => c.city === s.CITY)).city_uid,
         longitude: s.LON,
         latitude: s.LAT
-    })); 
+    }));
 
 
     const school_uids = await knex("wwg.school").insert(universities).returning("school_uid");
@@ -119,9 +120,6 @@ export async function seed(knex: Knex): Promise<void> {
         state_province: 'Demo',
         country: 'Nacirema',
     }]).returning("city_uid");
-
-    console.log(demo_city_uid);
-    console.log(typeof (demo_city_uid));
 
     const demo_school_uid = await knex("wwg.school").insert([{
         name: "Yew Nork University",

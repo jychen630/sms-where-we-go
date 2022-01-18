@@ -6,6 +6,7 @@ export async function seed(knex: Knex): Promise<void> {
     await knex("wwg.student").del();
     await knex("wwg.class").del();
     await knex("wwg.curriculum").del();
+    await knex("wwg.school_alias").del();
     await knex("wwg.school").del();
     await knex("wwg.city").del();
 
