@@ -38,6 +38,8 @@ This will run the development build of the website.
 
 # Architecture Overview
 
+![image](https://user-images.githubusercontent.com/39874143/149907479-f9e6c3b1-7978-4911-9ef2-887fe9fe2cbb.png)
+
 Where We Go Project is a web-based application consisted that can be divided into four main services:
 
 ## Nginx
