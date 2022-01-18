@@ -1,31 +1,50 @@
-import { Knex } from "knex";
+import knex, { Knex } from "knex";
 import faker, { fake, random } from "faker";
 
-let city = faker.address.city();
-let long = faker.address.longitude();
-let lat = faker.address.latitude();
-let name = faker.name.findName();
-let gradYear = faker.datatype.number(1) + 2019;
-let classNumber = faker.datatype.number(19) + 1;
-let registrationKey = faker.random.alphaNumeric(14);
+import * as fs from "fs";
+import * as path from "path";
+import { parse } from 'csv-parse/sync';
+
+
+const csvFilePath = path.resolve('./seeds/school_seeds.csv');
+const headers = ['NAME', 'CITY', 'STATE', 'ZIP', 'LAT', 'LON', 'CBSA', 'NMCBSA'];
+const fileContent = fs.readFileSync(csvFilePath, { encoding: 'utf-8' });
+
+type school = {
+    NAME: string,
+    CITY: string,
+    LAT: string,
+    LON: string
+}
+const school_demo: school[] = parse(fileContent, {
+    delimiter: ',',
+    columns: true,
+}).filter((school: school) => school.NAME.length < 60);
+
+let cities = school_demo.map((s: school) => ({
+    city: s.CITY,
+    country: "United States"
+}));
+cities = [...new Set(cities)];
 let curriculum = ["domestic", "international"];
-let phoneNumber = faker.phone.phoneNumberFormat();
 let visibilityType = ["private", "class", "curriculum", "year", "students",]
 let role = ['student', 'class', 'curriculum', 'year', 'system']
 
 function pick(array: any[]) {
     return array[Math.floor(Math.random() * array.length)];
 }
-
+/*
 let countries = new Array(20).fill(undefined)
     .map(_ => faker.address.country())
     .filter(country => country.length < 40);
-
+*/
+/*
 let cities = new Array(100).fill(undefined).map(_ => ({
     city: faker.address.city(),
     state_province: faker.address.state(),
     country: pick(countries)
 }));
+*/
 
 let curriculums = new Array(2).fill(undefined).map((_, i) => ({
     curriculum_name: curriculum[i]
@@ -61,16 +80,16 @@ export async function seed(knex: Knex): Promise<void> {
     // Inserts seed entries
 
     // Faker user info
-    const city_uids = await knex("wwg.city").insert(cities).returning("city_uid");
+    const city_objs = await knex("wwg.city").insert(cities).returning(["city_uid", "city"]);
+    let universities = school_demo.map((s: school) => ({
+        name: s.NAME,
+        city_uid: (city_objs.find(c => c.city === s.CITY)).city_uid,
+        longitude: s.LON,
+        latitude: s.LAT
+    })); 
 
-    const school_uids = await knex("wwg.school").insert(
-        new Array(100).fill(undefined).map(_ => ({
-            name: `${faker.address.city()} State University`,
-            latitude: faker.address.longitude(),
-            longitude: faker.address.latitude(),
-            city_uid: pick(city_uids),
-        }))
-    ).returning("school_uid");
+
+    const school_uids = await knex("wwg.school").insert(universities).returning("school_uid");
 
     await knex("wwg.curriculum").insert(curriculums);
 
@@ -80,8 +99,8 @@ export async function seed(knex: Knex): Promise<void> {
         new Array(100).fill(undefined).map(_ => ({
             name: faker.name.findName(),
             phone_number: faker.phone.phoneNumberFormat(),
-            email:faker.internet.email(),
-            major:"Undecided",
+            email: faker.internet.email(),
+            major: "Undecided",
             class_number: faker.datatype.number(19) + 1,
             grad_year: faker.datatype.number(1) + 2019,
             school_uid: pick(school_uids),
@@ -102,13 +121,13 @@ export async function seed(knex: Knex): Promise<void> {
     }]).returning("city_uid");
 
     console.log(demo_city_uid);
-    console.log(typeof(demo_city_uid));
+    console.log(typeof (demo_city_uid));
 
-    const demo_school_uid = await knex("wwg.school").insert([{   
+    const demo_school_uid = await knex("wwg.school").insert([{
         name: "Yew Nork University",
         longitude: "73.9965",
         latitude: "40.7295",
-        city_uid: demo_city_uid[0],        
+        city_uid: demo_city_uid[0],
     }]).returning("school_uid")
 
     await knex("wwg.student").insert([{
