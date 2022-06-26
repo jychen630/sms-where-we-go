@@ -109,7 +109,7 @@ const Users = () => {
             </PaginatedBox>
         </List>
             <Modal
-                title={t("编辑学生信息：")} //{value.name}
+                title={t("编辑学生信息:")} //{value.name}
                 visible={visible}
                 okText={<></>}
                 cancelText={t("Close")}

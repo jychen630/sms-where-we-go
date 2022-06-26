@@ -178,7 +178,7 @@ const Classes = () => {
 
     return (
         <>
-            <Divider>添加班级</Divider>
+            <Divider>{t("添加班级")}</Divider>
             <Form form={form} title={t("添加班级")} onFinish={handleFinish}>
                 <Form.Item
                     name="grad_year"
@@ -339,7 +339,7 @@ const Classes = () => {
                 defaultSize={classes.length}
                 fixedSize={true}
             >
-                <Divider>查看班级</Divider>
+                <Divider>{t("查看班级")}</Divider>
             </PaginatedBox>
         </>
     );
