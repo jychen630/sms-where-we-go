@@ -121,9 +121,6 @@ function App() {
                     <Route path="/list">
                         <ListPage />
                     </Route>
-                    <Route path="/about">
-                        <AboutPage />
-                    </Route>
                     {authProvider.role !== Role.STUDENT && (
                         <Route path="/admin">
                             <AdminPage />
