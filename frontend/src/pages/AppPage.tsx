@@ -81,14 +81,6 @@ const AppPage = ({
                         </Menu.Item>
                     )}
                     <Menu.Item
-                        key="about"
-                        onClick={() => history.push("/about")}
-                    >
-                        <Space>
-                            <InfoCircleOutlined /> {t("关于")}
-                        </Space>
-                    </Menu.Item>
-                    <Menu.Item
                         key="logout"
                         onClick={() => {
                             history.push("/login");
