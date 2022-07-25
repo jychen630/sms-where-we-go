@@ -326,7 +326,8 @@
             "隐私协议如何更新": "Update Notices for Privacy Policy Changes",
             "Privacy Agreement Update Time": "This agreement was last updated at {{lastUpdateTime}} (Local Time).",
             "最新的用户隐私协议将会通过网站提供。已注册的用户在重新登陆后将需要重新同意隐私协议以使用我们提供的服务。": "The latest Privacy Agreement will be made available through the website. Registered users will be required to agree to a new privacy agreement when logging back in to use our services. ",
-            "如对隐私协议，或网站提供的服务有任何疑问，请联系网站当前的管理员。": "If you have any questions about the privacy agreement or the services provided by the site, please contact the current administrator of the site."
+            "如对隐私协议，或网站提供的服务有任何疑问，请联系网站当前的管理员。": "If you have any questions about the privacy agreement or the services provided by the site, please contact the current administrator of the site.",
+            "Posted at": "Posted at"
         }
     },
     "zh-CN": {
@@ -704,7 +705,8 @@
             "网站通过Cookies记录您的会话，来保证网站的服务能供正常运行。您可通过浏览器关闭Cookies，但是请注意这可能使得网站无法正常提供服务。": "网站通过Cookies记录您的会话，来保证网站的服务能供正常运行。您可通过浏览器关闭Cookies，但是请注意这可能使得网站无法正常提供服务。",
             "隐私协议如何更新": "隐私协议如何更新",
             "最新的用户隐私协议将会通过网站提供。已注册的用户在重新登陆后将需要重新同意隐私协议以使用我们提供的服务。": "最新的用户隐私协议将会通过网站提供。已注册的用户在重新登陆后将需要重新同意隐私协议以使用我们提供的服务。",
-            "如对隐私协议，或网站提供的服务有任何疑问，请联系网站当前的管理员。": "如对隐私协议，或网站提供的服务有任何疑问，请联系网站当前的管理员。"
+            "如对隐私协议，或网站提供的服务有任何疑问，请联系网站当前的管理员。": "如对隐私协议，或网站提供的服务有任何疑问，请联系网站当前的管理员。",
+            "Posted at": "发送于"
         }
     }
 }

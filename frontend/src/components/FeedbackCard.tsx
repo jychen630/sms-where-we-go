@@ -5,6 +5,7 @@ import {
     Feedback,
     FeedbackComment,
     FeedbackInfo,
+    FeedbackMeta,
     Result,
     Service,
 } from "wwg-api";
@@ -19,10 +20,7 @@ import {
 } from "@ant-design/icons";
 
 export type FeedbackVerbose = Feedback &
-    FeedbackInfo & {
-        feedback_uid: string;
-        sender_uid?: number;
-        status: string;
+    FeedbackInfo & FeedbackMeta & {
         comments: FeedbackComment[];
         onSent?: (content: string) => void;
         onUpdateStatus?: (status: "resolved" | "pending" | "closed") => void;
@@ -123,6 +121,7 @@ const FeedbackCard = (props: FeedbackVerbose & { adminView: boolean }) => {
             <Optional content={t(props.status)} label={t("Status")} />
             <Optional content={props.title} label={t("Title")} />
             <Optional content={props.content} label={t("Content")} />
+            <Optional content={props.posted_at.toLocaleString()} label={t("Posted at")} />
             <Collapse ghost>
                 <Collapse.Panel header={t("留言")} key={0}>
                     {props.comments.length !== 0 ? (
