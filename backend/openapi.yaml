@@ -58,32 +58,12 @@ components:
                                               - $ref: "#/components/schemas/FeedbackInfo"
                                               - type: object
                                                 required:
-                                                    - feedback_uid
-                                                    - status
                                                     - comments
-                                                    - posted_at
                                                 properties:
-                                                    feedback_uid:
-                                                        type: string
-                                                        description: The unique id of a feedback
-                                                    sender_uid:
-                                                        type: integer
-                                                        description: The uid of the sender if the feedback was sent by a registered user
-                                                    status:
-                                                        type: string
-                                                        enum:
-                                                            [
-                                                                "resolved",
-                                                                "pending",
-                                                                "closed",
-                                                            ]
                                                     comments:
                                                         type: array
                                                         items:
                                                             $ref: "#/components/schemas/FeedbackComment"
-                                                    posted_at:
-                                                        type: string
-                                                        format: date
     schemas:
         Coordinate:
             type: object
@@ -217,6 +197,7 @@ components:
                     type: boolean
         Feedback:
             type: object
+            description: The minimal properties that a feedback should contain.
             required:
                 - title
                 - content
@@ -243,6 +224,7 @@ components:
                         ]
         FeedbackInfo:
             type: object
+            description: The additional info provided by the poster.
             properties:
                 name:
                     description: The name of the user
@@ -259,6 +241,31 @@ components:
                 grad_year:
                     description: The year of graduation reported by the student
                     type: integer
+        FeedbackMeta:
+            type: object
+            description: Metadata of a posted feedback.
+            required:
+                - feedback_uid
+                - status
+                - posted_at
+            properties:
+                feedback_uid:
+                    type: string
+                    description: The unique id of a feedback
+                sender_uid:
+                    type: integer
+                    description: The uid of the sender if the feedback was sent by a registered user
+                status:
+                    type: string
+                    enum:
+                        [
+                            "resolved",
+                            "pending",
+                            "closed",
+                        ]
+                posted_at:
+                    type: string
+                    format: date
         FeedbackComment:
             type: object
             required:

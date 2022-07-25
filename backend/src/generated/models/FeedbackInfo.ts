@@ -2,6 +2,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
+/**
+ * The additional info provided by the poster.
+ */
 export type FeedbackInfo = {
     /**
      * The name of the user

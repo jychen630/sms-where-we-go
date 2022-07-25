@@ -683,17 +683,7 @@ export class Service {
      */
     public static async viewGetFeedback(): Promise<(Result & {
         feedbacks?: Array<(Feedback & FeedbackInfo & {
-            /**
-             * The unique id of a feedback
-             */
-            feedback_uid: string,
-            /**
-             * The uid of the sender if the feedback was sent by a registered user
-             */
-            sender_uid?: number,
-            status: 'resolved' | 'pending' | 'closed',
             comments: Array<FeedbackComment>,
-            posted_at: string,
         })>,
     })> {
         const result = await __request({
@@ -710,17 +700,7 @@ export class Service {
      */
     public static async manageGetFeedback(): Promise<(Result & {
         feedbacks?: Array<(Feedback & FeedbackInfo & {
-            /**
-             * The unique id of a feedback
-             */
-            feedback_uid: string,
-            /**
-             * The uid of the sender if the feedback was sent by a registered user
-             */
-            sender_uid?: number,
-            status: 'resolved' | 'pending' | 'closed',
             comments: Array<FeedbackComment>,
-            posted_at: string,
         })>,
     })> {
         const result = await __request({

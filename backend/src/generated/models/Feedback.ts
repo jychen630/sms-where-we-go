@@ -2,6 +2,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
+/**
+ * The minimal properties that a feedback should contain.
+ */
 export type Feedback = {
     /**
      * The title of the feedback message

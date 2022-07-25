@@ -10,6 +10,7 @@ export type { Coordinate } from './models/Coordinate';
 export { Feedback } from './models/Feedback';
 export type { FeedbackComment } from './models/FeedbackComment';
 export type { FeedbackInfo } from './models/FeedbackInfo';
+export { FeedbackMeta } from './models/FeedbackMeta';
 export type { Limit } from './models/Limit';
 export type { Offset } from './models/Offset';
 export type { RegistrationKeyInfo } from './models/RegistrationKeyInfo';
