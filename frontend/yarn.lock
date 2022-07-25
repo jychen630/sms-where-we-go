@@ -12292,10 +12292,10 @@ ws@^7.2.3:
   resolved "https://registry.yarnpkg.com/ws/-/ws-7.4.3.tgz#1f9643de34a543b8edb124bdcbc457ae55a6e5cd"
   integrity sha512-hr6vCR76GsossIRsr8OLR9acVVm1jyfEWvhbNjtgPOrfvAlKzvyeg/P6r8RuDjRyrcQoPQT7K0DGEPc7Ae6jzA==
 
-wwg-api@^1.0.15:
-  version "1.0.15"
-  resolved "https://registry.yarnpkg.com/wwg-api/-/wwg-api-1.0.15.tgz#45170fc8e36244e5fe893da518da64a9dda3c949"
-  integrity sha512-/sFkb6c3ACwezkACBuYARWaLGoumNiuvUL6CizvAOGgujO4vMO8ujNs4pSAT2oXXPlwQfQD05oQI05sdym+W0Q==
+wwg-api@^1.0.16:
+  version "1.0.16"
+  resolved "https://registry.npmmirror.com/wwg-api/-/wwg-api-1.0.16.tgz#3c547873cfa4f35c52e699aefb8d781931110ea0"
+  integrity sha512-iksNdGHPJEasFnSwccEVGXBM7ipRae/KozNTBf9Cc3wi9uNe/1wzB+pEsyekFRPTeNS36Ofm9IVVWicqsitQXQ==
 
 xml-name-validator@^3.0.0:
   version "3.0.0"

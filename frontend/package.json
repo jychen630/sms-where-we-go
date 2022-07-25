@@ -28,7 +28,7 @@
     "string-similarity": "^4.0.4",
     "typescript": "^4.1.2",
     "web-vitals": "^1.0.1",
-    "wwg-api": "^1.0.15"
+    "wwg-api": "^1.0.16"
   },
   "devDependencies": {
     "@types/jest": "^26.0.15",
