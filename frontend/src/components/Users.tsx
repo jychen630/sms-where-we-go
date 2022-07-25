@@ -12,16 +12,15 @@ import PasswordResetForm from "./PasswordResetForm";
 const Users = () => {
     const auth = useAuth();
     const [t] = useTranslation();
-    const [index, setIndex] = useState(-1);
     const [visible, setVisible] = useState(false);
     const [passwordFormVisible, setPasswordFormVisibile] = useState(false);
-    const [students, setStudents] = useState<(Student & StudentVerbose)[]>([]);
+    const [currentStudent, setCurrentStudent] = useState<(Student & StudentVerbose)>();
 
     const handleCancel = () => {
         setVisible(false);
     };
 
-    const StudentItem = (student: Student, index: number) => {
+    const StudentItem = (student: Student & StudentVerbose, index: number) => {
         return (
             <List.Item
                 key={index}
@@ -29,7 +28,7 @@ const Users = () => {
                     <Button
                         onClick={() => {
                             setVisible(true);
-                            setIndex(index);
+                            setCurrentStudent(student);
                         }}
                     >
                         {t("Edit")}
@@ -39,7 +38,7 @@ const Users = () => {
                             setPasswordFormVisibile(
                                 true
                             );
-                            setIndex(index);
+                            setCurrentStudent(student);
                         }}
                         type="link"
                     >
@@ -64,7 +63,7 @@ const Users = () => {
             </List.Item>);
     }
 
-    const fetchStudent: DataHandler<Student, PaginatedQuery> = async ({ limit, offset, value }) => {
+    const fetchStudent: DataHandler<Student & StudentVerbose, PaginatedQuery> = async ({ limit, offset, value }) => {
         return Service.getStudent(false, true, value, undefined, undefined, undefined, undefined, undefined, limit, offset).then((res) => {
             return res.students ?? [];
         })
@@ -80,25 +79,6 @@ const Users = () => {
             });
     }
 
-    useEffect(() => {
-        Service.getStudent(false, true)
-            .then((result) => setStudents(result.students ?? []))
-            .catch((err) =>
-                handleApiError(
-                    err,
-                    createNotifyError(
-                        t("Error"),
-                        t("未能获取学生数据")
-                    )
-                )
-            );
-    }, [t]);
-
-    const getCurrentStudent = useCallback(
-        async () => (index === -1 ? undefined : students[index]),
-        [students, index]
-    );
-
     return (
         <><List itemLayout="horizontal">
             <PaginatedBox
@@ -108,32 +88,32 @@ const Users = () => {
                 {t("学生列表")}
             </PaginatedBox>
         </List>
-            <Modal
-                title={t("编辑学生信息:")} //{value.name}
-                visible={visible}
-                okText={<></>}
-                cancelText={t("Close")}
-                onCancel={handleCancel}
-            >
-                <InfoUpdateForm
-                    showRoleOptions={auth.role !== Role.STUDENT}
-                    getStudent={getCurrentStudent}
-                />
-            </Modal>
-            <Modal
-                visible={passwordFormVisible}
-                okText={<></>}
-                cancelText={t("Close")}
-                onCancel={() => setPasswordFormVisibile(false)}
-            >
-                <PasswordResetForm
-                    studentUid={
-                        !!students && index >= 0 && students.length > 0
-                            ? students[index].uid
-                            : undefined
-                    }
-                />
-            </Modal>
+            {currentStudent && <>
+                <Modal
+                    title={t("编辑学生信息:")} //{value.name}
+                    visible={visible}
+                    okText={<></>}
+                    cancelText={t("Close")}
+                    onCancel={handleCancel}
+                >
+                    <InfoUpdateForm
+                        showRoleOptions={auth.role !== Role.STUDENT}
+                        getStudent={async () => currentStudent}
+                    />
+                </Modal>
+                <Modal
+                    visible={passwordFormVisible}
+                    okText={<></>}
+                    cancelText={t("Close")}
+                    onCancel={() => setPasswordFormVisibile(false)}
+                >
+                    <PasswordResetForm
+                        studentUid={
+                            currentStudent.uid
+                        }
+                    />
+                </Modal>
+            </>}
         </>)
 }
 
