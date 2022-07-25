@@ -56,6 +56,7 @@ components:
                                           allOf:
                                               - $ref: "#/components/schemas/Feedback"
                                               - $ref: "#/components/schemas/FeedbackInfo"
+                                              - $ref: "#/components/schemas/FeedbackMeta"
                                               - type: object
                                                 required:
                                                     - comments

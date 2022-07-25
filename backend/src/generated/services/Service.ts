@@ -7,6 +7,7 @@ import type { Coordinate } from '../models/Coordinate';
 import type { Feedback } from '../models/Feedback';
 import type { FeedbackComment } from '../models/FeedbackComment';
 import type { FeedbackInfo } from '../models/FeedbackInfo';
+import type { FeedbackMeta } from '../models/FeedbackMeta';
 import type { Limit } from '../models/Limit';
 import type { Offset } from '../models/Offset';
 import type { RegistrationKeyInfo } from '../models/RegistrationKeyInfo';
@@ -682,7 +683,7 @@ export class Service {
      * @throws ApiError
      */
     public static async viewGetFeedback(): Promise<(Result & {
-        feedbacks?: Array<(Feedback & FeedbackInfo & {
+        feedbacks?: Array<(Feedback & FeedbackInfo & FeedbackMeta & {
             comments: Array<FeedbackComment>,
         })>,
     })> {
@@ -699,7 +700,7 @@ export class Service {
      * @throws ApiError
      */
     public static async manageGetFeedback(): Promise<(Result & {
-        feedbacks?: Array<(Feedback & FeedbackInfo & {
+        feedbacks?: Array<(Feedback & FeedbackInfo & FeedbackMeta & {
             comments: Array<FeedbackComment>,
         })>,
     })> {
